@@ -14,7 +14,7 @@ export default function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setSplashVisible(false);
-    }, 1000); // 1 second splash
+    }, 2000); // 2 second splash
     return () => clearTimeout(timer);
   }, []);
 
