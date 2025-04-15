@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 200,   // adjust based on your image
-    height: 200,
+    width: 300,   // adjust based on your image
+    height: 300,
   },
 });

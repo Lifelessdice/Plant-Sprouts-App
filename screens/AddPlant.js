@@ -5,8 +5,7 @@ import { popularPlants } from '../data/popularPlants';
 export default function AddPlantScreen({ navigation }) {
   const handleSelectPlant = (plant) => {
     console.log('Plant selected:', plant.name);
-    // Here you could save the plant to AsyncStorage or context
-    navigation.goBack(); // Go back to HomeScreen after selection
+    navigation.navigate('NamePlant', { plant }); // Navigate to custom name screen
   };
 
   return (

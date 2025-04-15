@@ -5,6 +5,8 @@ import SplashScreen from './screens/SplashScreen';
 import HomeScreen from './screens/HomeScreen';
 import PlantMonitoringScreen from './screens/PlantMonitoring'; // Import your PlantMonitoring screen
 import AddPlantScreen from './screens/AddPlant'; // Import your AddPlant screen
+import NamePlantScreen from './screens/NamePlantScreen';
+import { PlantProvider } from './context/PlantContext'; // Import PlantProvider
 
 const Stack = createNativeStackNavigator();
 
@@ -19,18 +21,21 @@ export default function App() {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isSplashVisible ? (
-          <Stack.Screen name="Splash" component={SplashScreen} />
-        ) : (
-          <>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="AddPlant" component={AddPlantScreen} />
-            <Stack.Screen name="PlantMonitoring" component={PlantMonitoringScreen} />
-          </>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <PlantProvider> {/* Wrap app with PlantProvider */}
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {isSplashVisible ? (
+            <Stack.Screen name="Splash" component={SplashScreen} />
+          ) : (
+            <>
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="AddPlant" component={AddPlantScreen} />
+              <Stack.Screen name="PlantMonitoring" component={PlantMonitoringScreen} />
+              <Stack.Screen name="NamePlant" component={NamePlantScreen} />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </PlantProvider>
   );
 }
