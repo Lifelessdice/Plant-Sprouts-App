@@ -19,7 +19,7 @@ export default function HomeScreen({ navigation }) {
       <Text style={styles.title}>Your Plants</Text>
 
       {plants.length === 0 ? (
-        <Text style={styles.emptyText}>No plants added yet. 🌿</Text>
+        <Text style={styles.emptyText}>No plants added yet 🌿</Text>
       ) : (
         <FlatList
           data={plants}
@@ -35,7 +35,7 @@ export default function HomeScreen({ navigation }) {
                 <Image source={item.image} style={styles.image} />
               )}
               <Text style={styles.plantName}>
-                {item.name} {item.nickname?`${item.nickname}` : ''}
+              {`${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
               </Text>
             </TouchableOpacity>
           )}
