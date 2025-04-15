@@ -35,7 +35,7 @@ export default function HomeScreen({ navigation }) {
                 <Image source={item.image} style={styles.image} />
               )}
               <Text style={styles.plantName}>
-              {`${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
+                {`${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
               </Text>
             </TouchableOpacity>
           )}

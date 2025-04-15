@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
-export default function App() {
+export default function PlantMonitoringScreen({ route }) {
+  const { plant } = route.params; // Destructure the plant object from route.params
+
+  // If plant is not found, show a message
+  if (!plant) {
+    return <Text>Plant not found</Text>;
+  }
+
+  // Debugging log to check the plant object
+  console.log('Plant from route params:', plant);
+
   const [soilMoisture, setSoilMoisture] = useState(45);
   const [lightLevel, setLightLevel] = useState(800);
   const [temperature, setTemperature] = useState(22);
   const [humidity, setHumidity] = useState(55);
 
-  // Simulating data fetch (you can replace it with actual IoT data fetching)
   useEffect(() => {
     const interval = setInterval(() => {
       setSoilMoisture(Math.floor(Math.random() * 100));
@@ -19,29 +28,46 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  const renderCard = (label, value, unit, preferred) => {
+    // Check if the preferred range exists
+    if (!preferred || !preferred.min || !preferred.max) {
+      return (
+        <View style={styles.card}>
+          <Text style={styles.label}>{label}</Text>
+          <Text style={styles.value}>{value} {unit}</Text>
+          <Text style={styles.recommendation}>
+            Preferred range not available
+          </Text>
+        </View>
+      );
+    }
+
+    const isOutOfRange = value < preferred.min || value > preferred.max;
+
+    return (
+      <View style={styles.card}>
+        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.value, isOutOfRange && styles.alert]}>
+          {value} {unit}
+        </Text>
+        <Text style={styles.recommendation}>
+          Preferred: {preferred.min} - {preferred.max} {unit}
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>🌿 Monitoring </Text>
+      <Text style={styles.title}>
+         {plant.name} {plant.nickname ? `${plant.nickname}` : ''} Monitoring
+      </Text>
+      <Text style={styles.info}>{plant.generalInfo}</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>🌱 Soil Moisture</Text>
-        <Text style={styles.value}>{soilMoisture}%</Text>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.label}>☀️ Light Level</Text>
-        <Text style={styles.value}>{lightLevel} lux</Text>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.label}>🌡️ Temperature</Text>
-        <Text style={styles.value}>{temperature}°C</Text>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.label}>💧 Humidity</Text>
-        <Text style={styles.value}>{humidity}%</Text>
-      </View>
+      {renderCard('🌱 Soil Moisture', soilMoisture, '%', plant.preferredSoilMoisture)}
+      {renderCard('☀️ Light Level', lightLevel, 'lux', plant.preferredLight)}
+      {renderCard('🌡️ Temperature', temperature, '°C', plant.preferredTemperature)}
+      {renderCard('💧 Humidity', humidity, '%', plant.preferredHumidity)}
     </ScrollView>
   );
 }
@@ -57,8 +83,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 30,
+    marginBottom: 10,
     color: '#1e3a8a',
+    textAlign: 'center',
+  },
+  info: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    color: '#374151',
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    textAlign: 'center',
   },
   card: {
     backgroundColor: '#ffffff',
@@ -83,5 +118,13 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '600',
     color: '#111827',
+  },
+  recommendation: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 4,
+  },
+  alert: {
+    color: '#dc2626', // red if out of range
   },
 });
