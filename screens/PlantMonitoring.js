@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 
 export default function PlantMonitoringScreen({ route }) {
-  const { plant } = route.params; // Destructure the plant object from route.params
+  const { plant } = route.params;
 
-  // If plant is not found, show a message
   if (!plant) {
     return <Text>Plant not found</Text>;
   }
-
-  // Debugging log to check the plant object
-  console.log('Plant from route params:', plant);
 
   const [soilMoisture, setSoilMoisture] = useState(45);
   const [lightLevel, setLightLevel] = useState(800);
@@ -29,20 +25,7 @@ export default function PlantMonitoringScreen({ route }) {
   }, []);
 
   const renderCard = (label, value, unit, preferred) => {
-    // Check if the preferred range exists
-    if (!preferred || !preferred.min || !preferred.max) {
-      return (
-        <View style={styles.card}>
-          <Text style={styles.label}>{label}</Text>
-          <Text style={styles.value}>{value} {unit}</Text>
-          <Text style={styles.recommendation}>
-            Preferred range not available
-          </Text>
-        </View>
-      );
-    }
-
-    const isOutOfRange = value < preferred.min || value > preferred.max;
+    const isOutOfRange = preferred && (value < preferred.min || value > preferred.max);
 
     return (
       <View style={styles.card}>
@@ -50,20 +33,45 @@ export default function PlantMonitoringScreen({ route }) {
         <Text style={[styles.value, isOutOfRange && styles.alert]}>
           {value} {unit}
         </Text>
-        <Text style={styles.recommendation}>
-          Preferred: {preferred.min} - {preferred.max} {unit}
-        </Text>
+        {preferred ? (
+          <Text style={styles.recommendation}>
+            Preferred: {preferred.min} - {preferred.max} {unit}
+          </Text>
+        ) : (
+          <Text style={styles.recommendation}>Preferred range not available</Text>
+        )}
       </View>
     );
   };
 
+  const renderInfoBox = (imageSource) => (
+    <View style={styles.infoBox}>
+      <Text style={styles.infoLabel}></Text>
+      <Image source={imageSource} style={styles.infoImage} resizeMode="contain" />
+    </View>
+  );
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* 1. Plant Name */}
       <Text style={styles.title}>
-         {plant.name} {plant.nickname ? `${plant.nickname}` : ''} Monitoring
+        {plant.name} {plant.nickname ? `${plant.nickname}` : ''}
       </Text>
-      <Text style={styles.info}>{plant.generalInfo}</Text>
 
+      {/* 2. General Info */}
+      <View style={styles.generalInfoBox}>
+        <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
+      </View>
+
+      {/* 3. Small Info Boxes */}
+      <View style={styles.infoBoxesContainer}>
+        {renderInfoBox(plant.difficulty)}
+        {renderInfoBox(plant.lightRecommendation)}
+        {renderInfoBox(plant.humidityRecommendation)}
+        {renderInfoBox(plant.toxicity)}
+      </View>
+
+      {/* 4. Monitoring Cards */}
       {renderCard('🌱 Soil Moisture', soilMoisture, '%', plant.preferredSoilMoisture)}
       {renderCard('☀️ Light Level', lightLevel, 'lux', plant.preferredLight)}
       {renderCard('🌡️ Temperature', temperature, '°C', plant.preferredTemperature)}
@@ -81,20 +89,46 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 10,
     color: '#1e3a8a',
+    marginBottom: 16,
     textAlign: 'center',
   },
-  info: {
+  generalInfoBox: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    maxWidth: 340,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  generalInfoText: {
     fontSize: 16,
     fontStyle: 'italic',
     color: '#374151',
-    marginBottom: 20,
-    paddingHorizontal: 10,
     textAlign: 'center',
   },
+  infoBoxesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 12,
+    marginBottom: 24,
+  },
+  infoBox: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    margin: 6,
+    width: 150,
+    alignItems: 'center',
+  },
+
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 16,
@@ -123,8 +157,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6b7280',
     marginTop: 4,
+    textAlign: 'center',
   },
   alert: {
-    color: '#dc2626', // red if out of range
+    color: '#dc2626',
+  },
+  infoImage: {
+    width: 120,
+    height: 120,
   },
 });
