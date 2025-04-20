@@ -46,8 +46,7 @@ export default function PlantMonitoringScreen({ route }) {
 
   const renderInfoBox = (imageSource) => (
     <View style={styles.infoBox}>
-      <Text style={styles.infoLabel}></Text>
-      <Image source={imageSource} style={styles.infoImage} resizeMode="contain" />
+      <Image source={imageSource} style={styles.infoImage} />
     </View>
   );
 
@@ -69,6 +68,8 @@ export default function PlantMonitoringScreen({ route }) {
         {renderInfoBox(plant.lightRecommendation)}
         {renderInfoBox(plant.humidityRecommendation)}
         {renderInfoBox(plant.toxicity)}
+        {renderInfoBox(plant.watering)}
+
       </View>
 
       {/* 4. Monitoring Cards */}
@@ -118,15 +119,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 12,
+    gap: 5,
     marginBottom: 24,
   },
   infoBox: {
     backgroundColor: '#ffffff',
     borderRadius: 12,
-    margin: 6,
-    width: 150,
+    width: 63,
+    height: 63,
     alignItems: 'center',
+    justifyContent: 'center',
+    padding: 0,
+    margin: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    overflow: 'hidden',
   },
 
   card: {
@@ -163,7 +173,8 @@ const styles = StyleSheet.create({
     color: '#dc2626',
   },
   infoImage: {
-    width: 120,
-    height: 120,
+    width: 63,
+    height: 63,
+    resizeMode: 'cover',
   },
 });
