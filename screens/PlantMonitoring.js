@@ -106,8 +106,7 @@ const styles = StyleSheet.create({
   },
   generalInfoText: {
     fontSize: 16,
-    fontStyle: 'italic',
-    color: '#374151',
+    color: '#1e3a8a',
     textAlign: 'center',
   },
   infoBoxesContainer: {

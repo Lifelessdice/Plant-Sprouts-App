@@ -32,6 +32,11 @@ export default function NamePlantScreen({ route, navigation }) {
     <View style={styles.container}>
       <Image source={plant.image} style={styles.image} />
 
+      {/* Add the General Info Box here */}
+      <View style={styles.generalInfoBox}>
+        <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
+      </View>
+
       {/* Info Boxes placed directly between the image and label */}
       <View style={styles.infoBoxesContainer}>
         <InfoBox imageSource={plant.difficulty} />
@@ -84,6 +89,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1, // Set shadow opacity
     shadowRadius: 6, // Set shadow radius
     elevation: 5, // For Android shadow effect
+  },
+  generalInfoBox: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 20,
+    maxWidth: 340,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  generalInfoText: {
+    fontSize: 16,
+    color: '#1e3a8a',
+    textAlign: 'center',
   },
   label: {
     fontSize: 18,
