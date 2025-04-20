@@ -1,58 +1,64 @@
+// screens/NamePlantScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
-import { usePlantContext } from '../context/PlantContext'; // Import context hook
+import { View, Text, TextInput, StyleSheet, Image } from 'react-native';
+import { usePlantContext } from '../context/PlantContext';
+import InfoBox from '../components/InfoBox';
+import CustomButton from '../components/CustomButton'; // Import the custom button component
 
 export default function NamePlantScreen({ route, navigation }) {
-  const { plant } = route.params; // Get the plant object from the route params
-  const { addPlant } = usePlantContext(); // Access the addPlant function from the context
-  const [nickname, setNickname] = useState(''); // State to hold the entered nickname
+  const { plant } = route.params;
+  const { addPlant } = usePlantContext();
+  const [nickname, setNickname] = useState('');
 
   const handleConfirm = () => {
-    // Ensure nickname is trimmed
     const trimmedNickname = nickname.trim();
-
     if (trimmedNickname) {
-      // Create a new plant object with the nickname
       const plantWithNickname = {
         ...plant,
-        nickname: trimmedNickname, // Trim any extra spaces
+        nickname: trimmedNickname,
       };
-
-      // Call the addPlant function from the context to save the plant
       addPlant(plantWithNickname);
-
-      // Navigate back to the Home screen
       navigation.navigate('Home');
     } else {
-      // Handle the case if the nickname is empty (optional)
       alert('Please enter a valid name for your plant!');
     }
   };
 
   const handleGoBack = () => {
-    // Go back to the previous screen without saving changes
     navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
       <Image source={plant.image} style={styles.image} />
+
+      {/* Info Boxes placed directly between the image and label */}
+      <View style={styles.infoBoxesContainer}>
+        <InfoBox imageSource={plant.difficulty} />
+        <InfoBox imageSource={plant.lightRecommendation} />
+        <InfoBox imageSource={plant.humidityRecommendation} />
+        <InfoBox imageSource={plant.toxicity} />
+        <InfoBox imageSource={plant.watering} />
+      </View>
+
       <Text style={styles.label}>Give your {plant.name} a name</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Enter plant name"
         value={nickname}
-        onChangeText={setNickname} // Update the nickname state as the user types
+        onChangeText={setNickname}
       />
+
       <View style={styles.buttonRow}>
         <View style={styles.buttonWrapper}>
-          <Button title="Back" onPress={handleGoBack} />
+          <CustomButton title="Back" onPress={handleGoBack} />
         </View>
         <View style={styles.buttonWrapper}>
-          <Button
+          <CustomButton
             title="Add plant"
             onPress={handleConfirm}
-            disabled={!nickname.trim()} // Disable the button if nickname is empty
+            disabled={!nickname.trim()}
           />
         </View>
       </View>
@@ -69,15 +75,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    width: 250,
-    height: 250,
-    borderRadius: 12,
-    marginBottom: 20,
+    width: 350,
+    height: 350,
+    borderRadius: 8,
+    marginBottom: 10, // Adjust spacing as needed
+    shadowColor: '#000', // Add shadow color
+    shadowOffset: { width: 0, height: 4 }, // Set shadow offset
+    shadowOpacity: 0.1, // Set shadow opacity
+    shadowRadius: 6, // Set shadow radius
+    elevation: 5, // For Android shadow effect
   },
   label: {
     fontSize: 18,
+    fontWeight: 'bold',
     color: '#1e3a8a',
     marginBottom: 10,
+    marginTop: 20, // Add space between the label and input
     textAlign: 'center',
   },
   input: {
@@ -89,10 +102,17 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: '#ffffff',
   },
+  infoBoxesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 20, // Space between info boxes and the label
+  },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    marginTop: 20,
   },
   buttonWrapper: {
     flex: 1,

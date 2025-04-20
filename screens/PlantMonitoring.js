@@ -1,5 +1,7 @@
+// screens/PlantMonitoringScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import InfoBox from '../components/InfoBox';
 
 export default function PlantMonitoringScreen({ route }) {
   const { plant } = route.params;
@@ -44,12 +46,6 @@ export default function PlantMonitoringScreen({ route }) {
     );
   };
 
-  const renderInfoBox = (imageSource) => (
-    <View style={styles.infoBox}>
-      <Image source={imageSource} style={styles.infoImage} />
-    </View>
-  );
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* 1. Plant Name */}
@@ -64,12 +60,11 @@ export default function PlantMonitoringScreen({ route }) {
 
       {/* 3. Small Info Boxes */}
       <View style={styles.infoBoxesContainer}>
-        {renderInfoBox(plant.difficulty)}
-        {renderInfoBox(plant.lightRecommendation)}
-        {renderInfoBox(plant.humidityRecommendation)}
-        {renderInfoBox(plant.toxicity)}
-        {renderInfoBox(plant.watering)}
-
+        <InfoBox imageSource={plant.difficulty} />
+        <InfoBox imageSource={plant.lightRecommendation} />
+        <InfoBox imageSource={plant.humidityRecommendation} />
+        <InfoBox imageSource={plant.toxicity} />
+        <InfoBox imageSource={plant.watering} />
       </View>
 
       {/* 4. Monitoring Cards */}
@@ -122,23 +117,6 @@ const styles = StyleSheet.create({
     gap: 5,
     marginBottom: 24,
   },
-  infoBox: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    width: 63,
-    height: 63,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 0,
-    margin: 0,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-    overflow: 'hidden',
-  },
-
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 16,
@@ -171,10 +149,5 @@ const styles = StyleSheet.create({
   },
   alert: {
     color: '#dc2626',
-  },
-  infoImage: {
-    width: 63,
-    height: 63,
-    resizeMode: 'cover',
   },
 });

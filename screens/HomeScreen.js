@@ -1,3 +1,4 @@
+// screens/HomeScreen.js
 import React from 'react';
 import {
   View,
@@ -6,16 +7,16 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  Button,
 } from 'react-native';
 import { usePlantContext } from '../context/PlantContext'; // Import context
+import CustomButton from '../components/CustomButton'; // Import the custom button component
 
 export default function HomeScreen({ navigation }) {
   const { plants } = usePlantContext(); // Use context instead of hardcoded array
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>🌱 SmartSprout</Text>
+      <Text style={styles.logo}> SmartSprout</Text>
       <Text style={styles.title}>Your Plants</Text>
 
       {plants.length === 0 ? (
@@ -42,7 +43,11 @@ export default function HomeScreen({ navigation }) {
         />
       )}
 
-      <Button title="Add New Plant" onPress={() => navigation.navigate('AddPlant')} />
+      <CustomButton
+        title="Add New Plant"
+        onPress={() => navigation.navigate('AddPlant')}
+        style={styles.addButton} // Add custom styling for the button if needed
+      />
     </View>
   );
 }
@@ -58,10 +63,13 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#1e3a8a',
   },
   title: {
     fontSize: 20,
     marginVertical: 20,
+    color: '#1e3a8a',
+    fontWeight: 'bold',
   },
   emptyText: {
     fontSize: 16,
@@ -92,5 +100,9 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 12,
+  },
+  addButton: {
+    marginTop: 30, // Space between the list and the button
+    width: '50%', // Adjust width if needed
   },
 });
