@@ -1,9 +1,13 @@
 // screens/PlantMonitoringScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { ArrowLeft, User } from 'lucide-react-native';
 import InfoBox from '../components/InfoBox';
 
+
 export default function PlantMonitoringScreen({ route }) {
+  const navigation = useNavigation();
   const { plant } = route.params;
 
   if (!plant) {
@@ -47,51 +51,82 @@ export default function PlantMonitoringScreen({ route }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* 1. Plant Name */}
-      <Text style={styles.title}>
-        {plant.name} {plant.nickname ? `${plant.nickname}` : ''}
-      </Text>
-
-      {/* 2. General Info */}
-      <View style={styles.generalInfoBox}>
-        <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
+    <>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <ArrowLeft color="#1e3a8a" size={24} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>
+          {plant.name} {plant.nickname ? `${plant.nickname}` : ''}
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Account')} style={styles.accountButton}>
+          <User color="#1e3a8a" size={24} />
+        </TouchableOpacity>
       </View>
 
-      {/* 3. Small Info Boxes */}
-      <View style={styles.infoBoxesContainer}>
-        <InfoBox imageSource={plant.difficulty} />
-        <InfoBox imageSource={plant.lightRecommendation} />
-        <InfoBox imageSource={plant.humidityRecommendation} />
-        <InfoBox imageSource={plant.toxicity} />
-        <InfoBox imageSource={plant.watering} />
-      </View>
+      <ScrollView contentContainerStyle={styles.container}>
 
-      {/* 4. Monitoring Cards */}
-      {renderCard('🌱 Soil Moisture', soilMoisture, '%', plant.preferredSoilMoisture)}
-      {renderCard('☀️ Light Level', lightLevel, 'lux', plant.preferredLight)}
-      {renderCard('🌡️ Temperature', temperature, '°C', plant.preferredTemperature)}
-      {renderCard('💧 Humidity', humidity, '%', plant.preferredHumidity)}
-    </ScrollView>
+        {/* General Info */}
+        <View style={styles.generalInfoBox}>
+          <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
+        </View>
+
+        {/* Small Info Boxes */}
+        <View style={styles.infoBoxesContainer}>
+          <InfoBox imageSource={plant.difficulty} />
+          <InfoBox imageSource={plant.lightRecommendation} />
+          <InfoBox imageSource={plant.humidityRecommendation} />
+          <InfoBox imageSource={plant.toxicity} />
+          <InfoBox imageSource={plant.watering} />
+        </View>
+
+        {/* Monitoring Cards */}
+        {renderCard('🌱 Soil Moisture', soilMoisture, '%', plant.preferredSoilMoisture)}
+        {renderCard('☀️ Light Level', lightLevel, 'lux', plant.preferredLight)}
+        {renderCard('🌡️ Temperature', temperature, '°C', plant.preferredTemperature)}
+        {renderCard('💧 Humidity', humidity, '%', plant.preferredHumidity)}
+      </ScrollView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
+  header: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 80,
+    backgroundColor: '#e0f2fe',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 30,
+    zIndex: 10,
+
+  },
+  backButton: {
+    marginRight: 12,
+  },
+  accountButton: {
+    padding: 6,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1e3a8a',
+  },
   container: {
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 80, // adjusted to accommodate header
     backgroundColor: '#f0fdf4',
     alignItems: 'center',
     flexGrow: 1,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
   generalInfoBox: {
+    marginTop: 20,
     backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 16,

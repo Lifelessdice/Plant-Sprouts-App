@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0097b2', // Default background color
+    backgroundColor: '#1e3a8a', // Default background color
   },
   buttonText: {
     color: '#fff',
