@@ -1,9 +1,17 @@
-// screens/NamePlantScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Image } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Image,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
+} from 'react-native';
 import { usePlantContext } from '../context/PlantContext';
 import InfoBox from '../components/InfoBox';
-import CustomButton from '../components/CustomButton'; // Import the custom button component
+import CustomButton from '../components/CustomButton';
 
 export default function NamePlantScreen({ route, navigation }) {
   const { plant } = route.params;
@@ -29,45 +37,53 @@ export default function NamePlantScreen({ route, navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={plant.image} style={styles.image} />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.container}>
+          <Image source={plant.image} style={styles.image} />
 
-      {/* Add the General Info Box here */}
-      <View style={styles.generalInfoBox}>
-        <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
-      </View>
+          <View style={styles.generalInfoBox}>
+            <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
+          </View>
 
-      {/* Info Boxes placed directly between the image and label */}
-      <View style={styles.infoBoxesContainer}>
-        <InfoBox imageSource={plant.difficulty} />
-        <InfoBox imageSource={plant.lightRecommendation} />
-        <InfoBox imageSource={plant.humidityRecommendation} />
-        <InfoBox imageSource={plant.toxicity} />
-        <InfoBox imageSource={plant.watering} />
-      </View>
+          <View style={styles.infoBoxesContainer}>
+            <InfoBox imageSource={plant.difficulty} />
+            <InfoBox imageSource={plant.lightRecommendation} />
+            <InfoBox imageSource={plant.humidityRecommendation} />
+            <InfoBox imageSource={plant.toxicity} />
+            <InfoBox imageSource={plant.watering} />
+          </View>
 
-      <Text style={styles.label}>Give your {plant.name} a name</Text>
+          <Text style={styles.label}>Give your {plant.name} a name</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Enter plant name"
-        value={nickname}
-        onChangeText={setNickname}
-      />
-
-      <View style={styles.buttonRow}>
-        <View style={styles.buttonWrapper}>
-          <CustomButton title="Back" onPress={handleGoBack} />
-        </View>
-        <View style={styles.buttonWrapper}>
-          <CustomButton
-            title="Add plant"
-            onPress={handleConfirm}
-            disabled={!nickname.trim()}
+          <TextInput
+            style={styles.input}
+            placeholder="Enter plant name"
+            value={nickname}
+            onChangeText={setNickname}
           />
+
+          <View style={styles.buttonRow}>
+            <View style={styles.buttonWrapper}>
+              <CustomButton title="Back" onPress={handleGoBack} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <CustomButton
+                title="Add plant"
+                onPress={handleConfirm}
+                disabled={!nickname.trim()}
+              />
+            </View>
+          </View>
         </View>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -83,12 +99,12 @@ const styles = StyleSheet.create({
     width: 350,
     height: 350,
     borderRadius: 8,
-    marginBottom: 10, // Adjust spacing as needed
-    shadowColor: '#000', // Add shadow color
-    shadowOffset: { width: 0, height: 4 }, // Set shadow offset
-    shadowOpacity: 0.1, // Set shadow opacity
-    shadowRadius: 6, // Set shadow radius
-    elevation: 5, // For Android shadow effect
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
   },
   generalInfoBox: {
     backgroundColor: '#ffffff',
@@ -113,7 +129,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1e3a8a',
     marginBottom: 10,
-    marginTop: 20, // Add space between the label and input
+    marginTop: 20,
     textAlign: 'center',
   },
   input: {
@@ -129,7 +145,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 10,
-    marginBottom: 20, // Space between info boxes and the label
+    marginBottom: 20,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -140,5 +156,9 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     flex: 1,
     marginHorizontal: 5,
+  },
+  scrollViewContent: {
+    flexGrow: 1, // Ensures ScrollView can expand to fit the content
+    paddingBottom: 20, // Prevent content from being cut off by the keyboard
   },
 });
