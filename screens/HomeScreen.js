@@ -1,4 +1,3 @@
-// screens/HomeScreen.js
 import React from 'react';
 import {
   View,
@@ -16,7 +15,8 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}> SmartSprout</Text>
+      {/* Replace text with the logo */}
+      <Image source={require('../assets/logo.png')} style={styles.logo} />
       <Text style={styles.title}>Your Plants</Text>
 
       {plants.length === 0 ? (
@@ -55,15 +55,15 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 80,
+    paddingTop: 60,
     alignItems: 'center',
     backgroundColor: '#f0fdf4',
     paddingHorizontal: 20,
   },
   logo: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1e3a8a',
+    width: 200,  // Adjust width as needed
+    height: 120, // Adjust height as needed
+    marginBottom: 0, // Space between logo and title
   },
   title: {
     fontSize: 20,
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   plantName: {
     fontSize: 18,
     fontWeight: '500',
-    color: '#2563eb',
+    color: '#1e3a8a',
     marginTop: 10,
   },
   image: {

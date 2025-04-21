@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-    color: '#2563eb',
+    color: '#1e3a8a',
     marginBottom: 6,
   },
   value: {
