@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { ArrowLeft, User } from 'lucide-react-native';
 import { popularPlants } from '../data/popularPlants';
 
 export default function AddPlantScreen({ navigation }) {
@@ -9,37 +11,76 @@ export default function AddPlantScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Choose a Plant</Text>
+    <>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <ArrowLeft color="#1e3a8a" size={24} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>List of available plants</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Account')} style={styles.accountButton}>
+          <User color="#1e3a8a" size={24} />
+        </TouchableOpacity>
+      </View>
 
-      <FlatList
-        data={popularPlants}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => handleSelectPlant(item)}>
-            <Image source={item.image} style={styles.image} />
-            <Text style={styles.name}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
+      {/* Main Content */}
+      <View style={styles.container}>
+        <Text style={styles.title}>Choose a Plant</Text>
+        <FlatList
+          data={popularPlants}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.card} onPress={() => handleSelectPlant(item)}>
+              <Image source={item.image} style={styles.image} />
+              <Text style={styles.name}>{item.name}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    backgroundColor: '#f0fdf4',
-  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#1e3a8a',
     marginBottom: 20,
+    marginTop: 20,
     alignSelf: 'center',
+    },
+  header: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 80,
+    backgroundColor: '#e0f2fe',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 30,
+    zIndex: 10,
+  },
+  backButton: {
+    marginRight: 12,
+  },
+  accountButton: {
+    padding: 6,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1e3a8a',
+  },
+  container: {
+    flex: 1,
+    paddingTop: 80, // adjusted to accommodate header
+    paddingHorizontal: 20,
+    backgroundColor: '#f0fdf4',
   },
   list: {
     alignItems: 'center',
