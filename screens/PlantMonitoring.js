@@ -1,13 +1,20 @@
+// screens/PlantMonitoringScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import InfoBox from '../components/InfoBox';
 
-export default function App() {
+export default function PlantMonitoringScreen({ route }) {
+  const { plant } = route.params;
+
+  if (!plant) {
+    return <Text>Plant not found</Text>;
+  }
+
   const [soilMoisture, setSoilMoisture] = useState(45);
   const [lightLevel, setLightLevel] = useState(800);
   const [temperature, setTemperature] = useState(22);
   const [humidity, setHumidity] = useState(55);
 
-  // Simulating data fetch (you can replace it with actual IoT data fetching)
   useEffect(() => {
     const interval = setInterval(() => {
       setSoilMoisture(Math.floor(Math.random() * 100));
@@ -19,29 +26,52 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  const renderCard = (label, value, unit, preferred) => {
+    const isOutOfRange = preferred && (value < preferred.min || value > preferred.max);
+
+    return (
+      <View style={styles.card}>
+        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.value, isOutOfRange && styles.alert]}>
+          {value} {unit}
+        </Text>
+        {preferred ? (
+          <Text style={styles.recommendation}>
+            Preferred: {preferred.min} - {preferred.max} {unit}
+          </Text>
+        ) : (
+          <Text style={styles.recommendation}>Preferred range not available</Text>
+        )}
+      </View>
+    );
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>🌿 Monitoring </Text>
+      {/* 1. Plant Name */}
+      <Text style={styles.title}>
+        {plant.name} {plant.nickname ? `${plant.nickname}` : ''}
+      </Text>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>🌱 Soil Moisture</Text>
-        <Text style={styles.value}>{soilMoisture}%</Text>
+      {/* 2. General Info */}
+      <View style={styles.generalInfoBox}>
+        <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>☀️ Light Level</Text>
-        <Text style={styles.value}>{lightLevel} lux</Text>
+      {/* 3. Small Info Boxes */}
+      <View style={styles.infoBoxesContainer}>
+        <InfoBox imageSource={plant.difficulty} />
+        <InfoBox imageSource={plant.lightRecommendation} />
+        <InfoBox imageSource={plant.humidityRecommendation} />
+        <InfoBox imageSource={plant.toxicity} />
+        <InfoBox imageSource={plant.watering} />
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>🌡️ Temperature</Text>
-        <Text style={styles.value}>{temperature}°C</Text>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.label}>💧 Humidity</Text>
-        <Text style={styles.value}>{humidity}%</Text>
-      </View>
+      {/* 4. Monitoring Cards */}
+      {renderCard('🌱 Soil Moisture', soilMoisture, '%', plant.preferredSoilMoisture)}
+      {renderCard('☀️ Light Level', lightLevel, 'lux', plant.preferredLight)}
+      {renderCard('🌡️ Temperature', temperature, '°C', plant.preferredTemperature)}
+      {renderCard('💧 Humidity', humidity, '%', plant.preferredHumidity)}
     </ScrollView>
   );
 }
@@ -55,10 +85,36 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 30,
     color: '#1e3a8a',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  generalInfoBox: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    maxWidth: 340,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  generalInfoText: {
+    fontSize: 16,
+    color: '#1e3a8a',
+    textAlign: 'center',
+  },
+  infoBoxesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 5,
+    marginBottom: 24,
   },
   card: {
     backgroundColor: '#ffffff',
@@ -76,12 +132,21 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-    color: '#2563eb',
+    color: '#1e3a8a',
     marginBottom: 6,
   },
   value: {
     fontSize: 22,
     fontWeight: '600',
     color: '#111827',
+  },
+  recommendation: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  alert: {
+    color: '#dc2626',
   },
 });

@@ -6,16 +6,17 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  Button,
 } from 'react-native';
 import { usePlantContext } from '../context/PlantContext'; // Import context
+import CustomButton from '../components/CustomButton'; // Import the custom button component
 
 export default function HomeScreen({ navigation }) {
   const { plants } = usePlantContext(); // Use context instead of hardcoded array
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>🌱 SmartSprout</Text>
+      {/* Replace text with the logo */}
+      <Image source={require('../assets/logo.png')} style={styles.logo} />
       <Text style={styles.title}>Your Plants</Text>
 
       {plants.length === 0 ? (
@@ -35,14 +36,18 @@ export default function HomeScreen({ navigation }) {
                 <Image source={item.image} style={styles.image} />
               )}
               <Text style={styles.plantName}>
-              {`${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
+                {`${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
               </Text>
             </TouchableOpacity>
           )}
         />
       )}
 
-      <Button title="Add New Plant" onPress={() => navigation.navigate('AddPlant')} />
+      <CustomButton
+        title="Add New Plant"
+        onPress={() => navigation.navigate('AddPlant')}
+        style={styles.addButton} // Add custom styling for the button if needed
+      />
     </View>
   );
 }
@@ -50,18 +55,21 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 80,
+    paddingTop: 60,
     alignItems: 'center',
     backgroundColor: '#f0fdf4',
     paddingHorizontal: 20,
   },
   logo: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    width: 200,  // Adjust width as needed
+    height: 120, // Adjust height as needed
+    marginBottom: 0, // Space between logo and title
   },
   title: {
     fontSize: 20,
     marginVertical: 20,
+    color: '#1e3a8a',
+    fontWeight: 'bold',
   },
   emptyText: {
     fontSize: 16,
@@ -85,12 +93,16 @@ const styles = StyleSheet.create({
   plantName: {
     fontSize: 18,
     fontWeight: '500',
-    color: '#2563eb',
+    color: '#1e3a8a',
     marginTop: 10,
   },
   image: {
     width: 100,
     height: 100,
     borderRadius: 12,
+  },
+  addButton: {
+    marginTop: 30, // Space between the list and the button
+    width: '50%', // Adjust width if needed
   },
 });

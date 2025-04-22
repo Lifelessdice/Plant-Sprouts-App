@@ -1,62 +1,89 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
-import { usePlantContext } from '../context/PlantContext'; // Import context hook
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Image,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
+} from 'react-native';
+import { usePlantContext } from '../context/PlantContext';
+import InfoBox from '../components/InfoBox';
+import CustomButton from '../components/CustomButton';
 
 export default function NamePlantScreen({ route, navigation }) {
-  const { plant } = route.params; // Get the plant object from the route params
-  const { addPlant } = usePlantContext(); // Access the addPlant function from the context
-  const [nickname, setNickname] = useState(''); // State to hold the entered nickname
+  const { plant } = route.params;
+  const { addPlant } = usePlantContext();
+  const [nickname, setNickname] = useState('');
 
   const handleConfirm = () => {
-    // Ensure nickname is trimmed
     const trimmedNickname = nickname.trim();
-
     if (trimmedNickname) {
-      // Create a new plant object with the nickname
       const plantWithNickname = {
         ...plant,
-        nickname: trimmedNickname, // Trim any extra spaces
+        nickname: trimmedNickname,
       };
-
-      // Call the addPlant function from the context to save the plant
       addPlant(plantWithNickname);
-
-      // Navigate back to the Home screen
       navigation.navigate('Home');
     } else {
-      // Handle the case if the nickname is empty (optional)
       alert('Please enter a valid name for your plant!');
     }
   };
 
   const handleGoBack = () => {
-    // Go back to the previous screen without saving changes
     navigation.goBack();
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={plant.image} style={styles.image} />
-      <Text style={styles.label}>Give your {plant.name} a name</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter plant name"
-        value={nickname}
-        onChangeText={setNickname} // Update the nickname state as the user types
-      />
-      <View style={styles.buttonRow}>
-        <View style={styles.buttonWrapper}>
-          <Button title="Back" onPress={handleGoBack} />
-        </View>
-        <View style={styles.buttonWrapper}>
-          <Button
-            title="Add plant"
-            onPress={handleConfirm}
-            disabled={!nickname.trim()} // Disable the button if nickname is empty
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.container}>
+          <Image source={plant.image} style={styles.image} />
+
+          <View style={styles.generalInfoBox}>
+            <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
+          </View>
+
+          <View style={styles.infoBoxesContainer}>
+            <InfoBox imageSource={plant.difficulty} />
+            <InfoBox imageSource={plant.lightRecommendation} />
+            <InfoBox imageSource={plant.humidityRecommendation} />
+            <InfoBox imageSource={plant.toxicity} />
+            <InfoBox imageSource={plant.watering} />
+          </View>
+
+          <Text style={styles.label}>Give your {plant.name} a name</Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Enter plant name"
+            value={nickname}
+            onChangeText={setNickname}
           />
+
+          <View style={styles.buttonRow}>
+            <View style={styles.buttonWrapper}>
+              <CustomButton title="Back" onPress={handleGoBack} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <CustomButton
+                title="Add plant"
+                onPress={handleConfirm}
+                disabled={!nickname.trim()}
+              />
+            </View>
+          </View>
         </View>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -69,15 +96,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    width: 250,
-    height: 250,
-    borderRadius: 12,
+    width: 350,
+    height: 350,
+    borderRadius: 8,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  generalInfoBox: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 16,
     marginBottom: 20,
+    maxWidth: 340,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  generalInfoText: {
+    fontSize: 16,
+    color: '#1e3a8a',
+    textAlign: 'center',
   },
   label: {
     fontSize: 18,
+    fontWeight: 'bold',
     color: '#1e3a8a',
     marginBottom: 10,
+    marginTop: 20,
     textAlign: 'center',
   },
   input: {
@@ -89,13 +141,24 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: '#ffffff',
   },
+  infoBoxesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 20,
+  },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    marginTop: 20,
   },
   buttonWrapper: {
     flex: 1,
     marginHorizontal: 5,
+  },
+  scrollViewContent: {
+    flexGrow: 1, // Ensures ScrollView can expand to fit the content
+    paddingBottom: 20, // Prevent content from being cut off by the keyboard
   },
 });

@@ -68,6 +68,6 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2563eb',
+    color: '#1e3a8a',
   },
 });
