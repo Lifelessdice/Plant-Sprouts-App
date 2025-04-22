@@ -7,69 +7,98 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import { usePlantContext } from '../context/PlantContext'; // Import context
-import CustomButton from '../components/CustomButton'; // Import the custom button component
+import { usePlantContext } from '../context/PlantContext';
+import CustomButton from '../components/CustomButton';
+import { User } from 'lucide-react-native';
 
 export default function HomeScreen({ navigation }) {
-  const { plants } = usePlantContext(); // Use context instead of hardcoded array
+  const { plants } = usePlantContext();
 
   return (
-    <View style={styles.container}>
-      {/* Replace text with the logo */}
-      <Image source={require('../assets/logo.png')} style={styles.logo} />
-      <Text style={styles.title}>Your Plants</Text>
+    <View style={styles.wrapper}>
+      {/* Header */}
+      <View style={styles.header}>
+      <Text style={styles.headerTitle}>Your Plants</Text>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Account')}
+        style={styles.accountButton}
+      >
+        <User color="#1e3a8a" size={24} />
+      </TouchableOpacity>
+    </View>
 
-      {plants.length === 0 ? (
-        <Text style={styles.emptyText}>No plants added yet 🌿</Text>
-      ) : (
-        <FlatList
-          data={plants}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() =>
-                navigation.navigate('PlantMonitoring', { plant: item })
-              }
-            >
-              {item.image && (
-                <Image source={item.image} style={styles.image} />
-              )}
-              <Text style={styles.plantName}>
-                {`${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
-              </Text>
-            </TouchableOpacity>
-          )}
+      <View style={styles.container}>
+        {plants.length === 0 ? (
+          <Text style={styles.emptyText}>No plants added yet 🌿</Text>
+        ) : (
+          <FlatList
+            data={plants}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.card}
+                onPress={() =>
+                  navigation.navigate('PlantMonitoring', { plant: item })
+                }
+              >
+                {item.image && (
+                  <Image source={item.image} style={styles.image} />
+                )}
+                <Text style={styles.plantName}>
+                  {`${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
+        <CustomButton
+          title="Add New Plant"
+          onPress={() => navigation.navigate('AddPlant')}
+          style={styles.addButton}
         />
-      )}
-
-      <CustomButton
-        title="Add New Plant"
-        onPress={() => navigation.navigate('AddPlant')}
-        style={styles.addButton} // Add custom styling for the button if needed
-      />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    backgroundColor: '#f0fdf4',
+  },
+  header: {
+    height: 80,
+    backgroundColor: '#e0f2fe',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 30,
+    position: 'relative', // allow absolute children
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1e3a8a',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    paddingTop: 30, 
+
+  },
+  accountButton: {
+    position: 'absolute',
+    right: 16,
+    top: 43,
+    padding: 6,
+    paddingTop: 0,
+  },
+  
   container: {
     flex: 1,
-    paddingTop: 60,
     alignItems: 'center',
-    backgroundColor: '#f0fdf4',
+    paddingTop: 20,
     paddingHorizontal: 20,
-  },
-  logo: {
-    width: 200,  // Adjust width as needed
-    height: 120, // Adjust height as needed
-    marginBottom: 0, // Space between logo and title
-  },
-  title: {
-    fontSize: 20,
-    marginVertical: 20,
-    color: '#1e3a8a',
-    fontWeight: 'bold',
   },
   emptyText: {
     fontSize: 16,
@@ -102,7 +131,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   addButton: {
-    marginTop: 30, // Space between the list and the button
-    width: '50%', // Adjust width if needed
+    marginTop: 30,
+    width: '50%',
   },
 });
