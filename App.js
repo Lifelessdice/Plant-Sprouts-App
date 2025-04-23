@@ -8,15 +8,20 @@ import AddPlantScreen from './screens/AddPlant'; // Import AddPlant screen
 import NamePlantScreen from './screens/NamePlantScreen';
 import { PlantProvider } from './context/PlantContext'; // Import PlantProvider
 import LoginScreen from './screens/LoginScreen';
+import { connect } from './src/mqttservice'; // Import connect from mqttservice
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [isSplashVisible, setSplashVisible] = useState(true);
 
   useEffect(() => {
+    // Establish MQTT connection
+    connect();
+
     const timer = setTimeout(() => {
       setSplashVisible(false);
     }, 2000); // 2 second splash screen
+
     return () => clearTimeout(timer);
   }, []);
 
