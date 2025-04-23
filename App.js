@@ -7,7 +7,7 @@ import PlantMonitoringScreen from './screens/PlantMonitoring'; // Import PlantMo
 import AddPlantScreen from './screens/AddPlant'; // Import AddPlant screen
 import NamePlantScreen from './screens/NamePlantScreen';
 import { PlantProvider } from './context/PlantContext'; // Import PlantProvider
-
+import LoginScreen from './screens/LoginScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -28,10 +28,12 @@ export default function App() {
             <Stack.Screen name="Splash" component={SplashScreen} />
           ) : (
             <>
+              <Stack.Screen name="LoginScreen" component={LoginScreen} />
               <Stack.Screen name="Home" component={HomeScreen} />
               <Stack.Screen name="AddPlant" component={AddPlantScreen} />
               <Stack.Screen name="PlantMonitoring" component={PlantMonitoringScreen} />
               <Stack.Screen name="NamePlant" component={NamePlantScreen} />
+              
             </>
           )}
         </Stack.Navigator>
