@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import SplashScreen from './screens/SplashScreen';
 import HomeScreen from './screens/HomeScreen';
-import PlantMonitoringScreen from './screens/PlantMonitoring'; // Import PlantMonitoring screen
-import AddPlantScreen from './screens/AddPlant'; // Import AddPlant screen
+import PlantMonitoringScreen from './screens/PlantMonitoring'; 
+import AddPlantScreen from './screens/AddPlant'; 
 import NamePlantScreen from './screens/NamePlantScreen';
-import { PlantProvider } from './context/PlantContext'; // Import PlantProvider
+import { PlantProvider } from './context/PlantContext'; 
 import LoginScreen from './screens/LoginScreen';
-import { connect } from './src/mqttservice'; // Import connect from mqttservice
+import { connect } from './src/mqttservice'; 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -17,30 +16,18 @@ export default function App() {
   useEffect(() => {
     // Establish MQTT connection
     connect();
-
-    const timer = setTimeout(() => {
-      setSplashVisible(false);
-    }, 2000); // 2 second splash screen
-
-    return () => clearTimeout(timer);
   }, []);
 
   return (
     <PlantProvider>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {isSplashVisible ? (
-            <Stack.Screen name="Splash" component={SplashScreen} />
-          ) : (
-            <>
+  
               <Stack.Screen name="LoginScreen" component={LoginScreen} />
               <Stack.Screen name="Home" component={HomeScreen} />
               <Stack.Screen name="AddPlant" component={AddPlantScreen} />
               <Stack.Screen name="PlantMonitoring" component={PlantMonitoringScreen} />
               <Stack.Screen name="NamePlant" component={NamePlantScreen} />
-              
-            </>
-          )}
         </Stack.Navigator>
       </NavigationContainer>
     </PlantProvider>
