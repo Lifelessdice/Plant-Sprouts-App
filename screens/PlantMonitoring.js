@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useNavigation } from '@react-navigation/native';
 import { ArrowLeft, User } from 'lucide-react-native';
 import InfoBox from '../components/InfoBox';
-
+import { dataStore, setHandlerForTopic } from '../src/mqttservice.js';
 
 export default function PlantMonitoringScreen({ route }) {
   const navigation = useNavigation();
@@ -16,16 +16,20 @@ export default function PlantMonitoringScreen({ route }) {
 
   const [soilMoisture, setSoilMoisture] = useState(45);
   const [lightLevel, setLightLevel] = useState(800);
-  const [temperature, setTemperature] = useState(22);
+  const [temperature, setTemperature] = useState(dataStore.temperature || 22);
   const [humidity, setHumidity] = useState(55);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setSoilMoisture(Math.floor(Math.random() * 100));
       setLightLevel(Math.floor(Math.random() * 1000));
-      setTemperature(Math.floor(Math.random() * 30) + 15);
       setHumidity(Math.floor(Math.random() * 100));
     }, 5000);
+
+  
+    setHandlerForTopic("CROWmium/rtl8720dn/temperature", (payload) => {
+      setTemperature(payload);
+    });
 
     return () => clearInterval(interval);
   }, []);
@@ -105,7 +109,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 30,
     zIndex: 10,
-
   },
   backButton: {
     marginRight: 12,
