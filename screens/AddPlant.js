@@ -1,14 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // Import useState and useEffect hooks
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ArrowLeft, User } from 'lucide-react-native';
 import { popularPlants } from '../data/popularPlants';
+import { db } from '../firebase'; 
+import { collection, getDocs } from 'firebase/firestore';
 
 export default function AddPlantScreen({ navigation }) {
-  const handleSelectPlant = (plant) => {
-    console.log('Plant selected:', plant.name);
-    navigation.navigate('NamePlant', { plant }); // Navigate to custom name screen
-  };
+    const [firebaseData, setFirebaseData] = useState([]);
+
+
+  // Fetch data from Firebase when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+          try {
+            const snapshot = await getDocs(collection(db, 'plants'));
+            const plantsFromFirebase = snapshot.docs.map(doc => ({
+              id: doc.id, // get the document id
+              ...doc.data(), // get the plant data
+            }));
+            setFirebaseData(plantsFromFirebase);
+          } catch (error) {
+            console.error('Error fetching Firebase data:', error);
+          }
+        };
+    
+        fetchData();
+      }, []);
+    
+      // Merge Firebase data into static local data
+      const mergedPlants = popularPlants.map((localPlant) => {
+        const cloudPlant = firebaseData.find(p => p.id === localPlant.id) || {};
+        return {
+          ...localPlant, // image and icons remain intact
+          generalInfo: cloudPlant.generalInfo || localPlant.generalInfo,
+          preferredSoilMoisture: cloudPlant.preferredSoilMoisture || localPlant.preferredSoilMoisture,
+          preferredHumidity: cloudPlant.preferredHumidity || localPlant.preferredHumidity,
+          preferredTemperature: cloudPlant.preferredTemperature || localPlant.preferredTemperature,
+          preferredLight: cloudPlant.preferredLight || localPlant.preferredLight,
+        };
+      });
+    
+      const handleSelectPlant = (plant) => {
+        console.log('Plant selected:', plant.name);
+        navigation.navigate('NamePlant', { plant }); // Navigate to custom name screen
+      };
+    
 
   return (
     <>
@@ -27,7 +64,7 @@ export default function AddPlantScreen({ navigation }) {
       <View style={styles.container}>
         <Text style={styles.title}>Choose a Plant</Text>
         <FlatList
-          data={popularPlants}
+          data={mergedPlants}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
