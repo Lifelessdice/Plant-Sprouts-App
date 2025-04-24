@@ -6,6 +6,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import React, { useState } from 'react';
 import { View, StyleSheet, Text,TextInput, TouchableOpacity, Button } from 'react-native';
+import { Video } from 'expo-av';
 
 const LoginScreen = ({ navigation }) => {
   const[email, setEmail]=useState('');
@@ -87,110 +88,120 @@ const LoginScreen = ({ navigation }) => {
 };
         
 
-  return (
+return (
+  <View style={styles.wrapper}>
+    {/* Background video */}
+    <View style={styles.videoWrapper}>
+      <Video
+        source={require('../assets/animation3.mp4')}
+        style={styles.video}
+        isLooping
+        shouldPlay
+        isMuted
+        resizeMode="cover"
+      />
+    </View>
+
+    {/* Login form */}
     <View style={styles.page}>
-    <Text style={styles.header}>🌱 SmartSprout</Text>
+      <Text style={styles.header}>SmartSprout</Text>
 
-<TextInput
-style={styles.UserInput}
-value={email}
-placeholder="Enter your email"
-onChangeText={setEmail}
+      <TextInput
+        style={styles.UserInput}
+        value={email}
+        placeholder="Enter your email"
+        onChangeText={setEmail}
+      />
 
-/>
+      <TextInput
+        style={styles.UserInput}
+        value={password}
+        placeholder="Enter your password"
+        onChangeText={setPassword}
+        secureTextEntry={!showPassword}
+      />
+      <Text style={styles.showPasswordstyle} onPress={() => setShowPassword(!showPassword)}>
+        {showPassword ? 'Hide password' : 'Show password'}
+      </Text>
 
+      <View style={styles.loginSignupStyle}>
+        <TouchableOpacity onPress={userLogin}>
+          <Text style={styles.loginstyle}>Login</Text>
+        </TouchableOpacity>
 
-<TextInput 
-  style={styles.UserInput} 
-  value={password}
-  placeholder="Enter your password"
-  onChangeText={setPassword}
-  secureTextEntry ={!showPassword}
-/>  
-<Text style={styles.showPasswordstyle} onPress={() => setShowPassword(!showPassword)}>
-  {showPassword ? 'Hide password':'show password' }
-</Text>
-
-<View style={styles.loginSignupStyle}>
-  <TouchableOpacity onPress={userLogin}>
-  <Text style={styles.loginstyle}>Login</Text>
-</TouchableOpacity>
-
-<TouchableOpacity onPress={Signup}>
-    <Text style={styles.signupStyle}>Create account</Text>
-  </TouchableOpacity>
-
+        <TouchableOpacity onPress={Signup}>
+          <Text style={styles.signupStyle}>Create account</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   </View>
-  
-  
-</View>
-
 );
-
 };
 
 const styles = StyleSheet.create({
-    page:  {
-        flex: 1,
-        backgroundColor: '#e6f3ec',
-        alignItems: 'center',
-        justifyContent: 'center',
+wrapper: {
+  flex: 1,
+  backgroundColor: '#e6f3ec',
 },
-
-      logoContainer: {
-        marginTop: 50,
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-
-      header : { fontSize: 40,
-      marginBottom: 10,
-      fontWeight: 'bold'
-    },
-    loginButton: {
-        width: '50%',
-        marginTop: 20,
-        
-      },
-
-      UserInput : {    
-  backgroundColor: '#fff',  
-  width :'80%',  
-  borderRadius: 10,      
-  padding: 15,       
-  borderWidth: 1,                   
+videoWrapper: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+  zIndex: 0,
+},
+video: {
+  width: '100%',
+  height: '100%',
+  position: 'absolute',
+},
+page: {
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1,
+  paddingHorizontal: 20,
+},
+header: {
+  fontSize: 40,
+  marginBottom: 10,
+  fontWeight: 'bold',
+},
+UserInput: {
+  backgroundColor: '#fff',
+  width: '80%',
+  borderRadius: 10,
+  padding: 15,
+  borderWidth: 1,
   marginBottom: 20,
   borderColor: '#ccc',
-  
 },
 signupStyle: {
-    fontSize: 20,
-    color: 'black',
-    fontWeight: 'bold',
-
-  },
-  loginstyle: {
-    fontSize: 20,
-    color: 'black',
-    marginRight: 40,
-    fontWeight: 'bold',
- 
-  },
-  loginSignupStyle :{
-    justifyContent:  'center',
-    flexDirection: 'row',
-    width: '75%',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  showPasswordstyle: {
-    color: 'black',
-    textAlign: 'right',
-    fontWeight: '400',
-    marginBottom: 9,
-    width: '75%',
-  },
-  
+  fontSize: 20,
+  color: 'black',
+  fontWeight: 'bold',
+},
+loginstyle: {
+  fontSize: 20,
+  color: 'black',
+  marginRight: 40,
+  fontWeight: 'bold',
+},
+loginSignupStyle: {
+  justifyContent: 'center',
+  flexDirection: 'row',
+  width: '75%',
+  alignItems: 'center',
+  marginTop: 20,
+},
+showPasswordstyle: {
+  color: 'black',
+  textAlign: 'right',
+  fontWeight: '400',
+  marginBottom: 9,
+  width: '75%',
+},
 });
 
 export default LoginScreen;
