@@ -16,7 +16,7 @@
     "expo": "~52.0.43",
     "expo-av": "~15.0.2",
     "expo-status-bar": "~2.0.1",
-    "firebase": "^11.6.0",
+    "firebase": "^11.6.1",
     "lottie-react-native": "7.1.0",
     "lucide-react-native": "^0.503.0",
     "paho-mqtt": "^1.1.0",

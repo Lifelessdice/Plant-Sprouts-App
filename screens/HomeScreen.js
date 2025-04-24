@@ -1,12 +1,44 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
-import { usePlantContext } from '../context/PlantContext';
-import CustomButton from '../components/CustomButton';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 import { User } from 'lucide-react-native';
-import { Video } from 'expo-av';  // If using Expo, you can use expo-av for video playback
+import { Video } from 'expo-av'; // If using Expo, you can use expo-av for video playback
+import { getAuth } from 'firebase/auth';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import CustomButton from '../components/CustomButton';
 
 export default function HomeScreen({ navigation }) {
-  const { plants } = usePlantContext();
+  const [plants, setPlants] = useState([]);  // Local state to store user's plants
+
+  useEffect(() => {
+    // Fetch the user's plants from Firestore when the component mounts
+    const fetchPlants = async () => {
+      try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+
+        if (!user) {
+          Alert.alert('Please log in to view your plants.');
+          return;
+        }
+
+        const db = getFirestore();
+        const plantsCollection = collection(db, 'users', user.uid, 'plants');
+        const snapshot = await getDocs(plantsCollection);
+
+        const plantsList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setPlants(plantsList);
+      } catch (error) {
+        console.error('Error fetching plants:', error);
+        Alert.alert('Failed to load plants.');
+      }
+    };
+
+    fetchPlants();
+  }, []); // Empty dependency array ensures this runs only once when the component mounts
 
   return (
     <View style={styles.wrapper}>
@@ -15,31 +47,28 @@ export default function HomeScreen({ navigation }) {
         <Video
           source={require('../assets/animation.mp4')} // Replace with your MP4 file
           style={styles.video}
-          isLooping={true} // Loop the video
-          shouldPlay={true} // Play automatically
-          isMuted={true} // Mute the video (optional)
-          resizeMode="cover" // Cover the whole area
+          isLooping={true}
+          shouldPlay={true}
+          isMuted={true}
+          resizeMode="cover"
         />
       </View>
 
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Your Plants</Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Account')}
-          style={styles.accountButton}
-        >
+        <TouchableOpacity style={styles.accountButton}>
           <User color="#1e3a8a" size={24} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.container}>
         {plants.length === 0 ? (
-          <Text style={styles.emptyText}>No plants added yet 🌿</Text>
+          <Text style={styles.emptyText}>No plants added yet</Text>
         ) : (
           <FlatList
             data={plants}
-            keyExtractor={(_, index) => index.toString()}
+            keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.card}
@@ -48,7 +77,11 @@ export default function HomeScreen({ navigation }) {
                 }
               >
                 {item.image && (
-                  <Image source={item.image} style={styles.image} />
+                  typeof item.image === 'string' ? (
+                    <Image source={{ uri: item.image }} style={styles.image} />
+                  ) : (
+                    <Image source={item.image} style={styles.image} />
+                  )
                 )}
                 <Text style={styles.plantName}>
                   {`${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
@@ -71,15 +104,15 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: '#f0fdf4', // Green background
+    backgroundColor: '#f0fdf4',
   },
   videoWrapper: {
     position: 'absolute',
-    top: '10%', // Adjust the position of the video
+    top: '10%',
     left: '0%',
     width: 400,
     height: 900,
-    zIndex: 0, // Ensure video stays behind other elements
+    zIndex: 0,
   },
   video: {
     width: '100%',
@@ -92,7 +125,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 30,
-    position: 'relative', // allow absolute children
+    position: 'relative',
   },
   headerTitle: {
     fontSize: 20,
@@ -116,7 +149,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 20,
     paddingHorizontal: 20,
-    zIndex: 1, // Ensure content stays above video
+    zIndex: 1,
   },
   emptyText: {
     fontSize: 16,
