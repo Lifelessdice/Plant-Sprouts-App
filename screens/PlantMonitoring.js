@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ArrowLeft, User } from 'lucide-react-native';
 import InfoBox from '../components/InfoBox';
 import { dataStore, setHandlerForTopic } from '../src/mqttservice.js';
+import * as Progress from 'react-native-progress';
 
 export default function PlantMonitoringScreen({ route }) {
   const navigation = useNavigation();
@@ -40,13 +41,44 @@ export default function PlantMonitoringScreen({ route }) {
 
   const renderCard = (label, value, unit, preferred) => {
     const isOutOfRange = preferred && (value < preferred.min || value > preferred.max);
+    const aboveRange = preferred && value > preferred.max;
+    const belowRange = preferred && value < preferred.min;
+    const isSoilMoisture = label.includes('Soil Moisture');
+
+    const getProgress = () => {
+      if (!preferred) return 0;
+      if (value < preferred.min) return 0;
+      if (value > preferred.max) return 1;
+      return (value - preferred.min) / (preferred.max - preferred.min);
+    };
 
     return (
       <View style={styles.card}>
         <Text style={styles.label}>{label}</Text>
-        <Text style={[styles.value, isOutOfRange && styles.alert]}>
-          {value} {unit}
-        </Text>
+
+        {isSoilMoisture ? (
+          <Progress.Circle
+            size={100}
+            endAngle={0.75}
+            progress={getProgress()}
+            thickness={10}
+            color={isOutOfRange ? '#dc2626' : '#DAA06D'}
+            unfilledColor={value > (preferred?.max ?? 100) ? '#fee2e2' : '#f3f4f6'}
+            borderWidth={0}
+            showsText={true}
+            formatText={() => (
+              <Text style={[styles.value, isOutOfRange && styles.alert]}>
+                {aboveRange ? 'HIGH' : belowRange ? 'LOW' : `${value} ${unit}`}
+              </Text>
+            )}
+            strokeCap="round"
+          />
+        ) : (
+          <Text style={[styles.value, isOutOfRange && styles.alert]}>
+            {aboveRange ? 'HIGH' : belowRange ? 'LOW' : `${value} ${unit}`}
+          </Text>
+        )}
+
         {preferred ? (
           <Text style={styles.recommendation}>
             Preferred: {preferred.min} - {preferred.max} {unit}
