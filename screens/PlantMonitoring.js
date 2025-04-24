@@ -15,20 +15,24 @@ export default function PlantMonitoringScreen({ route }) {
   }
 
   const [soilMoisture, setSoilMoisture] = useState(45);
-  const [lightLevel, setLightLevel] = useState(800);
+  const [lightLevel, setLightLevel] = useState(dataStore.light || 800);
   const [temperature, setTemperature] = useState(dataStore.temperature || 22);
   const [humidity, setHumidity] = useState(55);
 
   useEffect(() => {
+    // Random values for soilMoisture and humidity
     const interval = setInterval(() => {
       setSoilMoisture(Math.floor(Math.random() * 100));
-      setLightLevel(Math.floor(Math.random() * 1000));
       setHumidity(Math.floor(Math.random() * 100));
     }, 5000);
 
-  
+    // Set MQTT handlers
     setHandlerForTopic("CROWmium/rtl8720dn/temperature", (payload) => {
       setTemperature(payload);
+    });
+
+    setHandlerForTopic("CROWmium/rtl8720dn/light", (payload) => {
+      setLightLevel(payload);
     });
 
     return () => clearInterval(interval);
