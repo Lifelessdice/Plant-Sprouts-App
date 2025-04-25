@@ -64,7 +64,7 @@ const connect = () => {
         "CROWmium/rtl8720dn/temperature",
         "CROWmium/rtl8720dn/humidity",
         "CROWmium/rtl8720dn/light",
-        "lifelessdice/soil",
+        "CROWmium/rtl8720dn/moisture",
       ];
 
       topics.forEach((topic) => {
