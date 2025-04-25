@@ -13,6 +13,8 @@ const int mqtt_port = 1883;
 // Sensor setup
 #define DHTPIN 2
 #define DHTTYPE DHT11
+#define SOIL_PIN A0  
+
 DHT dht(DHTPIN, DHTTYPE);
 
 // MQTT client setup
@@ -37,7 +39,7 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("rtl8720dnClient")) {
       Serial.println("connected!");
-      client.subscribe("CROWmium/rtl8720dn/#"); // Optionally subscirbing to every topic
+      client.subscribe("CROWmium/rtl8720dn/#"); // Optionally subscribing to every topic
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -66,9 +68,10 @@ void setup() {
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
 
-  // Sensors
+  // Initializing Sensors
   dht.begin();
   pinMode(WIO_LIGHT, INPUT);
+  pinMode(SOIL_PIN, INPUT);
 }
 
 void loop() {
@@ -77,31 +80,37 @@ void loop() {
   }
   client.loop();
 
+  // Control publishing frequency
   unsigned long now = millis();
   const unsigned long publishInterval = 10000;
-  if (now - lastMsgTime > publishInterval) { 
+  if (now - lastMsgTime > publishInterval) {
     lastMsgTime = now;
 
     int temperature = dht.readTemperature();
     int humidity = dht.readHumidity();
     int light = analogRead(WIO_LIGHT);
 
-    char tempStr[10], humStr[10], lightStr[10];
+    int soilRaw = analogRead(SOIL_PIN);
+    int soilMoisture = map(soilRaw, 1023, 0, 0, 100);  
+    soilMoisture = constrain(soilMoisture, 0, 100);    
+
+    // Convert values to strings
+    char tempStr[10], humStr[10], lightStr[10], soilStr[10];
     snprintf(tempStr, sizeof(tempStr), "%d", temperature);
     snprintf(humStr, sizeof(humStr), "%d", humidity);
     snprintf(lightStr, sizeof(lightStr), "%d", light);
+    snprintf(soilStr, sizeof(soilStr), "%d", soilMoisture);
 
     // Print to Serial
-    Serial.print("Temperature: ");
-    Serial.println(tempStr);
-    Serial.print("Humidity: ");
-    Serial.println(humStr);
-    Serial.print("Light: ");
-    Serial.println(lightStr);
+    Serial.print("Temperature: "); Serial.println(tempStr);
+    Serial.print("Humidity: "); Serial.println(humStr);
+    Serial.print("Light: "); Serial.println(lightStr);
+    Serial.print("Soil Moisture: "); Serial.println(soilStr);
 
-    // Publish to separate topics
+    // Publish to MQTT
     client.publish("CROWmium/rtl8720dn/temperature", tempStr);
     client.publish("CROWmium/rtl8720dn/humidity", humStr);
     client.publish("CROWmium/rtl8720dn/light", lightStr);
+    client.publish("CROWmium/rtl8720dn/moisture", soilStr);
   }
 }
