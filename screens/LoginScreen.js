@@ -22,11 +22,11 @@ const LoginScreen = ({ navigation }) => {
         Alert.alert(' Enter your password');
         return; }
     
-   signInWithEmailAndPassword(auth, email, password)
-  .then((result) => {
-    const createUser = result.user;
-    navigation.navigate('Home');
-  })
+        signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          // No navigation here
+          console.log('Login successful'); // Optional
+        })
   .catch((error) => {
     if (error.code === 'auth/user-not-found') {
       

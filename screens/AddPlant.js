@@ -1,13 +1,59 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Alert } from 'react-native';
 import { ArrowLeft, User } from 'lucide-react-native';
 import { popularPlants } from '../data/popularPlants';
+import { db } from '../firebase'; 
+import { collection, getDocs } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 export default function AddPlantScreen({ navigation }) {
+  const [firebaseData, setFirebaseData] = useState([]);
+  const [loading, setLoading] = useState(true); // Added loading state
+
+  // Fetch data from Firebase when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'plants'));
+        const plantsFromFirebase = snapshot.docs.map(doc => ({
+          id: doc.id, // get the document id
+          ...doc.data(), // get the plant data
+        }));
+        setFirebaseData(plantsFromFirebase);
+        setLoading(false); // Set loading to false once data is fetched
+      } catch (error) {
+        console.error('Error fetching Firebase data:', error);
+        setLoading(false); // Stop loading even in case of error
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Merge Firebase data into static local data
+  const mergedPlants = popularPlants.map((localPlant) => {
+    const cloudPlant = firebaseData.find(p => p.id === localPlant.id) || {};
+    return {
+      ...localPlant, 
+      generalInfo: cloudPlant.generalInfo || localPlant.generalInfo,
+      preferredSoilMoisture: cloudPlant.preferredSoilMoisture || localPlant.preferredSoilMoisture,
+      preferredHumidity: cloudPlant.preferredHumidity || localPlant.preferredHumidity,
+      preferredTemperature: cloudPlant.preferredTemperature || localPlant.preferredTemperature,
+      preferredLight: cloudPlant.preferredLight || localPlant.preferredLight,
+    };
+  });
+
   const handleSelectPlant = (plant) => {
-    console.log('Plant selected:', plant.name);
-    navigation.navigate('NamePlant', { plant }); // Navigate to custom name screen
+    const auth = getAuth();
+    const user = auth.currentUser;  // Get the current user
+    if (user) {
+      const uid = user.uid;  // Get the user's UID
+      console.log("Navigating with plant:", plant);  // Debug log
+      console.log("User UID:", uid);  // Debug log
+      navigation.navigate('NamePlant', { plant, uid });  // Pass the plant and UID
+    } else {
+      Alert.alert('Please log in to proceed.');
+    }
   };
 
   return (
@@ -26,17 +72,23 @@ export default function AddPlantScreen({ navigation }) {
       {/* Main Content */}
       <View style={styles.container}>
         <Text style={styles.title}>Choose a Plant</Text>
-        <FlatList
-          data={popularPlants}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.card} onPress={() => handleSelectPlant(item)}>
-              <Image source={item.image} style={styles.image} />
-              <Text style={styles.name}>{item.name}</Text>
-            </TouchableOpacity>
-          )}
-        />
+        
+        {/* Show loading indicator while fetching data */}
+        {loading ? (
+          <Text style={styles.loadingText}>Loading plants...</Text>
+        ) : (
+          <FlatList
+            data={mergedPlants}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.list}
+            renderItem={({ item }) => (
+              <TouchableOpacity style={styles.card} onPress={() => handleSelectPlant(item)}>
+                <Image source={item.image} style={styles.image} />
+                <Text style={styles.name}>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
       </View>
     </>
   );
@@ -50,7 +102,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 20,
     alignSelf: 'center',
-    },
+  },
   header: {
     position: 'absolute',
     top: 0,
@@ -110,5 +162,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#1e3a8a',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#1e3a8a',
+    textAlign: 'center',
   },
 });

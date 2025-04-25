@@ -7,30 +7,55 @@ import {
   Image,
   KeyboardAvoidingView,
   ScrollView,
+  Alert,
   Platform,
 } from 'react-native';
-import { usePlantContext } from '../context/PlantContext';
 import InfoBox from '../components/InfoBox';
 import CustomButton from '../components/CustomButton';
+import { db, auth } from '../firebase';  // Import the auth from firebase.js
+import { doc, setDoc, collection } from 'firebase/firestore';
 
 export default function NamePlantScreen({ route, navigation }) {
-  const { plant } = route.params;
-  const { addPlant } = usePlantContext();
+  const { plant } = route.params; // Receive plant object from the previous screen
   const [nickname, setNickname] = useState('');
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const trimmedNickname = nickname.trim();
     if (trimmedNickname) {
       const plantWithNickname = {
         ...plant,
         nickname: trimmedNickname,
       };
-      addPlant(plantWithNickname);
-      navigation.navigate('Home');
+  
+      try {
+        if (!auth.currentUser) {
+          Alert.alert('Please log in to save your plant.');
+          return;
+        }
+  
+        const uid = auth.currentUser.uid; // Get the user's UID
+  
+        // Save the plant to Firestore under the user's collection
+        const plantRef = doc(collection(db, 'users', uid, 'plants'));
+        await setDoc(plantRef, plantWithNickname);
+  
+        Alert.alert('Your plant is saved successfully! 🌱');
+  
+        // Only navigate to "Home" if the user is authenticated
+        if (auth.currentUser) {
+          navigation.navigate('Home');
+        } else {
+          Alert.alert('Please log in to continue.');
+        }
+      } catch (error) {
+        console.error('Error saving plant:', error);
+        Alert.alert('Something went wrong. Please try again.');
+      }
     } else {
-      alert('Please enter a valid name for your plant!');
+      Alert.alert('Please enter a valid name for your plant!');
     }
   };
+  
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -158,7 +183,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   scrollViewContent: {
-    flexGrow: 1, // Ensures ScrollView can expand to fit the content
-    paddingBottom: 20, // Prevent content from being cut off by the keyboard
+    flexGrow: 1,
+    paddingBottom: 20,
   },
 });
