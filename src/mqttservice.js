@@ -33,7 +33,7 @@ client.onMessageArrived = (message) => {
       dataStore.humidity = parseFloat(payload);
     } else if (topic === "CROWmium/rtl8720dn/light") {
       dataStore.light = parseInt(payload);
-    } else if (topic === "lifelessdice/soil") {
+    } else if (topic === "CROWmium/rtl8720dn/moisture") {
       dataStore.soil = parseInt(payload);
     }
 
