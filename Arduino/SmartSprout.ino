@@ -90,7 +90,7 @@ void loop() {
     int light = analogRead(WIO_LIGHT);
 
     int soilRaw = analogRead(SOIL_PIN);
-    int soilMoisture = map(soilRaw, 0, 1023, 0, 100);  
+    int soilMoisture = map(soilRaw, 1023, 0, 0, 100);  
     soilMoisture = constrain(soilMoisture, 0, 100);    
 
     // Convert values to strings
