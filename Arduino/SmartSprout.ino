@@ -39,7 +39,7 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("rtl8720dnClient")) {
       Serial.println("connected!");
-      client.subscribe("CROWmium/rtl8720dn/#");
+      client.subscribe("CROWmium/rtl8720dn/#"); // Optionally subscribing to every topic
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -68,7 +68,7 @@ void setup() {
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
 
-  // Sensors
+  // Initializing Sensors
   dht.begin();
   pinMode(WIO_LIGHT, INPUT);
   pinMode(SOIL_PIN, INPUT);
@@ -80,6 +80,7 @@ void loop() {
   }
   client.loop();
 
+  // Control publishing frequency
   unsigned long now = millis();
   const unsigned long publishInterval = 10000;
   if (now - lastMsgTime > publishInterval) {
