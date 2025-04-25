@@ -5,7 +5,8 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import React, { useState } from 'react';
-import { View, StyleSheet, Text,TextInput, TouchableOpacity, Button } from 'react-native';
+import { View, StyleSheet, Text,TextInput } from 'react-native';
+import CustomButton from '../components/CustomButton';
 import { Video } from 'expo-av';
 
 const LoginScreen = ({ navigation }) => {
@@ -125,13 +126,8 @@ return (
       </Text>
 
       <View style={styles.loginSignupStyle}>
-        <TouchableOpacity onPress={userLogin}>
-          <Text style={styles.loginstyle}>Login</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={Signup}>
-          <Text style={styles.signupStyle}>Create account</Text>
-        </TouchableOpacity>
+      <CustomButton title="Login" onPress={userLogin} style={{marginRight:15}}/>
+      <CustomButton title="Create account" onPress={Signup} />
       </View>
     </View>
   </View>
@@ -177,17 +173,6 @@ UserInput: {
   marginBottom: 20,
   borderColor: '#ccc',
 },
-signupStyle: {
-  fontSize: 20,
-  color: 'black',
-  fontWeight: 'bold',
-},
-loginstyle: {
-  fontSize: 20,
-  color: 'black',
-  marginRight: 40,
-  fontWeight: 'bold',
-},
 loginSignupStyle: {
   justifyContent: 'center',
   flexDirection: 'row',
@@ -195,6 +180,7 @@ loginSignupStyle: {
   alignItems: 'center',
   marginTop: 20,
 },
+
 showPasswordstyle: {
   color: 'black',
   textAlign: 'right',
