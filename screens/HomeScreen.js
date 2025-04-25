@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 import { User } from 'lucide-react-native';
-import { Video } from 'expo-av'; // If using Expo, you can use expo-av for video playback
+import { Video } from 'expo-av'; 
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import CustomButton from '../components/CustomButton';
+import { dataStore, setHandlerForTopic } from '../src/mqttservice';
 
 export default function HomeScreen({ navigation }) {
   const [plants, setPlants] = useState([]);  // Local state to store user's plants
+  const [soilMoisture, setSoilMoisture] = useState(dataStore.soilMoisture || 45);
+  const [lightLevel, setLightLevel] = useState(dataStore.light || 800);
+  const [temperature, setTemperature] = useState(dataStore.temperature || 22);
+  const [humidity, setHumidity] = useState(dataStore.humidity || 55);
 
   useEffect(() => {
-    // Fetch the user's plants from Firestore when the component mounts
+    // Fetch the user's plants from Firestore 
     const fetchPlants = async () => {
       try {
         const auth = getAuth();
@@ -38,7 +43,31 @@ export default function HomeScreen({ navigation }) {
     };
 
     fetchPlants();
+
+    // MQTT subscriptions
+    setHandlerForTopic("CROWmium/rtl8720dn/temperature", (payload) => {
+      setTemperature(payload);
+    });
+    setHandlerForTopic("CROWmium/rtl8720dn/light", (payload) => {
+      setLightLevel(payload);
+    });
+    setHandlerForTopic("CROWmium/rtl8720dn/humidity", (payload) => {
+      setHumidity(payload);
+    });
   }, []); // Empty dependency array ensures this runs only once when the component mounts
+
+  const isOutOfPreferredRange = (plant) => {
+    const checks = [
+      { value: soilMoisture, preferred: plant.preferredSoilMoisture },
+      { value: lightLevel, preferred: plant.preferredLight },
+      { value: temperature, preferred: plant.preferredTemperature },
+      { value: humidity, preferred: plant.preferredHumidity },
+    ];
+
+    return checks.some(({ value, preferred }) =>
+      preferred && (value < preferred.min || value > preferred.max)
+    );
+  };
 
   return (
     <View style={styles.wrapper}>
@@ -64,14 +93,33 @@ export default function HomeScreen({ navigation }) {
 
       <View style={styles.container}>
         {plants.length === 0 ? (
-          <Text style={styles.emptyText}>No plants added yet</Text>
+          <View style={styles.emptyWrapper}>
+            <Text style={styles.emptyTitle}>No plants yet.{'\n'}But that’s easy to fix!</Text>
+            <Text style={styles.emptyBody}>
+              Add one to:
+              {'\n'}Monitor real-time sensor data
+              {'\n'}Get care tips and alerts
+              {'\n'}Track light, humidity, temperature and soil moisture
+            </Text>
+          </View>
         ) : (
           <FlatList
             data={plants}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={styles.card}
+                style={[
+                  styles.card,
+                  isOutOfPreferredRange(item) && {
+                    borderColor: '#dc2626',
+                    borderWidth: 2,
+                    shadowColor: '#dc2626',
+                    shadowOpacity: 0.7,
+                    shadowRadius: 30,
+                    shadowOffset: { width: 0, height: 4 },
+                    elevation: 12,
+                  }
+                ]}
                 onPress={() =>
                   navigation.navigate('PlantMonitoring', { plant: item })
                 }
@@ -157,6 +205,25 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
+  emptyWrapper: {
+    alignItems: 'center',
+    marginTop: 40,
+    paddingHorizontal: 20,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#1e3a8a',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  emptyBody: {
+    fontSize: 16,
+    color: '#374151',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 16,
