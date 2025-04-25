@@ -26,18 +26,23 @@ const LoginScreen = ({ navigation }) => {
         signInWithEmailAndPassword(auth, email, password)
         .then(() => {
           // No navigation here
-          console.log('Login successful'); // Optional
+          console.log('Login successful');
         })
   .catch((error) => {
-    if (error.code === 'auth/user-not-found') {
-      
+    if (error.code === 'auth/user-not-found') {      
       Alert.alert('Please create account. No account exists for this email');
     } else if (error.code === 'auth/wrong-password') {
       Alert.alert('Incorrect password');
     }
       else if (error.code === 'auth/invalid-credential') {
         Alert.alert('Try again. The email or password is incorrect.');
-  } 
+    } else if (error.code === 'auth/invalid-email') {
+        Alert.alert('Please enter a valid Email.');
+    }
+      else if (error.code === 'auth/weak-password') {
+        Alert.alert('Password should be at least 6 characters long.');
+    }
+
      else {
       Alert.alert(error.message);
     }
@@ -73,7 +78,7 @@ const LoginScreen = ({ navigation }) => {
   
   catch (error)  {
     if (error.code === 'auth/email-already-in-use') {
-      Alert.alert('You already have an account just log in');
+      Alert.alert('You already have an account, just log in');
     } else if (error.code === 'auth/invalid-email') {
       Alert.alert('Enter a valid Email');
     } else if (error.code === 'auth/wrong-password') {
@@ -163,6 +168,7 @@ header: {
   fontSize: 40,
   marginBottom: 10,
   fontWeight: 'bold',
+  color: '#202b4a',
 },
 UserInput: {
   backgroundColor: '#fff',
@@ -182,11 +188,13 @@ loginSignupStyle: {
 },
 
 showPasswordstyle: {
-  color: 'black',
+  color: '#202b4a',
   textAlign: 'right',
   fontWeight: '400',
   marginBottom: 9,
+  marginTop: -10,
   width: '75%',
+  fontWeight: 'bold',
 },
 });
 
