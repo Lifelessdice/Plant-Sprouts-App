@@ -9,14 +9,15 @@ import {
   ScrollView,
   Alert,
   Platform,
+  Dimensions,
 } from 'react-native';
 import InfoBox from '../components/InfoBox';
 import CustomButton from '../components/CustomButton';
-import { db, auth } from '../firebase';  // Import the auth from firebase.js
+import { db, auth } from '../firebase';
 import { doc, setDoc, collection } from 'firebase/firestore';
 
 export default function NamePlantScreen({ route, navigation }) {
-  const { plant } = route.params; // Receive plant object from the previous screen
+  const { plant } = route.params;
   const [nickname, setNickname] = useState('');
 
   const handleConfirm = async () => {
@@ -26,22 +27,20 @@ export default function NamePlantScreen({ route, navigation }) {
         ...plant,
         nickname: trimmedNickname,
       };
-  
+
       try {
         if (!auth.currentUser) {
           Alert.alert('Please log in to save your plant.');
           return;
         }
-  
-        const uid = auth.currentUser.uid; // Get the user's UID
-  
-        // Save the plant to Firestore under the user's collection
+
+        const uid = auth.currentUser.uid;
+
         const plantRef = doc(collection(db, 'users', uid, 'plants'));
         await setDoc(plantRef, plantWithNickname);
-  
+
         Alert.alert('Your plant is saved successfully! 🌱');
-  
-        // Only navigate to "Home" if the user is authenticated
+
         if (auth.currentUser) {
           navigation.navigate('Home');
         } else {
@@ -55,7 +54,6 @@ export default function NamePlantScreen({ route, navigation }) {
       Alert.alert('Please enter a valid name for your plant!');
     }
   };
-  
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -70,9 +68,11 @@ export default function NamePlantScreen({ route, navigation }) {
         contentContainerStyle={styles.scrollViewContent}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.container}>
+        <View style={styles.imageContainer}>
           <Image source={plant.image} style={styles.image} />
+        </View>
 
+        <View style={styles.container}>
           <View style={styles.generalInfoBox}>
             <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
           </View>
@@ -112,24 +112,26 @@ export default function NamePlantScreen({ route, navigation }) {
   );
 }
 
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
 const styles = StyleSheet.create({
+  scrollViewContent: {
+    flexGrow: 1,
+    backgroundColor: '#f0fdf4',
+  },
+  imageContainer: {
+    width: '100%',
+  },
+  image: {
+    width: windowWidth,
+    height: windowHeight * 0.45, // Take more vertical space
+    resizeMode: 'cover',
+  },
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f0fdf4',
-    justifyContent: 'center',
     alignItems: 'center',
-  },
-  image: {
-    width: 350,
-    height: 350,
-    borderRadius: 8,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 5,
   },
   generalInfoBox: {
     backgroundColor: '#ffffff',
@@ -169,8 +171,9 @@ const styles = StyleSheet.create({
   infoBoxesContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 10,
-    marginBottom: 20,
+    gap: 5,
+    marginBottom: 10,
+    flexWrap: 'wrap',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -181,9 +184,5 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     flex: 1,
     marginHorizontal: 5,
-  },
-  scrollViewContent: {
-    flexGrow: 1,
-    paddingBottom: 20,
   },
 });
