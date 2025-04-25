@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 import { User } from 'lucide-react-native';
-import { Video } from 'expo-av'; // If using Expo, you can use expo-av for video playback
+import { Video } from 'expo-av'; 
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import CustomButton from '../components/CustomButton';
@@ -64,7 +64,15 @@ export default function HomeScreen({ navigation }) {
 
       <View style={styles.container}>
         {plants.length === 0 ? (
-          <Text style={styles.emptyText}>No plants added yet</Text>
+        <View style={styles.emptyWrapper}>
+        <Text style={styles.emptyTitle}>No plants yet.{'\n'}But that’s easy to fix!</Text>
+        <Text style={styles.emptyBody}>
+         Add one to:
+         {'\n'}Monitor real-time sensor data
+         {'\n'}Get care tips and alerts
+         {'\n'}Track light, humidity, temperature and soil moisture
+        </Text>
+        </View>
         ) : (
           <FlatList
             data={plants}
@@ -157,6 +165,25 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
+  emptyWrapper: {
+    alignItems: 'center',
+    marginTop: 40,
+    paddingHorizontal: 20,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#1e3a8a',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  emptyBody: {
+    fontSize: 16,
+    color: '#374151',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 16,
