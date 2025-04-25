@@ -13,7 +13,7 @@ const int mqtt_port = 1883;
 // Sensor setup
 #define DHTPIN 2
 #define DHTTYPE DHT11
-#define SOIL_PIN A0  // Soil moisture analog input
+#define SOIL_PIN A0  
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -90,8 +90,8 @@ void loop() {
     int light = analogRead(WIO_LIGHT);
 
     int soilRaw = analogRead(SOIL_PIN);
-    int soilMoisture = map(soilRaw, 1023, 0, 0, 100);  // Adjust if your sensor behaves differently
-    soilMoisture = constrain(soilMoisture, 0, 100);    // Clamp between 0–100%
+    int soilMoisture = map(soilRaw, 0, 1023, 0, 100);  
+    soilMoisture = constrain(soilMoisture, 0, 100);    
 
     // Convert values to strings
     char tempStr[10], humStr[10], lightStr[10], soilStr[10];
