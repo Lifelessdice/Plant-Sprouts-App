@@ -17,13 +17,12 @@ export default function PlantMonitoringScreen({ route }) {
   const [soilMoisture, setSoilMoisture] = useState(45);
   const [lightLevel, setLightLevel] = useState(dataStore.light || 800);
   const [temperature, setTemperature] = useState(dataStore.temperature || 22);
-  const [humidity, setHumidity] = useState(55);
+  const [humidity, setHumidity] = useState(dataStore.humidity || 55);
 
   useEffect(() => {
-    // Random values for soilMoisture and humidity
+    // Random value only for soil moisture
     const interval = setInterval(() => {
       setSoilMoisture(Math.floor(Math.random() * 100));
-      setHumidity(Math.floor(Math.random() * 100));
     }, 5000);
 
     // Set MQTT handlers
@@ -33,6 +32,10 @@ export default function PlantMonitoringScreen({ route }) {
 
     setHandlerForTopic("CROWmium/rtl8720dn/light", (payload) => {
       setLightLevel(payload);
+    });
+
+    setHandlerForTopic("CROWmium/rtl8720dn/humidity", (payload) => {
+      setHumidity(payload);
     });
 
     return () => clearInterval(interval);
@@ -74,7 +77,6 @@ export default function PlantMonitoringScreen({ route }) {
       </View>
 
       <ScrollView contentContainerStyle={styles.container}>
-
         {/* General Info */}
         <View style={styles.generalInfoBox}>
           <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
@@ -127,7 +129,7 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 20,
-    paddingTop: 80, // adjusted to accommodate header
+    paddingTop: 80,
     backgroundColor: '#f0fdf4',
     alignItems: 'center',
     flexGrow: 1,
