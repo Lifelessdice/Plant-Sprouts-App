@@ -15,17 +15,12 @@ export default function PlantMonitoringScreen({ route }) {
     return <Text>Plant not found</Text>;
   }
 
-  const [soilMoisture, setSoilMoisture] = useState(45);
+  const [soilMoisture, setSoilMoisture] = useState(dataStore.soilMoisture || 45);
   const [lightLevel, setLightLevel] = useState(dataStore.light || 800);
   const [temperature, setTemperature] = useState(dataStore.temperature || 22);
   const [humidity, setHumidity] = useState(dataStore.humidity || 55);
 
   useEffect(() => {
-    // Random value only for soil moisture
-    const interval = setInterval(() => {
-      setSoilMoisture(Math.floor(Math.random() * 100));
-    }, 5000);
-
     // Set MQTT handlers
     setHandlerForTopic("CROWmium/rtl8720dn/temperature", (payload) => {
       setTemperature(payload);
@@ -39,7 +34,10 @@ export default function PlantMonitoringScreen({ route }) {
       setHumidity(payload);
     });
 
-    return () => clearInterval(interval);
+    setHandlerForTopic("CROWmium/rtl8720dn/moisture", (payload) => {
+      setSoilMoisture(payload);
+    });
+
   }, []);
 
   const renderCard = (label, value, unit, preferred, theme) => {
@@ -89,7 +87,7 @@ export default function PlantMonitoringScreen({ route }) {
           )}
           strokeCap="round"
         />
-       
+
         {preferred ? (
           <Text style={styles.recommendation}>
             Preferred: {preferred.min} - {preferred.max} {unit}
