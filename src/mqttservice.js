@@ -85,7 +85,7 @@ const connect = () => {
         console.log("Light Intensity:", payload);
       });
 
-      setHandlerForTopic("lifelessdice/soil", (payload) => {
+      setHandlerForTopic("CROWmium/rtl8720dn/moisture", (payload) => {
         console.log("Soil Moisture:", payload);
       });
     },
