@@ -1,0 +1,35 @@
+stages:
+  - install
+  - test
+  - build
+
+variables:
+  NODE_ENV: development
+
+cache:
+  paths:
+    - node_modules/
+
+before_script:
+  - npm install -g eas-cli
+  - npm install
+  # If needed, log in using Expo token
+  - eas login --token $EXPO_TOKEN
+
+install:
+  stage: install
+  script:
+    - echo "Dependencies installed"
+
+test:
+  stage: test
+  script:
+    - echo "Run tests here if you have any"
+    # - npm test
+
+build:
+  stage: build
+  script:
+    - eas build --platform android --non-interactive
+  only:
+    - main
