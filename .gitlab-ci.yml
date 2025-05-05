@@ -36,3 +36,5 @@ build:
     - eas build --platform android --non-interactive
   only:
     - main
+    - preview
+
