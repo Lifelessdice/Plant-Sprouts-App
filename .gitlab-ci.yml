@@ -1,10 +1,9 @@
 image: node:18
 
-
 stages:
-  - install
-  - test
   - build
+  - test
+  - deploy
 
 variables:
   NODE_ENV: development
@@ -16,31 +15,28 @@ cache:
 before_script:
   - npm install -g eas-cli
   - npm install
-  # If needed, log in using Expo token
   - eas login --token $EXPO_TOKEN
-
-install:
-  stage: install
-  tags:
-    - docker  # Specify the Docker runner
-  script:
-    - echo "Dependencies installed"
-
-test:
-  stage: test
-  tags:
-    - docker  # Specify the Docker runner
-  script:
-    - echo "Run tests here if you have any"
-    # - npm test
 
 build:
   stage: build
   tags:
-    - docker  # Specify the Docker runner
+    - docker
   script:
+    - echo "Building the project..."
     - eas build --platform android --non-interactive
   only:
     - main
     - preview
+
+test:
+  stage: test
+  script:
+    - echo "Running tests..."
+    # - npm test
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying the project..."
+
 
