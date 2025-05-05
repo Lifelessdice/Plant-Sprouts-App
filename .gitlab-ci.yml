@@ -21,17 +21,23 @@ before_script:
 
 install:
   stage: install
+  tags:
+    - docker  # Specify the Docker runner
   script:
     - echo "Dependencies installed"
 
 test:
   stage: test
+  tags:
+    - docker  # Specify the Docker runner
   script:
     - echo "Run tests here if you have any"
     # - npm test
 
 build:
   stage: build
+  tags:
+    - docker  # Specify the Docker runner
   script:
     - eas build --platform android --non-interactive
   only:
