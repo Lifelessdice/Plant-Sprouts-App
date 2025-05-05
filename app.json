@@ -19,10 +19,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/app-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.project.smartsprout"
     },
     "web": {
       "favicon": "./assets/app-icon.png"
+    },
+    "cli": {
+      "appVersionSource": "remote"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "acb23b2f-fdff-434e-aa74-d5c6a7491b87"
+      }
     }
   }
 }
