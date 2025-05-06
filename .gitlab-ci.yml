@@ -15,6 +15,7 @@ cache:
 before_script:
   - npm install -g eas-cli
   - npm install
+  - eas login --token $EXPO_TOKEN
 
 build:
   stage: build
