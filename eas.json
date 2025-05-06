@@ -6,8 +6,5 @@
     "production": {
       "distribution": "store"
     }
-  },
-  "cli": {
-    "appVersionSource": "remote" 
   }
 }
