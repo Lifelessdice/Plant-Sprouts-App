@@ -24,6 +24,9 @@ build:
   script:
     - echo "Building the project..."
     - eas build --platform android --non-interactive
+  only:
+    - main
+    - preview
 
 test:
   stage: test
