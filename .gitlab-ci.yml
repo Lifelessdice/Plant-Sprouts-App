@@ -10,10 +10,14 @@ cache:
     - node_modules/
 
 before_script:
+  - curl -sL https://deb.nodesource.com/setup_18.x | bash -
+  - apt-get install -y nodejs
   - npm ci
 
 build:
   stage: build
+  tags:
+    - docker  # Specify the Docker runner
   script:
     - echo "🔧 Building the React Native app..."
     - npx expo export --dev --output-dir=dist
@@ -23,11 +27,15 @@ build:
 
 test:
   stage: test
+  tags:
+    - docker  # Specify the Docker runner
   script:
     - echo "🧪 Running tests..."
     - npm test || echo "No tests defined"
 
 deploy:
+  tags:
+    - docker  # Specify the Docker runner
   stage: deploy
   script:
     - echo "🚀 Deploying (this is just a placeholder)..."
