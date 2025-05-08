@@ -6,6 +6,8 @@ import { ArrowLeft, User } from 'lucide-react-native';
 import InfoBox from '../components/InfoBox';
 import { dataStore, setHandlerForTopic } from '../src/mqttservice.js';
 import * as Progress from 'react-native-progress';
+import CustomButton from '../components/CustomButton';
+
 
 export default function PlantMonitoringScreen({ route }) {
   const navigation = useNavigation();
@@ -95,6 +97,14 @@ export default function PlantMonitoringScreen({ route }) {
         ) : (
           <Text style={styles.recommendation}>Preferred range not available</Text>
         )}
+
+        <CustomButton
+          title="Change preferred conditions"
+          onPress={() => navigation.navigate('AddPlant')}
+          textStyle={styles.addButtonText}
+          style={styles.smallButton}
+        />
+
       </View>
     );
   };
@@ -232,5 +242,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#dc2626',
+  },
+  addButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#ffffff',
+    fontFamily: 'System',
+  },
+  smallButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    marginTop: 6,
   },
 });
