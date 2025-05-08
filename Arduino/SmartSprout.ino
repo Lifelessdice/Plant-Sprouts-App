@@ -17,6 +17,7 @@ const int mqtt_port = 1883;
 
 DHT dht(DHTPIN, DHTTYPE);
 
+// LED setup
 #define BLUE_LED 3
 #define RED_LED 4
 
@@ -31,10 +32,27 @@ void callback(char *topic, byte *payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("]: ");
+
+  String message;
   for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
+    char c = (char)payload[i];
+    Serial.print(c);
+    message += c;
   }
   Serial.println();
+
+  // Handle warning messages
+  if (String(topic) == "CROWmium/rtl8720dn/warnings") {
+    message.trim();
+
+    if (message == "WARNING") {
+      digitalWrite(BLUE_LED, LOW);
+      digitalWrite(RED_LED, HIGH);
+    } else if (message == "CLEAR") {
+      digitalWrite(BLUE_LED, HIGH);
+      digitalWrite(RED_LED, LOW);
+    }
+  }
 }
 
 void reconnect() {
@@ -42,7 +60,7 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("rtl8720dnClient")) {
       Serial.println("connected!");
-      client.subscribe("CROWmium/rtl8720dn/#"); // Optionally subscribing to every topic
+      client.subscribe("CROWmium/rtl8720dn/#"); // Includes warnings
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -56,7 +74,7 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
 
-  // WiFi
+  // WiFi connection
   Serial.println("Connecting to WiFi...");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -71,15 +89,15 @@ void setup() {
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
 
-  // Initializing Sensors
+  // Sensors and LEDs
   dht.begin();
   pinMode(WIO_LIGHT, INPUT);
   pinMode(SOIL_PIN, INPUT);
-
+  
   pinMode(BLUE_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
-  digitalWrite(BLUE_LED, HIGH); // Green LED tuned on by default
-  digitalWrite(RED_LED, LOW);
+  digitalWrite(BLUE_LED, HIGH); // Green LED on by default
+  digitalWrite(RED_LED, LOW);   
 }
 
 void loop() {
@@ -88,7 +106,6 @@ void loop() {
   }
   client.loop();
 
-  // Control publishing frequency
   unsigned long now = millis();
   const unsigned long publishInterval = 10000;
   if (now - lastMsgTime > publishInterval) {
@@ -99,23 +116,20 @@ void loop() {
     int light = analogRead(WIO_LIGHT);
 
     int soilRaw = analogRead(SOIL_PIN);
-    int soilMoisture = map(soilRaw, 1023, 0, 0, 100);  
-    soilMoisture = constrain(soilMoisture, 0, 100);    
+    int soilMoisture = map(soilRaw, 1023, 0, 0, 100);
+    soilMoisture = constrain(soilMoisture, 0, 100);
 
-    // Convert values to strings
     char tempStr[10], humStr[10], lightStr[10], soilStr[10];
     snprintf(tempStr, sizeof(tempStr), "%d", temperature);
     snprintf(humStr, sizeof(humStr), "%d", humidity);
     snprintf(lightStr, sizeof(lightStr), "%d", light);
     snprintf(soilStr, sizeof(soilStr), "%d", soilMoisture);
 
-    // Print to Serial
     Serial.print("Temperature: "); Serial.println(tempStr);
     Serial.print("Humidity: "); Serial.println(humStr);
     Serial.print("Light: "); Serial.println(lightStr);
     Serial.print("Soil Moisture: "); Serial.println(soilStr);
 
-    // Publish to MQTT
     client.publish("CROWmium/rtl8720dn/temperature", tempStr);
     client.publish("CROWmium/rtl8720dn/humidity", humStr);
     client.publish("CROWmium/rtl8720dn/light", lightStr);
