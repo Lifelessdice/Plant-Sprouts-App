@@ -60,7 +60,7 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("rtl8720dnClient")) {
       Serial.println("connected!");
-      client.subscribe("CROWmium/rtl8720dn/#"); // Includes warnings
+      client.subscribe("CROWmium/rtl8720dn/#"); // Optionally subscribing to every topic which includes warnings
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -74,7 +74,7 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
 
-  // WiFi connection
+  // WiFi Setup
   Serial.println("Connecting to WiFi...");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -85,7 +85,7 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  // MQTT
+  // MQTT Setup
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
 
@@ -96,7 +96,7 @@ void setup() {
   
   pinMode(BLUE_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
-  digitalWrite(BLUE_LED, HIGH); // Green LED on by default
+  digitalWrite(BLUE_LED, HIGH); // Green LED turned on by default
   digitalWrite(RED_LED, LOW);   
 }
 
@@ -119,17 +119,20 @@ void loop() {
     int soilMoisture = map(soilRaw, 1023, 0, 0, 100);
     soilMoisture = constrain(soilMoisture, 0, 100);
 
+    // Convert values to strings
     char tempStr[10], humStr[10], lightStr[10], soilStr[10];
     snprintf(tempStr, sizeof(tempStr), "%d", temperature);
     snprintf(humStr, sizeof(humStr), "%d", humidity);
     snprintf(lightStr, sizeof(lightStr), "%d", light);
     snprintf(soilStr, sizeof(soilStr), "%d", soilMoisture);
 
+    // Print to Serial
     Serial.print("Temperature: "); Serial.println(tempStr);
     Serial.print("Humidity: "); Serial.println(humStr);
     Serial.print("Light: "); Serial.println(lightStr);
     Serial.print("Soil Moisture: "); Serial.println(soilStr);
 
+    // Publish to MQTT
     client.publish("CROWmium/rtl8720dn/temperature", tempStr);
     client.publish("CROWmium/rtl8720dn/humidity", humStr);
     client.publish("CROWmium/rtl8720dn/light", lightStr);
