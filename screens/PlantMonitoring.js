@@ -91,8 +91,8 @@ export default function PlantMonitoringScreen({ route }) {
 
         <CustomButton
           title="Change preferred conditions"
-          onPress={() => navigation.navigate('AddPlant')}
-          textStyle={styles.addButtonText}
+          onPress={() => navigation.navigate('ChangeConditions', {label, preferred, plant, unit})}
+          textStyle={styles.addButtonText} 
           style={styles.smallButton}
         />
 
