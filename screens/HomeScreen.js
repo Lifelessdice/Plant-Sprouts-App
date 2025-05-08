@@ -167,9 +167,11 @@ export default function HomeScreen({ navigation }) {
                 <Text style={styles.plantName}>
                   {`${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
                 </Text>
-                <TouchableOpacity onPress={() => handleDeletePlant(item.userPlantId)} style={{ marginTop: 10 }}>
-                  <Text style={{ color: '#dc2626', fontWeight: 'bold' }}>❌</Text>
-                </TouchableOpacity>
+                <View style={styles.deleteButtonContainer}>
+                  <TouchableOpacity onPress={() => handleDeletePlant(item.userPlantId)}>
+                    <Text style={styles.deleteButtonText}>❌</Text>
+                  </TouchableOpacity>
+                </View>
               </TouchableOpacity>
             )}
           />
@@ -280,5 +282,15 @@ const styles = StyleSheet.create({
   addButton: {
     marginTop: 30,
     width: '50%',
+  },
+  deleteButtonContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+  },
+  deleteButtonText: {
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
