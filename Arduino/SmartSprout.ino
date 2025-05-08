@@ -17,6 +17,9 @@ const int mqtt_port = 1883;
 
 DHT dht(DHTPIN, DHTTYPE);
 
+#define BLUE_LED 3
+#define RED_LED 4
+
 // MQTT client setup
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
@@ -72,6 +75,11 @@ void setup() {
   dht.begin();
   pinMode(WIO_LIGHT, INPUT);
   pinMode(SOIL_PIN, INPUT);
+
+  pinMode(BLUE_LED, OUTPUT);
+  pinMode(RED_LED, OUTPUT);
+  digitalWrite(BLUE_LED, HIGH); // Green LED tuned on by default
+  digitalWrite(RED_LED, LOW);
 }
 
 void loop() {
