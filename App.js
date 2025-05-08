@@ -49,6 +49,7 @@ export default function App() {
             <Stack.Screen name="AddPlant" component={AddPlantScreen} />
             <Stack.Screen name="PlantMonitoring" component={PlantMonitoringScreen} />
             <Stack.Screen name="NamePlant" component={NamePlantScreen} />
+            <Stack.Screen name="ChangeConditions" component={require('./screens/ChangeConditions').default} />
           </>
         ) : (
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
