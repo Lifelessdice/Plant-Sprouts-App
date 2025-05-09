@@ -5,14 +5,13 @@ import { Video } from 'expo-av';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import CustomButton from '../components/CustomButton';
-import { dataStore, setHandlerForTopic } from '../src/mqttservice';
 
 export default function HomeScreen({ navigation }) {
   const [plants, setPlants] = useState([]);  // Local state to store user's plants
-  const [soilMoisture, setSoilMoisture] = useState(dataStore.soilMoisture || 45);
-  const [lightLevel, setLightLevel] = useState(dataStore.light || 800);
-  const [temperature, setTemperature] = useState(dataStore.temperature || 22);
-  const [humidity, setHumidity] = useState(dataStore.humidity || 55);
+  const [soilMoisture, setSoilMoisture] = useState(45);  // Default to 45 if no value
+  const [lightLevel, setLightLevel] = useState(800);  // Default to 800 if no value
+  const [temperature, setTemperature] = useState(22);  // Default to 22°C if no value
+  const [humidity, setHumidity] = useState(55);  // Default to 55% if no value
 
   useEffect(() => {
     // Fetch the user's plants from Firestore 
@@ -43,17 +42,6 @@ export default function HomeScreen({ navigation }) {
     };
 
     fetchPlants();
-
-    // MQTT subscriptions
-    setHandlerForTopic("CROWmium/rtl8720dn/temperature", (payload) => {
-      setTemperature(payload);
-    });
-    setHandlerForTopic("CROWmium/rtl8720dn/light", (payload) => {
-      setLightLevel(payload);
-    });
-    setHandlerForTopic("CROWmium/rtl8720dn/humidity", (payload) => {
-      setHumidity(payload);
-    });
   }, []); // Empty dependency array ensures this runs only once when the component mounts
 
   const isOutOfPreferredRange = (plant) => {
@@ -223,7 +211,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
   },
-  
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 16,

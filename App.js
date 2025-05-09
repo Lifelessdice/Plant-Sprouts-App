@@ -7,8 +7,8 @@ import AddPlantScreen from './screens/AddPlant';
 import NamePlantScreen from './screens/NamePlantScreen';
 import LoginScreen from './screens/LoginScreen';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { connect } from './src/mqttservice'; 
-import { auth } from './firebase';  // Firebase initialization
+//import { connect } from './src/mqttservice'; 
+import { auth } from './firebase';  
 
 const Stack = createNativeStackNavigator();
 
@@ -17,7 +17,7 @@ export default function App() {
 
   useEffect(() => {
     // Establish MQTT connection
-    connect();
+    //connect();
 
     // Listen for authentication state changes
     const unsubscribe = onAuthStateChanged(auth, (user) => {
