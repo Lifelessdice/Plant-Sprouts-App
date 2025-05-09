@@ -179,9 +179,16 @@ export default function HomeScreen({ navigation }) {
 
         <CustomButton
           title="Add New Plant"
-          onPress={() => navigation.navigate('AddPlant')}
+          onPress={() => {
+            if (plants.length >= 5) {
+              Alert.alert('Limit Reached', 'You can only add up to 5 plants.');
+            } else {
+              navigation.navigate('AddPlant');
+            }
+          }}
           style={styles.addButton}
         />
+
       </View>
     </View>
   );
