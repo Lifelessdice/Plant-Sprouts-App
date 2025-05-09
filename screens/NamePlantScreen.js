@@ -27,25 +27,29 @@ export default function NamePlantScreen({ route, navigation }) {
         ...plant,
         nickname: trimmedNickname,
       };
-
+  
       try {
         if (!auth.currentUser) {
           Alert.alert('Please log in to save your plant.');
           return;
         }
-
+  
         const uid = auth.currentUser.uid;
-
+  
+        // Create a new document reference for the user in 'plants' collection
         const plantRef = doc(collection(db, 'users', uid, 'plants'));
-        await setDoc(plantRef, plantWithNickname);
-
+  
+        // Generate a unique user-specific plant ID (e.g., using Date.now or a UUID)
+        const userPlantId = plantRef.id; // You can use this or create a custom ID logic
+  
+        await setDoc(plantRef, {
+          ...plantWithNickname,
+          userPlantId, // Store the unique plant ID in 'userPlantId'
+        });
+  
         Alert.alert('Your plant is saved successfully! 🌱');
-
-        if (auth.currentUser) {
-          navigation.navigate('Home');
-        } else {
-          Alert.alert('Please log in to continue.');
-        }
+  
+        navigation.navigate('Home');
       } catch (error) {
         console.error('Error saving plant:', error);
         Alert.alert('Something went wrong. Please try again.');
@@ -54,6 +58,7 @@ export default function NamePlantScreen({ route, navigation }) {
       Alert.alert('Please enter a valid name for your plant!');
     }
   };
+  
 
   const handleGoBack = () => {
     navigation.goBack();
