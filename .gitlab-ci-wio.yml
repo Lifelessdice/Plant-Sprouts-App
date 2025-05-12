@@ -17,7 +17,6 @@ before_script:
   - arduino-cli core install Seeeduino:samd
   - arduino-cli lib install "Seeed Arduino rpcWiFi"
   - arduino-cli lib install "PubSubClient"
-  - arduino-cli lib install "Grove_Moisture_Sensor"
   - arduino-cli lib install "Grove Temperature And Humidity Sensor"
 
 
