@@ -1,7 +1,4 @@
 image: ubuntu:latest
-before_script:
-  - chmod +x setup-build-env.sh
-  - ./setup-build-env.sh
 
 stages:
   - build
@@ -13,6 +10,7 @@ build:
   tags:
     - docker
   script:
+    - echo "🔧 Building Wio Terminal..."
     - export PATH=$PATH:/root/bin
     - pwd
     - cd arduino_src
@@ -21,9 +19,10 @@ build:
 test:
   stage: test
   script:
-    - echo "Running Wio Terminal tests..."
+    - echo "🧪 Running Wio Terminal tests..."
 
 deploy:
   stage: deploy
   script:
-    - echo "Deploying Wio Terminal..."
+    - echo "🚀 Deploying Wio Terminal..."
+
