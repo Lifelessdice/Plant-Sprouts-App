@@ -1,0 +1,29 @@
+image: ubuntu:latest
+before_script:
+  - chmod +x setup-build-env.sh
+  - ./setup-build-env.sh
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  tags:
+    - docker
+  script:
+    - export PATH=$PATH:/root/bin
+    - pwd
+    - cd arduino_src
+    - arduino-cli compile --fqbn Seeeduino:samd:seeed_wio_terminal
+
+test:
+  stage: test
+  script:
+    - echo "Running Wio Terminal tests..."
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying Wio Terminal..."
