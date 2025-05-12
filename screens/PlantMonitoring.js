@@ -1,21 +1,43 @@
 // screens/PlantMonitoringScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { ArrowLeft, User } from 'lucide-react-native';
 import InfoBox from '../components/InfoBox';
 import { dataStore, setHandlerForTopic } from '../src/mqttservice.js';
 import * as Progress from 'react-native-progress';
 import CustomButton from '../components/CustomButton';
+import { getDoc, doc } from 'firebase/firestore';
+import { db, auth } from '../firebase';
 
 
 export default function PlantMonitoringScreen({ route }) {
   const navigation = useNavigation();
-  const { plant } = route.params;
+  const [plantData, setPlantData] = useState(route.params.plant);
 
-  if (!plant) {
+  if (!plantData) {
     return <Text>Plant not found</Text>;
   }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchUpdatedPlant = async () => {
+        try {
+          const plantRef = doc(db, 'users', auth.currentUser.uid, 'plants', plantData.id);
+          const snapshot = await getDoc(plantRef);
+          if (snapshot.exists()) {
+            const updatedPlant = snapshot.data();
+            updatedPlant.id = snapshot.id;
+            setPlantData(updatedPlant);
+          }
+        } catch (err) {
+          console.error('Error fetching updated plant:', err);
+        }
+      };
+
+      fetchUpdatedPlant();
+    }, [])
+  );
 
   const [soilMoisture, setSoilMoisture] = useState(dataStore.soilMoisture || 45);
   const [lightLevel, setLightLevel] = useState(dataStore.light || 800);
@@ -99,8 +121,8 @@ export default function PlantMonitoringScreen({ route }) {
         )}
 
         <CustomButton
-          title="Change preferred conditions"
-          onPress={() => navigation.navigate('ChangeConditions', {label, preferred, plant, unit})}
+          title={label?.toLowerCase().includes('temperature') ? "Change preferred temperature" : ""}
+          onPress={() => navigation.navigate('ChangeConditions', {label, preferred, plant: plantData, unit})}
           textStyle={styles.addButtonText} 
           style={styles.smallButton}
         />
@@ -117,7 +139,7 @@ export default function PlantMonitoringScreen({ route }) {
           <ArrowLeft color="#1e3a8a" size={24} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {plant.name} {plant.nickname ? `${plant.nickname}` : ''}
+          {plantData.name} {plantData.nickname ? `${plantData.nickname}` : ''}
         </Text>
         <TouchableOpacity onPress={() => navigation.navigate('Account')} style={styles.accountButton}>
           <User color="#1e3a8a" size={24} />
@@ -127,23 +149,23 @@ export default function PlantMonitoringScreen({ route }) {
       <ScrollView contentContainerStyle={styles.container}>
         {/* General Info */}
         <View style={styles.generalInfoBox}>
-          <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
+          <Text style={styles.generalInfoText}>{plantData.generalInfo}</Text>
         </View>
 
         {/* Small Info Boxes */}
         <View style={styles.infoBoxesContainer}>
-          <InfoBox imageSource={plant.difficulty} />
-          <InfoBox imageSource={plant.lightRecommendation} />
-          <InfoBox imageSource={plant.humidityRecommendation} />
-          <InfoBox imageSource={plant.toxicity} />
-          <InfoBox imageSource={plant.watering} />
+          <InfoBox imageSource={plantData.difficulty} />
+          <InfoBox imageSource={plantData.lightRecommendation} />
+          <InfoBox imageSource={plantData.humidityRecommendation} />
+          <InfoBox imageSource={plantData.toxicity} />
+          <InfoBox imageSource={plantData.watering} />
         </View>
 
         {/* Monitoring Cards */}
-        {renderCard('🌱 Soil Moisture', soilMoisture, 'kPa', plant.preferredSoilMoisture, '#DAA06D')}
-        {renderCard('☀️ Light Level', lightLevel, 'lux', plant.preferredLight, '#facc15')}
-        {renderCard('🌡️ Temperature', temperature, '°C', plant.preferredTemperature, '#fb923c')}
-        {renderCard('💧 Humidity', humidity, 'g/m3', plant.preferredHumidity, '#60a5fa')}
+        {renderCard('🌱 Soil Moisture', soilMoisture, 'kPa', plantData.preferredSoilMoisture, '#DAA06D')}
+        {renderCard('☀️ Light Level', lightLevel, 'lux', plantData.preferredLight, '#facc15')}
+        {renderCard('🌡️ Temperature', temperature, '°C', plantData.preferredTemperature, '#fb923c')}
+        {renderCard('💧 Humidity', humidity, 'g/m3', plantData.preferredHumidity, '#60a5fa')}
       </ScrollView>
     </>
   );

@@ -26,6 +26,10 @@ export default function NamePlantScreen({ route, navigation }) {
       const plantWithNickname = {
         ...plant,
         nickname: trimmedNickname,
+        originalPreferredTemperature: plant.preferredTemperature,
+        originalPreferredHumidity: plant.preferredHumidity,
+        originalPreferredLight: plant.preferredLight,
+        originalPreferredSoilMoisture: plant.preferredSoilMoisture,
       };
 
       try {
@@ -37,7 +41,7 @@ export default function NamePlantScreen({ route, navigation }) {
         const uid = auth.currentUser.uid;
 
         const plantRef = doc(collection(db, 'users', uid, 'plants'));
-        await setDoc(plantRef, plantWithNickname);
+        await setDoc(plantRef, { ...plantWithNickname, id: plantRef.id });
 
         Alert.alert('Your plant is saved successfully! 🌱');
 
