@@ -16,6 +16,8 @@ before_script:
   - arduino-cli core update-index
   - arduino-cli core install Seeeduino:samd
   - arduino-cli lib install "Seeed Arduino rpcWiFi"
+  - arduino-cli lib install "PubSubClient"
+
 
 
 build:
