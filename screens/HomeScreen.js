@@ -6,13 +6,14 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import CustomButton from '../components/CustomButton';
 import { dataStore, setHandlerForTopic } from '../src/mqttservice';
+import { deleteDoc, doc } from 'firebase/firestore';
 
 export default function HomeScreen({ navigation }) {
   const [plants, setPlants] = useState([]);  // Local state to store user's plants
-  const [soilMoisture, setSoilMoisture] = useState(dataStore.soilMoisture || 45);
-  const [lightLevel, setLightLevel] = useState(dataStore.light || 800);
-  const [temperature, setTemperature] = useState(dataStore.temperature || 22);
-  const [humidity, setHumidity] = useState(dataStore.humidity || 55);
+  const [soilMoisture, setSoilMoisture] = useState(45);  // Default to 45 if no value
+  const [lightLevel, setLightLevel] = useState(800);  // Default to 800 if no value
+  const [temperature, setTemperature] = useState(22);  // Default to 22°C if no value
+  const [humidity, setHumidity] = useState(55);  // Default to 55% if no value
 
   useEffect(() => {
     // Fetch the user's plants from Firestore 
@@ -31,7 +32,7 @@ export default function HomeScreen({ navigation }) {
         const snapshot = await getDocs(plantsCollection);
 
         const plantsList = snapshot.docs.map(doc => ({
-          id: doc.id,
+          userPlantId: doc.id, // Use the Firestore document ID as userPlantId
           ...doc.data(),
         }));
 
@@ -43,18 +44,39 @@ export default function HomeScreen({ navigation }) {
     };
 
     fetchPlants();
-
-    // MQTT subscriptions
-    setHandlerForTopic("CROWmium/rtl8720dn/temperature", (payload) => {
-      setTemperature(payload);
-    });
-    setHandlerForTopic("CROWmium/rtl8720dn/light", (payload) => {
-      setLightLevel(payload);
-    });
-    setHandlerForTopic("CROWmium/rtl8720dn/humidity", (payload) => {
-      setHumidity(payload);
-    });
   }, []); // Empty dependency array ensures this runs only once when the component mounts
+
+  const handleDeletePlant = (userPlantId) => {
+    Alert.alert(
+      'Delete Plant',
+      'Are you sure you want to delete this plant?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const auth = getAuth();
+              const db = getFirestore();
+              const user = auth.currentUser;
+              if (!user) return;
+
+              // Use the userPlantId to delete the plant
+              const plantRef = doc(db, 'users', user.uid, 'plants', userPlantId);
+              await deleteDoc(plantRef);
+
+              setPlants((prev) => prev.filter((p) => p.userPlantId !== userPlantId));
+              Alert.alert('Plant deleted successfully');
+            } catch (error) {
+              console.error('Error deleting plant:', error);
+              Alert.alert('Failed to delete plant.');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const isOutOfPreferredRange = (plant) => {
     const checks = [
@@ -105,7 +127,7 @@ export default function HomeScreen({ navigation }) {
         ) : (
           <FlatList
             data={plants}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.userPlantId} // Use userPlantId for the key
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={[
@@ -134,6 +156,11 @@ export default function HomeScreen({ navigation }) {
                 <Text style={styles.plantName}>
                   {`${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
                 </Text>
+                <View style={styles.deleteButtonContainer}>
+                  <TouchableOpacity onPress={() => handleDeletePlant(item.userPlantId)}>
+                    <Text style={styles.deleteButtonText}>❌</Text>
+                  </TouchableOpacity>
+                </View>
               </TouchableOpacity>
             )}
           />
@@ -141,9 +168,16 @@ export default function HomeScreen({ navigation }) {
 
         <CustomButton
           title="Add New Plant"
-          onPress={() => navigation.navigate('AddPlant')}
+          onPress={() => {
+            if (plants.length >= 5) {
+              Alert.alert('Limit Reached', 'You can only add up to 5 plants.');
+            } else {
+              navigation.navigate('AddPlant');
+            }
+          }}
           style={styles.addButton}
         />
+
       </View>
     </View>
   );
@@ -199,12 +233,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     zIndex: 1,
   },
-  emptyText: {
-    fontSize: 16,
-    color: '#6b7280',
-    textAlign: 'center',
-    marginTop: 20,
-  },
   emptyWrapper: {
     alignItems: 'center',
     marginTop: 40,
@@ -223,7 +251,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
   },
-  
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 16,
@@ -251,5 +278,15 @@ const styles = StyleSheet.create({
   addButton: {
     marginTop: 30,
     width: '50%',
+  },
+  deleteButtonContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+  },
+  deleteButtonText: {
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });

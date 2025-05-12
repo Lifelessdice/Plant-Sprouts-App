@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useNavigation } from '@react-navigation/native';
 import { ArrowLeft, User } from 'lucide-react-native';
 import InfoBox from '../components/InfoBox';
-import { dataStore, setHandlerForTopic } from '../src/mqttservice.js';
+import { dataStore } from '../src/mqtt-proxy.js';
 import * as Progress from 'react-native-progress';
 
 export default function PlantMonitoringScreen({ route }) {
@@ -15,29 +15,20 @@ export default function PlantMonitoringScreen({ route }) {
     return <Text>Plant not found</Text>;
   }
 
-  const [soilMoisture, setSoilMoisture] = useState(dataStore.soilMoisture || 45);
+  const [soilMoisture, setSoilMoisture] = useState(dataStore.moisture || 45);
   const [lightLevel, setLightLevel] = useState(dataStore.light || 800);
   const [temperature, setTemperature] = useState(dataStore.temperature || 22);
   const [humidity, setHumidity] = useState(dataStore.humidity || 55);
 
   useEffect(() => {
-    // Set MQTT handlers
-    setHandlerForTopic("CROWmium/rtl8720dn/temperature", (payload) => {
-      setTemperature(payload);
-    });
+    const interval = setInterval(() => {
+      setTemperature(dataStore.temperature || 22);
+      setLightLevel(dataStore.light || 800);
+      setHumidity(dataStore.humidity || 55);
+      setSoilMoisture(dataStore.moisture || 45);
+    }, 5000); // Sync with mqtt-proxy.js polling interval
 
-    setHandlerForTopic("CROWmium/rtl8720dn/light", (payload) => {
-      setLightLevel(payload);
-    });
-
-    setHandlerForTopic("CROWmium/rtl8720dn/humidity", (payload) => {
-      setHumidity(payload);
-    });
-
-    setHandlerForTopic("CROWmium/rtl8720dn/moisture", (payload) => {
-      setSoilMoisture(payload);
-    });
-
+    return () => clearInterval(interval);
   }, []);
 
   const renderCard = (label, value, unit, preferred, theme) => {
@@ -78,7 +69,7 @@ export default function PlantMonitoringScreen({ route }) {
           showsText={true}
           formatText={() => (
             <Text style={[styles.value, isOutOfRange && styles.alert]}>
-                {aboveRange
+              {aboveRange
                 ? `  High\n${value} ${unit}`
                 : belowRange
                 ? `   Low\n${value} ${unit}`
