@@ -8,7 +8,7 @@ import NamePlantScreen from './screens/NamePlantScreen';
 import LoginScreen from './screens/LoginScreen';
 import SplashScreen from './screens/SplashScreen';  
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { connect } from './src/mqttservice'; 
+//import { connect } from './src/mqttservice'; 
 import { auth } from './firebase';  
 
 const Stack = createNativeStackNavigator();
@@ -20,7 +20,7 @@ export default function App() {
 
   useEffect(() => {
     // Establish MQTT connection
-    connect();
+    //connect();
 
     const timer = setTimeout(() => {
       setSplashVisible(false);
