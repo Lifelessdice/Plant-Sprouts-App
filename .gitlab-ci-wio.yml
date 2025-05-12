@@ -15,6 +15,8 @@ before_script:
   - arduino-cli config add board_manager.additional_urls https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
   - arduino-cli core update-index
   - arduino-cli core install Seeeduino:samd
+  - arduino-cli lib install "Seeed Arduino rpcWiFi"
+
 
 build:
   stage: build
