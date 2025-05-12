@@ -16,7 +16,7 @@ build:
     - echo "🔧 Building Wio Terminal..."
     - export PATH=$PATH:/root/bin
     - pwd
-    - cd arduino_src
+    - cd Arduino
     - arduino-cli compile --fqbn Seeeduino:samd:seeed_wio_terminal
 
 test:
