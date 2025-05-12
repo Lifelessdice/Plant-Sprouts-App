@@ -26,6 +26,10 @@ export default function NamePlantScreen({ route, navigation }) {
       const plantWithNickname = {
         ...plant,
         nickname: trimmedNickname,
+        originalPreferredTemperature: plant.preferredTemperature,
+        originalPreferredHumidity: plant.preferredHumidity,
+        originalPreferredLight: plant.preferredLight,
+        originalPreferredSoilMoisture: plant.preferredSoilMoisture,
       };
   
       try {
