@@ -22,24 +22,63 @@ export default function ChangeConditionsScreen() {
       const userId = auth.currentUser.uid;
       const plantRef = doc(db, 'users', userId, 'plants', plant.id);
 
-      const updatedPreferredTemperature = {
+      const updatedPreferredConditions = {
         min: newMin ? parseFloat(newMin) : preferred.min,
         max: newMax ? parseFloat(newMax) : preferred.max,
       };
 
-      const updatePayload = {
-        preferredTemperature: updatedPreferredTemperature,
-      };
+      let updatePayload = {};
+      if (label?.toLowerCase().includes('temperature')) {
+        updatePayload = {
+          preferredTemperature: updatedPreferredConditions,
+        };
+      } else if (label?.toLowerCase().includes('soil')) {
+        updatePayload = {
+          preferredSoilMoisture: updatedPreferredConditions,
+        };
+      }
 
       try {
         await updateDoc(plantRef, updatePayload);
-        Alert.alert('Preferred temperature updated!');
+        Alert.alert('Preferred conditions updated!');
         navigation.goBack();
       } catch (error) {
         console.error('Error updating preferred temperature:', error);
         Alert.alert('Failed to update.');
       }
     };
+
+    const EditConditions = (label, preferred, unit) => {
+      return (<ScrollView contentContainerStyle={{ padding: 20 }}>
+        {preferred ? (
+          <View style={styles.formContainer}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>{label}</Text>
+            <Text>Current range: {preferred.min} – {preferred.max} {unit}</Text>
+            <TextInput
+              placeholder={`Enter new min ${label}`}
+              value={newMin}
+              onChangeText={setNewMin}
+              keyboardType="numeric"
+              style={{ width: '80%', backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#94a3b8', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10, fontSize: 16, marginTop: 12 }}
+            />
+            <TextInput
+              placeholder={`Enter new max ${label}`}
+              value={newMax}
+              onChangeText={setNewMax}
+              keyboardType="numeric"
+              style={{ width: '80%', backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#94a3b8', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10, fontSize: 16, marginTop: 12 }}
+            />
+            <CustomButton
+              title="Save Changes"
+              onPress={handleSave}
+              style={{ marginTop: 20 }}
+            />
+          </View>
+        ) : (
+          <Text>No preferred range set.</Text>
+        )}
+    </ScrollView>
+    )}
 
     return (
     
@@ -53,37 +92,11 @@ export default function ChangeConditionsScreen() {
             <User color="#1e3a8a" size={24} />
           </TouchableOpacity>
         </View>
-        {label?.toLowerCase().includes('temperature') && (
-            <ScrollView contentContainerStyle={{ padding: 20 }}>
-                {preferred ? (
-                  <View style={styles.formContainer}>
-                    <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>{label}</Text>
-                    <Text>Current range: {preferred.min} – {preferred.max} {unit}</Text>
-                    <TextInput
-                      placeholder="Enter new min temperature"
-                      value={newMin}
-                      onChangeText={setNewMin}
-                      keyboardType="numeric"
-                      style={{ width: '80%', backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#94a3b8', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10, fontSize: 16, marginTop: 12 }}
-                    />
-                    <TextInput
-                      placeholder="Enter new max temperature"
-                      value={newMax}
-                      onChangeText={setNewMax}
-                      keyboardType="numeric"
-                      style={{ width: '80%', backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#94a3b8', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10, fontSize: 16, marginTop: 12 }}
-                    />
-                    <CustomButton
-                      title="Save Changes"
-                      onPress={handleSave}
-                      style={{ marginTop: 20 }}
-                    />
-                  </View>
-                ) : (
-                  <Text>No preferred range set.</Text>
-                )}
-            </ScrollView>
-        )}
+        {label?.toLowerCase().includes('temperature') ? (EditConditions('Temperature', preferred, unit)) 
+        : 
+        label?.toLowerCase().includes('soil') ? (EditConditions('Soil Moisture', preferred, unit))
+        : null}
+        
       </>
 
     );
