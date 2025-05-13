@@ -22,18 +22,25 @@ export default function ChangeConditionsScreen() {
       const userId = auth.currentUser.uid;
       const plantRef = doc(db, 'users', userId, 'plants', plant.id);
 
-      const updatedPreferredTemperature = {
+      const updatedPreferredConditions = {
         min: newMin ? parseFloat(newMin) : preferred.min,
         max: newMax ? parseFloat(newMax) : preferred.max,
       };
 
-      const updatePayload = {
-        preferredTemperature: updatedPreferredTemperature,
-      };
+      let updatePayload = {};
+      if (label?.toLowerCase().includes('temperature')) {
+        updatePayload = {
+          preferredTemperature: updatedPreferredConditions,
+        };
+      } else if (label?.toLowerCase().includes('soil')) {
+        updatePayload = {
+          preferredSoilMoisture: updatedPreferredConditions,
+        };
+      }
 
       try {
         await updateDoc(plantRef, updatePayload);
-        Alert.alert('Preferred temperature updated!');
+        Alert.alert('Preferred conditions updated!');
         navigation.goBack();
       } catch (error) {
         console.error('Error updating preferred temperature:', error);
@@ -85,7 +92,11 @@ export default function ChangeConditionsScreen() {
             <User color="#1e3a8a" size={24} />
           </TouchableOpacity>
         </View>
-        {label?.toLowerCase().includes('temperature') && EditConditions('Temperature', preferred, unit)}
+        {label?.toLowerCase().includes('temperature') ? (EditConditions('Temperature', preferred, unit)) 
+        : 
+        label?.toLowerCase().includes('soil') ? (EditConditions('Soil Moisture', preferred, unit))
+        : null}
+        
       </>
 
     );
