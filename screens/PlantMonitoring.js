@@ -9,7 +9,8 @@ import CustomButton from '../components/CustomButton';
 import { getDoc, doc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import TopBar from '../components/TopBar';
-
+import { colors } from '../theme/colors';
+import { fonts } from '../theme/fonts';
 
 export default function PlantMonitoringScreen({ route }) {
   const navigation = useNavigation();
@@ -159,27 +160,27 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     paddingTop: 80,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: colors.background,
     alignItems: 'center',
     flexGrow: 1,
   },
   generalInfoBox: {
     marginTop: 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.cardBackground,
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
     maxWidth: 340,
     width: '100%',
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 3,
   },
   generalInfoText: {
-    fontSize: 16,
-    color: '#1e3a8a',
+    ...fonts.body,
+    color: colors.primaryText,
     textAlign: 'center',
   },
   infoBoxesContainer: {
@@ -190,22 +191,22 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.cardBackground,
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
     width: '100%',
     maxWidth: 300,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 4,
   },
   label: {
-    fontSize: 18,
-    color: '#1e3a8a',
+    ...fonts.cardTitle,
+    color: colors.primaryText,
     marginBottom: 6,
   },
   value: {
@@ -222,8 +223,8 @@ const styles = StyleSheet.create({
   alert: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#dc2626',
-  },
+    color: colors.danger,  },
+    
   addButtonText: {
     fontSize: 14,
     fontWeight: '600',
