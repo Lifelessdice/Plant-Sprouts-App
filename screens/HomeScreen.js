@@ -208,6 +208,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 100,
     paddingHorizontal: 20,
+    paddingBottom: 20,
     zIndex: 1,
   },
   emptyWrapper: {
