@@ -5,6 +5,8 @@ import TopBar from '../components/TopBar';
 import { db } from '../firebase'; 
 import { collection, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import { colors } from '../theme/colors';
+import { fonts } from '../theme/fonts';
 
 export default function AddPlantScreen({ navigation }) {
   const [firebaseData, setFirebaseData] = useState([]);
@@ -91,9 +93,8 @@ export default function AddPlantScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1e3a8a',
+    ...fonts.title,  
+    color: colors.primaryText,
     marginBottom: 20,
     marginTop: 20,
     alignSelf: 'center',
@@ -103,20 +104,20 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 80, // adjusted to accommodate header
     paddingHorizontal: 20,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: colors.background, 
   },
   list: {
     alignItems: 'center',
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.cardBackground,     
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
     width: '100%',
     maxWidth: 320,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
@@ -130,13 +131,12 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   name: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1e3a8a',
+  ...fonts.cardTitle,  
+    color: colors.primaryText,  
   },
   loadingText: {
-    fontSize: 18,
-    color: '#1e3a8a',
+    ...fonts.body,
+    color: colors.primaryText,
     textAlign: 'center',
   },
 });
