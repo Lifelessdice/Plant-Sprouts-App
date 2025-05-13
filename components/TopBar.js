@@ -1,9 +1,14 @@
-// components/TopBar.js
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import { User, ArrowLeft } from 'lucide-react-native';
 
 export default function TopBar({ title = '', onUserPress, onBackPress }) {
+  useEffect(() => {
+    // Set the Android status bar color to match the top bar
+    StatusBar.setBarStyle('dark-content');  //  Define the color of the very top area of the screen on Android
+    StatusBar.setBackgroundColor('#e0f2fe'); // Set background color to match your top bar
+  }, []);
+
   return (
     <View style={styles.header}>
       {onBackPress && (
@@ -24,7 +29,7 @@ export default function TopBar({ title = '', onUserPress, onBackPress }) {
 }
 
 const styles = StyleSheet.create({
-    header: {
+  header: {
     height: 80,
     backgroundColor: '#e0f2fe',
     justifyContent: 'center',
@@ -35,7 +40,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10, // ensure it's on top
-    },
+  },
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
