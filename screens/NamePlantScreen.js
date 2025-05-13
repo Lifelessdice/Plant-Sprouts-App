@@ -15,6 +15,8 @@ import InfoBox from '../components/InfoBox';
 import CustomButton from '../components/CustomButton';
 import { db, auth } from '../firebase';
 import { doc, setDoc, collection } from 'firebase/firestore';
+import { colors } from '../theme/colors';
+import { fonts } from '../theme/fonts';
 
 export default function NamePlantScreen({ route, navigation }) {
   const { plant } = route.params;
@@ -43,8 +45,8 @@ export default function NamePlantScreen({ route, navigation }) {
         // Create a new document reference for the user in 'plants' collection
         const plantRef = doc(collection(db, 'users', uid, 'plants'));
   
-        // Generate a unique user-specific plant ID (e.g., using Date.now or a UUID)
-        const userPlantId = plantRef.id; // You can use this or create a custom ID logic
+        // Generate a unique user-specific plant ID 
+        const userPlantId = plantRef.id; 
   
         await setDoc(plantRef, {
           ...plantWithNickname,
@@ -127,7 +129,7 @@ const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   scrollViewContent: {
     flexGrow: 1,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: colors.background,
   },
   imageContainer: {
     width: '100%',
@@ -143,39 +145,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   generalInfoBox: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.cardBackground,
     borderRadius: 8,
     padding: 16,
     marginBottom: 20,
     maxWidth: 340,
     width: '100%',
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 3,
   },
   generalInfoText: {
-    fontSize: 16,
-    color: '#1e3a8a',
+    ...fonts.body,
+    color: colors.primaryText,
     textAlign: 'center',
   },
   label: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e3a8a',
+    ...fonts.cardTitle,
+    color: colors.primaryText,
     marginBottom: 10,
     marginTop: 20,
     textAlign: 'center',
   },
   input: {
-    borderColor: '#1e3a8a',
+    borderColor: colors.primaryText,
     borderWidth: 1,
     borderRadius: 8,
     padding: 10,
     width: '100%',
     marginBottom: 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.cardBackground,
+    color: colors.primaryText,
+    ...fonts.body,
   },
   infoBoxesContainer: {
     flexDirection: 'row',
