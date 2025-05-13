@@ -105,19 +105,17 @@ export default function PlantMonitoringScreen({ route }) {
         />
 
         {preferred ? (
-          <Text style={styles.recommendation}>
-            Preferred: {preferred.min} - {preferred.max} {unit}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+            <Text style={styles.recommendation}>
+              Preferred: {preferred.min} - {preferred.max} {unit}
+            </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('ChangeConditions', {label, preferred, plant: plantData, unit})} style={{ marginLeft: 8 }}>
+              <Text style={styles.editButtonText}>✏️</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
           <Text style={styles.recommendation}>Preferred range not available</Text>
         )}
-
-        <CustomButton
-          title={label?.toLowerCase().includes('temperature') ? "Change preferred temperature" : ""}
-          onPress={() => navigation.navigate('ChangeConditions', {label, preferred, plant: plantData, unit})}
-          textStyle={styles.addButtonText} 
-          style={styles.smallButton}
-        />
 
       </View>
     );
@@ -225,16 +223,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.danger,  },
     
-  addButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#ffffff',
-    fontFamily: 'System',
-  },
-  smallButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    marginTop: 6,
+  editButtonText: {
+    fontWeight: 'bold',
+    fontSize: 18,
   },
 });
