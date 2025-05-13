@@ -1,0 +1,44 @@
+image: ubuntu:latest
+
+stages:
+  - build
+  - test
+  - deploy
+  
+before_script:
+  # Install curl and unzip only once (no need for double apt-get update)
+  - apt-get update && apt-get install -y curl unzip
+  - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+  - mv bin/arduino-cli /usr/local/bin/
+  - arduino-cli config init
+  # Add Seeed Studio board URL
+  - arduino-cli config add board_manager.additional_urls https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
+  - arduino-cli core update-index
+  - arduino-cli core install Seeeduino:samd
+  - arduino-cli lib install "Seeed Arduino rpcWiFi"
+  - arduino-cli lib install "PubSubClient"
+  - arduino-cli lib install "Grove Temperature And Humidity Sensor"
+
+
+
+build:
+  stage: build
+  tags:
+    - docker
+  script:
+    - echo "🔧 Building Wio Terminal..."
+    - export PATH=$PATH:/root/bin
+    - pwd
+    - cd Arduino
+    - arduino-cli compile --fqbn Seeeduino:samd:seeed_wio_terminal
+
+test:
+  stage: test
+  script:
+    - echo "🧪 Running Wio Terminal tests..."
+
+deploy:
+  stage: deploy
+  script:
+    - echo "🚀 Deploying Wio Terminal..."
+

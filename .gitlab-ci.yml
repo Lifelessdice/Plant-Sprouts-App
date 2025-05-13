@@ -1,0 +1,3 @@
+include:
+  - local: '.gitlab-ci-app.yml'
+  - local: '.gitlab-ci-wio.yml'

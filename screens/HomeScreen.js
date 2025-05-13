@@ -5,8 +5,9 @@ import { Video } from 'expo-av';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import CustomButton from '../components/CustomButton';
-import { dataStore, setHandlerForTopic } from '../src/mqttservice';
+import { dataStore, setHandlerForTopic } from '../src/mqtt-proxy';
 import { deleteDoc, doc } from 'firebase/firestore';
+
 
 export default function HomeScreen({ navigation }) {
   const [plants, setPlants] = useState([]);  // Local state to store user's plants
