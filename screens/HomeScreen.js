@@ -7,6 +7,8 @@ import CustomButton from '../components/CustomButton';
 import { dataStore, setHandlerForTopic } from '../src/mqtt-proxy';
 import { deleteDoc, doc } from 'firebase/firestore';
 import TopBar from '../components/TopBar';
+import { colors } from '../theme/colors';
+import { fonts } from '../theme/fonts';
 
 
 
@@ -185,7 +187,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: colors.background,
   },
   videoWrapper: {
     position: 'absolute',
@@ -214,20 +216,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   emptyTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#1e3a8a',
+    ...fonts.title,
+    color: colors.primaryText,
     textAlign: 'center',
     marginBottom: 10,
   },
   emptyBody: {
-    fontSize: 16,
-    color: '#374151',
+    ...fonts.body,
+    color: colors.secondaryText,    
     textAlign: 'center',
     lineHeight: 24,
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.cardBackground,
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
@@ -240,9 +241,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   plantName: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#1e3a8a',
+    ...fonts.cardTitle,
+    color: colors.primaryText,
     marginTop: 10,
   },
   image: {
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   deleteButtonText: {
-    fontWeight: 'bold',
-    fontSize: 16,
+    ...fonts.cardTitle,
+
   },
 });

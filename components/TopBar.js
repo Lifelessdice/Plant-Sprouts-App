@@ -1,19 +1,21 @@
 import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import { User, ArrowLeft } from 'lucide-react-native';
+import { colors } from '../theme/colors';
+import { fonts } from '../theme/fonts';
 
 export default function TopBar({ title = '', onUserPress, onBackPress }) {
   useEffect(() => {
     // Set the Android status bar color to match the top bar
     StatusBar.setBarStyle('dark-content');  //  Define the color of the very top area of the screen on Android
-    StatusBar.setBackgroundColor('#e0f2fe'); // Set background color to match your top bar
+    StatusBar.setBackgroundColor(colors.topBarBackground); // Set background color to match your top bar
   }, []);
 
   return (
     <View style={styles.header}>
       {onBackPress && (
         <TouchableOpacity style={styles.backButton} onPress={onBackPress}>
-          <ArrowLeft color="#1e3a8a" size={24} />
+          <ArrowLeft color={colors.primaryText} size={24} />
         </TouchableOpacity>
       )}
 
@@ -21,7 +23,7 @@ export default function TopBar({ title = '', onUserPress, onBackPress }) {
 
       {onUserPress && (
         <TouchableOpacity style={styles.accountButton} onPress={onUserPress}>
-          <User color="#1e3a8a" size={24} />
+          <User color={colors.primaryText} size={24} />
         </TouchableOpacity>
       )}
     </View>
@@ -31,7 +33,7 @@ export default function TopBar({ title = '', onUserPress, onBackPress }) {
 const styles = StyleSheet.create({
   header: {
     height: 80,
-    backgroundColor: '#e0f2fe',
+    backgroundColor: colors.topBarBackground,
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 30,
@@ -42,9 +44,8 @@ const styles = StyleSheet.create({
     zIndex: 10, // ensure it's on top
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1e3a8a',
+    ...fonts.title, // Use font styling from fonts.js
+    color: colors.primaryText, // Use color from colors.js
     position: 'absolute',
     left: 0,
     right: 0,
