@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
-import { User } from 'lucide-react-native';
 import { Video } from 'expo-av'; 
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import CustomButton from '../components/CustomButton';
 import { dataStore, setHandlerForTopic } from '../src/mqtt-proxy';
 import { deleteDoc, doc } from 'firebase/firestore';
+import TopBar from '../components/TopBar';
+
 
 
 export default function HomeScreen({ navigation }) {
@@ -106,13 +107,10 @@ export default function HomeScreen({ navigation }) {
         />
       </View>
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Your Plants</Text>
-        <TouchableOpacity style={styles.accountButton}>
-          <User color="#1e3a8a" size={24} />
-        </TouchableOpacity>
-      </View>
+    <TopBar
+      title="Your Plants"
+      onUserPress={() => navigation.navigate('Account')} 
+    />
 
       <View style={styles.container}>
         {plants.length === 0 ? (
@@ -202,35 +200,11 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
   },
-  header: {
-    height: 80,
-    backgroundColor: '#e0f2fe',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 30,
-    position: 'relative',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1e3a8a',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    textAlign: 'center',
-    paddingTop: 30,
-  },
-  accountButton: {
-    position: 'absolute',
-    right: 16,
-    top: 43,
-    padding: 6,
-    paddingTop: 0,
-  },
+
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: 100,
     paddingHorizontal: 20,
     zIndex: 1,
   },

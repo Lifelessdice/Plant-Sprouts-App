@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Alert } from 'react-native';
-import { ArrowLeft, User } from 'lucide-react-native';
 import { popularPlants } from '../data/popularPlants';
+import TopBar from '../components/TopBar';
 import { db } from '../firebase'; 
 import { collection, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
@@ -58,16 +58,11 @@ export default function AddPlantScreen({ navigation }) {
 
   return (
     <>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <ArrowLeft color="#1e3a8a" size={24} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>List of available plants</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Account')} style={styles.accountButton}>
-          <User color="#1e3a8a" size={24} />
-        </TouchableOpacity>
-      </View>
+      <TopBar
+        title="List of available plants"
+        onBackPress={() => navigation.goBack()}
+        onUserPress={() => navigation.navigate('Account')}
+      />
 
       {/* Main Content */}
       <View style={styles.container}>
@@ -103,31 +98,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignSelf: 'center',
   },
-  header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    backgroundColor: '#e0f2fe',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 30,
-    zIndex: 10,
-  },
-  backButton: {
-    marginRight: 12,
-  },
-  accountButton: {
-    padding: 6,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1e3a8a',
-  },
+
   container: {
     flex: 1,
     paddingTop: 80, // adjusted to accommodate header

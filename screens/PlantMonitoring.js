@@ -2,13 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { ArrowLeft, User } from 'lucide-react-native';
 import InfoBox from '../components/InfoBox';
 import { dataStore } from '../src/mqtt-proxy.js';
 import * as Progress from 'react-native-progress';
 import CustomButton from '../components/CustomButton';
 import { getDoc, doc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
+import TopBar from '../components/TopBar';
 
 
 export default function PlantMonitoringScreen({ route }) {
@@ -124,18 +124,11 @@ export default function PlantMonitoringScreen({ route }) {
 
   return (
     <>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <ArrowLeft color="#1e3a8a" size={24} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {plantData.name} {plantData.nickname ? `${plantData.nickname}` : ''}
-        </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Account')} style={styles.accountButton}>
-          <User color="#1e3a8a" size={24} />
-        </TouchableOpacity>
-      </View>
+      <TopBar
+        title={`${plantData.name}${plantData.nickname ? ' ' + plantData.nickname : ''}`}
+        onBackPress={() => navigation.goBack()}
+        onUserPress={() => navigation.navigate('Account')}
+      />
 
       <ScrollView contentContainerStyle={styles.container}>
         {/* General Info */}
@@ -163,31 +156,6 @@ export default function PlantMonitoringScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    backgroundColor: '#e0f2fe',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 30,
-    zIndex: 10,
-  },
-  backButton: {
-    marginRight: 12,
-  },
-  accountButton: {
-    padding: 6,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1e3a8a',
-  },
   container: {
     padding: 20,
     paddingTop: 80,
