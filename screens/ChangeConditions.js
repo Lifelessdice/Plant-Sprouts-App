@@ -5,6 +5,8 @@ import CustomButton from '../components/CustomButton';
 import TopBar from '../components/TopBar';
 import { db, auth } from '../firebase';
 import { updateDoc, doc } from 'firebase/firestore';
+import { colors } from '../theme/colors';
+import { fonts } from '../theme/fonts';
 
 
 export default function ChangeConditionsScreen() {
@@ -50,11 +52,13 @@ export default function ChangeConditionsScreen() {
         />
 
         {label?.toLowerCase().includes('temperature') && (
-            <ScrollView contentContainerStyle={{ padding: 20 }}>
+              <ScrollView contentContainerStyle={styles.scrollContent}>
                 {preferred ? (
                   <View style={styles.formContainer}>
-                    <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>{label}</Text>
-                    <Text>Current range: {preferred.min} – {preferred.max} {unit}</Text>
+                    <Text style={[fonts.title, { color: colors.primaryText, marginBottom: 10 }]}>{label}</Text>
+                    <Text style={[fonts.body, { color: colors.secondaryText }]}>
+                      Current range: {preferred.min} – {preferred.max} {unit}
+                    </Text>
                     <TextInput
                       placeholder="Enter new min temperature"
                       value={newMin}
@@ -87,11 +91,15 @@ export default function ChangeConditionsScreen() {
 }
 
 const styles = StyleSheet.create({
+    scrollContent: {
+      padding: 20,
+      backgroundColor: colors.background,
+      flexGrow: 1,
+    },
 
     formContainer: {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingTop: 100,
     },
   });
