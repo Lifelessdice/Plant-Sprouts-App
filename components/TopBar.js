@@ -1,15 +1,10 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import { User, ArrowLeft } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 
 export default function TopBar({ title = '', onUserPress, onBackPress }) {
-  useEffect(() => {
-    // Set the Android status bar color to match the top bar
-    StatusBar.setBarStyle('dark-content');  //  Define the color of the very top area of the screen on Android
-    StatusBar.setBackgroundColor(colors.topBarBackground); // Set background color to match your top bar
-  }, []);
 
   return (
     <View style={styles.header}>
