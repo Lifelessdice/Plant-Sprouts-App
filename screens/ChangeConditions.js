@@ -54,43 +54,31 @@ export default function ChangeConditionsScreen() {
           </TouchableOpacity>
         </View>
         {label?.toLowerCase().includes('temperature') && (
-            <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 100 }}>
-                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{label}</Text>
+            <ScrollView contentContainerStyle={{ padding: 20 }}>
                 {preferred ? (
-                  <>
+                  <View style={styles.formContainer}>
+                    <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>{label}</Text>
                     <Text>Current range: {preferred.min} – {preferred.max} {unit}</Text>
                     <TextInput
                       placeholder="Enter new min temperature"
                       value={newMin}
                       onChangeText={setNewMin}
                       keyboardType="numeric"
-                      style={{
-                        borderWidth: 1,
-                        borderColor: '#ccc',
-                        padding: 8,
-                        borderRadius: 6,
-                        marginTop: 12,
-                      }}
+                      style={{ width: '80%', backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#94a3b8', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10, fontSize: 16, marginTop: 12 }}
                     />
                     <TextInput
                       placeholder="Enter new max temperature"
                       value={newMax}
                       onChangeText={setNewMax}
                       keyboardType="numeric"
-                      style={{
-                        borderWidth: 1,
-                        borderColor: '#ccc',
-                        padding: 8,
-                        borderRadius: 6,
-                        marginTop: 12,
-                      }}
+                      style={{ width: '80%', backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#94a3b8', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10, fontSize: 16, marginTop: 12 }}
                     />
                     <CustomButton
                       title="Save Changes"
                       onPress={handleSave}
-                      style={{ marginTop: 10 }}
+                      style={{ marginTop: 20 }}
                     />
-                  </>
+                  </View>
                 ) : (
                   <Text>No preferred range set.</Text>
                 )}
@@ -127,5 +115,11 @@ const styles = StyleSheet.create({
       fontSize: 20,
       fontWeight: '600',
       color: '#1e3a8a',
+    },
+    formContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingTop: 100,
     },
   });
