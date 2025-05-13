@@ -50,24 +50,28 @@ export default function ChangeConditionsScreen() {
     };
 
     const EditConditions = (label, preferred, unit) => {
-      return (<ScrollView contentContainerStyle={{ padding: 20 }}>
+      return (<ScrollView contentContainerStyle={styles.scrollContent}>
         {preferred ? (
           <View style={styles.formContainer}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>{label}</Text>
-            <Text>Current range: {preferred.min} – {preferred.max} {unit}</Text>
+              <Text style={[fonts.title, { color: colors.primaryText, marginBottom: 10 }]}>{label}</Text>
+              <Text style={[fonts.body, { color: colors.secondaryText }]}>
+              Current range: {preferred.min} – {preferred.max} {unit}
+              </Text>
+
             <TextInput
               placeholder={`Enter new min ${label}`}
               value={newMin}
               onChangeText={setNewMin}
               keyboardType="numeric"
-              style={{ width: '80%', backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#94a3b8', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10, fontSize: 16, marginTop: 12 }}
+              style={[styles.input]}
+
             />
             <TextInput
               placeholder={`Enter new max ${label}`}
               value={newMax}
               onChangeText={setNewMax}
               keyboardType="numeric"
-              style={{ width: '80%', backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#94a3b8', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10, fontSize: 16, marginTop: 12 }}
+              style={[styles.input]}
             />
             <CustomButton
               title="Save Changes"
@@ -76,7 +80,7 @@ export default function ChangeConditionsScreen() {
             />
           </View>
         ) : (
-          <Text>No preferred range set.</Text>
+          <Text style={fonts.body}>No preferred range set.</Text>
         )}
     </ScrollView>
     )}
@@ -84,15 +88,12 @@ export default function ChangeConditionsScreen() {
     return (
     
         <>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <ArrowLeft color="#1e3a8a" size={24} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{plant.name} {plant.nickname ? `${plant.nickname}` : ''}</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Account')} style={styles.accountButton}>
-            <User color="#1e3a8a" size={24} />
-          </TouchableOpacity>
-        </View>
+        <TopBar
+          title={`${plant.name}${plant.nickname ? ` ${plant.nickname}` : ''}`}
+          onBackPress={() => navigation.goBack()}
+          onUserPress={() => navigation.navigate('Account')}
+        />
+
         {label?.toLowerCase().includes('temperature') ? (EditConditions('Temperature', preferred, unit)) 
         : 
         label?.toLowerCase().includes('soil') ? (EditConditions('Soil Moisture', preferred, unit))
@@ -105,15 +106,25 @@ export default function ChangeConditionsScreen() {
 }
 
 const styles = StyleSheet.create({
-    scrollContent: {
-      padding: 20,
-      backgroundColor: colors.background,
-      flexGrow: 1,
+    input: {
+      width: '80%',
+      backgroundColor: colors.cardBackground,
+      borderWidth: 1,
+      borderColor: '#94a3b8', 
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 10,
+      fontSize: fonts.body.fontSize,
+      marginTop: 12,
     },
-
     formContainer: {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    scrollContent: {
+      padding: 20,
+      backgroundColor: colors.background,
+      flexGrow: 1,
     },
   });
