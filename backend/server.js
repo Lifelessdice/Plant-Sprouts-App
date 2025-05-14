@@ -19,7 +19,7 @@ let mqttData = {
 const mqttClient = mqtt.connect("mqtt://broker.hivemq.com:1883");
 
 mqttClient.on("connect", function () {
-  console.log("✅ Connected to HiveMQ");
+  console.log("Connected to HiveMQ");
 
   const topics = [
     "CROWmium/rtl8720dn/temperature",
@@ -31,9 +31,9 @@ mqttClient.on("connect", function () {
   topics.forEach((topic) => {
     mqttClient.subscribe(topic, function (err) {
       if (err) {
-        console.log(`❌ Subscription error on ${topic}:`, err);
+        console.log(`Subscription error on ${topic}:`, err);
       } else {
-        console.log(`📡 Subscribed to ${topic}`);
+        console.log(`Subscribed to ${topic}`);
       }
     });
   });
@@ -41,9 +41,9 @@ mqttClient.on("connect", function () {
 
 mqttClient.on("message", function (topic, message) {
   // Update the relevant data when a message is received
-  console.log(`📩 Message received:`);
-  console.log(`  ➤ Topic: ${topic}`);
-  console.log(`  ➤ Payload: ${message.toString()}`);
+  console.log(`Message received:`);
+  console.log(`Topic: ${topic}`);
+  console.log(`Payload: ${message.toString()}`);
 
   switch (topic) {
     case "CROWmium/rtl8720dn/temperature":
@@ -94,6 +94,6 @@ app.get("/", (req, res) => {
 
 // Start HTTP server
 server.listen(port, () => {
-  console.log(`🚀 Proxy server running at http://localhost:${port}`);
+  console.log(`Proxy server running at http://localhost:${port}`);
   console.log(`You can access the status page at http://localhost:${port}`);
 });
