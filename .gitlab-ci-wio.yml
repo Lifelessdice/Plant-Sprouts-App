@@ -1,20 +1,24 @@
-image: ubuntu:latest
+image: ubuntu:latest # Use the latest official Ubuntu image as the base for all jobs
 
-stages:
+stages: # Define the stages of the pipeline
   - build
   - test
   - deploy
   
-before_script:
-  # Install curl and unzip only once (no need for double apt-get update)
-  - apt-get update && apt-get install -y curl unzip
-  - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
-  - mv bin/arduino-cli /usr/local/bin/
-  - arduino-cli config init
+before_script: # Commands that run before each job
+  # Update package list and install required tools
+  - apt-get update && apt-get install -y curl unzip   
+  # Download and install the Arduino CLI tool
+  - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh   
+  - mv bin/arduino-cli /usr/local/bin/   
+  # Initialize Arduino CLI configuration
+  - arduino-cli config init   
   # Add Seeed Studio board URL
-  - arduino-cli config add board_manager.additional_urls https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
+  - arduino-cli config add board_manager.additional_urls https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json 
+  # Update the board index and install the Wio Terminal board
   - arduino-cli core update-index
   - arduino-cli core install Seeeduino:samd
+  # Install necessary libraries for the Wio Terminal project
   - arduino-cli lib install "Seeed Arduino rpcWiFi"
   - arduino-cli lib install "PubSubClient"
   - arduino-cli lib install "Grove Temperature And Humidity Sensor"
@@ -26,19 +30,19 @@ build:
   tags:
     - docker
   script:
-    - echo "🔧 Building Wio Terminal..."
-    - export PATH=$PATH:/root/bin
-    - pwd
-    - cd Arduino
-    - arduino-cli compile --fqbn Seeeduino:samd:seeed_wio_terminal
+    - echo "Building Wio Terminal..." # Log message
+    - export PATH=$PATH:/root/bin # Ensure CLI is on PATH 
+    - pwd # Show current directory
+    - cd Arduino # Enter the Arduino sketch directory
+    - arduino-cli compile --fqbn Seeeduino:samd:seeed_wio_terminal # Compile the sketch for Wio Terminal
 
-test:
+test: # Placeholder for running tests
   stage: test
   script:
-    - echo "🧪 Running Wio Terminal tests..."
+    - echo "Running Wio Terminal tests..."
 
-deploy:
+deploy: # Placeholder for deployment
   stage: deploy
   script:
-    - echo "🚀 Deploying Wio Terminal..."
+    - echo "Deploying Wio Terminal..."
 

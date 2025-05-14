@@ -1,42 +1,42 @@
-image: node:18
+image: node:18 # Use the official Node.js 18 Docker image as the base for all jobs
 
-stages:
+stages: # Define the stages of the pipeline
   - build
   - test
   - deploy
 
-cache:
+cache: # Cache node_modules between pipeline runs to speed things up
   paths:
     - node_modules/
 
-before_script:
-  - curl -sL https://deb.nodesource.com/setup_18.x | bash -
-  - apt-get install -y nodejs
-  - npm ci
+before_script: # Commands to run before each job
+  - curl -sL https://deb.nodesource.com/setup_18.x | bash -   # Set up Node.js 18 from Nodesource
+  - apt-get install -y nodejs # Install Node.js
+  - npm ci  # Clean install all dependencies based on package-lock.json
 
 build:
   stage: build
   tags:
     - docker  # Specify the Docker runner
   script:
-    - echo "🔧 Building the React Native app..."
-    - npx expo export --dev --output-dir=dist
+    - echo "Building the React Native app..." # Informative log
+    - npx expo export --dev --output-dir=dist # Export the app for development into the "dist" folder
   artifacts:
     paths:
-      - dist/
+      - dist/ # Save the output (dist/) so it's available for the next stages
 
-test:
+test: # Not implemented yet, this job is a placeholder for running tests
   stage: test
   tags:
-    - docker  # Specify the Docker runner
+    - docker  
   script:
-    - echo "🧪 Running tests..."
+    - echo "Running tests..."
     - npm test || echo "No tests defined"
 
-deploy:
+deploy: # Not implemented yet, this job is a placeholder for deployment
   tags:
-    - docker  # Specify the Docker runner
+    - docker  
   stage: deploy
   script:
-    - echo "🚀 Deploying (this is just a placeholder)..."
+    - echo "Deploying..."
 
