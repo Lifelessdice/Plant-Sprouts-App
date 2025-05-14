@@ -4,7 +4,7 @@ import { Video } from 'expo-av';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import CustomButton from '../components/CustomButton';
-import { dataStore, setHandlerForTopic } from '../src/mqtt-proxy';
+import { dataStore, setHandlerForTopic } from '../src/backendAPI';
 import { deleteDoc, doc } from 'firebase/firestore';
 import TopBar from '../components/TopBar';
 import { colors } from '../theme/colors';

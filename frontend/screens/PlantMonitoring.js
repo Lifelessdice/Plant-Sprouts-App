@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import InfoBox from '../components/InfoBox';
-import { dataStore } from '../src/mqtt-proxy.js';
+import { dataStore } from '../src/backendAPI.js';
 import * as Progress from 'react-native-progress';
 import CustomButton from '../components/CustomButton';
 import { getDoc, doc } from 'firebase/firestore';
@@ -51,7 +51,7 @@ export default function PlantMonitoringScreen({ route }) {
       setLightLevel(dataStore.light || 800);
       setHumidity(dataStore.humidity || 55);
       setSoilMoisture(dataStore.moisture || 45);
-    }, 5000); // Sync with mqtt-proxy.js polling interval
+    }, 5000); 
 
     return () => clearInterval(interval);
   }, []);
