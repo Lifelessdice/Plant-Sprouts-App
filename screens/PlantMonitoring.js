@@ -2,14 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { ArrowLeft, User } from 'lucide-react-native';
 import InfoBox from '../components/InfoBox';
 import { dataStore } from '../src/mqtt-proxy.js';
 import * as Progress from 'react-native-progress';
 import CustomButton from '../components/CustomButton';
 import { getDoc, doc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-
+import TopBar from '../components/TopBar';
+import { colors } from '../theme/colors';
+import { fonts } from '../theme/fonts';
 
 export default function PlantMonitoringScreen({ route }) {
   const navigation = useNavigation();
@@ -122,18 +123,11 @@ export default function PlantMonitoringScreen({ route }) {
 
   return (
     <>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <ArrowLeft color="#1e3a8a" size={24} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {plantData.name} {plantData.nickname ? `${plantData.nickname}` : ''}
-        </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Account')} style={styles.accountButton}>
-          <User color="#1e3a8a" size={24} />
-        </TouchableOpacity>
-      </View>
+      <TopBar
+        title={`${plantData.name}${plantData.nickname ? ' ' + plantData.nickname : ''}`}
+        onBackPress={() => navigation.goBack()}
+        onUserPress={() => navigation.navigate('Account')}
+      />
 
       <ScrollView contentContainerStyle={styles.container}>
         {/* General Info */}
@@ -161,55 +155,30 @@ export default function PlantMonitoringScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    backgroundColor: '#e0f2fe',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 30,
-    zIndex: 10,
-  },
-  backButton: {
-    marginRight: 12,
-  },
-  accountButton: {
-    padding: 6,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1e3a8a',
-  },
   container: {
     padding: 20,
     paddingTop: 80,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: colors.background,
     alignItems: 'center',
     flexGrow: 1,
   },
   generalInfoBox: {
     marginTop: 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.cardBackground,
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
     maxWidth: 340,
     width: '100%',
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 3,
   },
   generalInfoText: {
-    fontSize: 16,
-    color: '#1e3a8a',
+    ...fonts.body,
+    color: colors.primaryText,
     textAlign: 'center',
   },
   infoBoxesContainer: {
@@ -220,22 +189,22 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.cardBackground,
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
     width: '100%',
     maxWidth: 300,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 4,
   },
   label: {
-    fontSize: 18,
-    color: '#1e3a8a',
+    ...fonts.cardTitle,
+    color: colors.primaryText,
     marginBottom: 6,
   },
   value: {
@@ -252,8 +221,8 @@ const styles = StyleSheet.create({
   alert: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#dc2626',
-  },
+    color: colors.danger,  },
+    
   editButtonText: {
     fontWeight: 'bold',
     fontSize: 18,

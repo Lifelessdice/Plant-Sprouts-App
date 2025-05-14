@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
-import { User } from 'lucide-react-native';
 import { Video } from 'expo-av'; 
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import CustomButton from '../components/CustomButton';
 import { dataStore, setHandlerForTopic } from '../src/mqtt-proxy';
 import { deleteDoc, doc } from 'firebase/firestore';
+import TopBar from '../components/TopBar';
+import { colors } from '../theme/colors';
+import { fonts } from '../theme/fonts';
+
 
 
 export default function HomeScreen({ navigation }) {
@@ -106,13 +109,10 @@ export default function HomeScreen({ navigation }) {
         />
       </View>
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Your Plants</Text>
-        <TouchableOpacity style={styles.accountButton}>
-          <User color="#1e3a8a" size={24} />
-        </TouchableOpacity>
-      </View>
+    <TopBar
+      title="Your Plants"
+      onUserPress={() => navigation.navigate('Account')} 
+    />
 
       <View style={styles.container}>
         {plants.length === 0 ? (
@@ -187,7 +187,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: colors.background,
   },
   videoWrapper: {
     position: 'absolute',
@@ -202,36 +202,13 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
   },
-  header: {
-    height: 80,
-    backgroundColor: '#e0f2fe',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 30,
-    position: 'relative',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1e3a8a',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    textAlign: 'center',
-    paddingTop: 30,
-  },
-  accountButton: {
-    position: 'absolute',
-    right: 16,
-    top: 43,
-    padding: 6,
-    paddingTop: 0,
-  },
+
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: 100,
     paddingHorizontal: 20,
+    paddingBottom: 20,
     zIndex: 1,
   },
   emptyWrapper: {
@@ -240,20 +217,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   emptyTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#1e3a8a',
+    ...fonts.title,
+    color: colors.primaryText,
     textAlign: 'center',
     marginBottom: 10,
   },
   emptyBody: {
-    fontSize: 16,
-    color: '#374151',
+    ...fonts.body,
+    color: colors.secondaryText,    
     textAlign: 'center',
     lineHeight: 24,
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.cardBackground,
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
@@ -266,9 +242,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   plantName: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#1e3a8a',
+    ...fonts.cardTitle,
+    color: colors.primaryText,
     marginTop: 10,
   },
   image: {
@@ -287,7 +262,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   deleteButtonText: {
-    fontWeight: 'bold',
-    fontSize: 16,
+    ...fonts.cardTitle,
+
   },
 });
