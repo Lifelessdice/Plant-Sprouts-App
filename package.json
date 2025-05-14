@@ -1,0 +1,21 @@
+{
+  "name": "system-development",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "cd frontend && npm start",
+    "install": "cd frontend && npm install",
+    "android": "cd frontend && npm run android",
+    "ios": "cd frontend && npm run ios",
+    "web": "cd frontend && npm run web"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@git.chalmers.se/courses/dit113/2025/group-20/system-development.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
