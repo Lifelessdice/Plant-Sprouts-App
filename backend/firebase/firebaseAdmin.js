@@ -5,7 +5,7 @@ const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSO
 
 //Inititalize the Firebase Admin SDK
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount);\,
+    credential: admin.credential.cert(serviceAccount),
 });
 
 module.exports = admin;
