@@ -13,7 +13,7 @@ const fetchDataFromServer = async () => {
   console.log("🛰️ Fetching data from proxy server...");
 
   try {
-    const { data } = await axios.get('https://mqtt-proxy-server.onrender.com/status');
+    const { data } = await axios.get('https://mqtt-proxy-server.onrender.com/api/status');
     console.log("🌐 Data fetched:", data);
 
     // Update the data store with the fetched data
