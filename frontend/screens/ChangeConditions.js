@@ -21,7 +21,7 @@ export default function ChangeConditionsScreen() {
       if (!plant || !plant.id || !preferred) return;
 
       const userId = auth.currentUser.uid;
-      const plantRef = doc(db, 'users', userId, 'plants', plant.id);
+      const plantRef = doc(db, 'users', userId, 'plants', plant.userPlantId);
 
       const updatedPreferredConditions = {
         min: newMin ? parseFloat(newMin) : preferred.min,
@@ -36,6 +36,10 @@ export default function ChangeConditionsScreen() {
       } else if (label?.toLowerCase().includes('soil')) {
         updatePayload = {
           preferredSoilMoisture: updatedPreferredConditions,
+        };
+      } else if (label?.toLowerCase().includes('light')) {
+        updatePayload = {
+          preferredLight: updatedPreferredConditions,
         };
       }
 
@@ -97,6 +101,8 @@ export default function ChangeConditionsScreen() {
         {label?.toLowerCase().includes('temperature') ? (EditConditions('Temperature', preferred, unit)) 
         : 
         label?.toLowerCase().includes('soil') ? (EditConditions('Soil Moisture', preferred, unit))
+        :
+        label?.toLowerCase().includes('light') ? (EditConditions('Soil Moisture', preferred, unit))
         : null}
         
       </>

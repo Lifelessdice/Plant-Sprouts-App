@@ -5,7 +5,6 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import InfoBox from '../components/InfoBox';
 import { dataStore } from '../src/backendAPI.js';
 import * as Progress from 'react-native-progress';
-import CustomButton from '../components/CustomButton';
 import { getDoc, doc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import TopBar from '../components/TopBar';
@@ -20,15 +19,14 @@ export default function PlantMonitoringScreen({ route }) {
     return <Text>Plant not found</Text>;
   }
 
-  useFocusEffect(
+  useFocusEffect(              // fetch plant data when screen is opened
     React.useCallback(() => {
       const fetchUpdatedPlant = async () => {
         try {
-          const plantRef = doc(db, 'users', auth.currentUser.uid, 'plants', plantData.id);
-          const snapshot = await getDoc(plantRef);
+          const plantRef = doc(db, 'users', auth.currentUser.uid, 'plants', plantData.userPlantId);
+          const snapshot = await getDoc(plantRef);  // realtime data from firebase
           if (snapshot.exists()) {
             const updatedPlant = snapshot.data();
-            updatedPlant.id = snapshot.id;
             setPlantData(updatedPlant);
           }
         } catch (err) {
