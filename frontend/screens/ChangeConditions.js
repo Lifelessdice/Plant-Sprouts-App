@@ -37,6 +37,10 @@ export default function ChangeConditionsScreen() {
         updatePayload = {
           preferredSoilMoisture: updatedPreferredConditions,
         };
+      } else if (label?.toLowerCase().includes('light')) {
+        updatePayload = {
+          preferredLight: updatedPreferredConditions,
+        };
       }
 
       try {
@@ -97,6 +101,8 @@ export default function ChangeConditionsScreen() {
         {label?.toLowerCase().includes('temperature') ? (EditConditions('Temperature', preferred, unit)) 
         : 
         label?.toLowerCase().includes('soil') ? (EditConditions('Soil Moisture', preferred, unit))
+        :
+        label?.toLowerCase().includes('light') ? (EditConditions('Soil Moisture', preferred, unit))
         : null}
         
       </>

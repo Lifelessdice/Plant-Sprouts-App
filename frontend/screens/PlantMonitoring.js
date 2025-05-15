@@ -19,12 +19,12 @@ export default function PlantMonitoringScreen({ route }) {
     return <Text>Plant not found</Text>;
   }
 
-  useFocusEffect(
+  useFocusEffect(              // fetch plant data when screen is opened
     React.useCallback(() => {
       const fetchUpdatedPlant = async () => {
         try {
           const plantRef = doc(db, 'users', auth.currentUser.uid, 'plants', plantData.userPlantId);
-          const snapshot = await getDoc(plantRef);
+          const snapshot = await getDoc(plantRef);  // realtime data from firebase
           if (snapshot.exists()) {
             const updatedPlant = snapshot.data();
             setPlantData(updatedPlant);
