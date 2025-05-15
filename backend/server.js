@@ -1,36 +1,40 @@
 const express = require("express");
 const http = require("http");
-const { mqttClient, mqttData } = require("./mqtt/mqttClient");
 
+const db = require("./firebase/firebase");
 
-// Setup Express server
+// Import mqtt API routes (only /status for now)
+const apiRoutes = require("./routes/api");
+
 const app = express();
 const server = http.createServer(app);
 const port = 5000;
 
+// Firebase test endpoint stays here as-is
+app.get("/firebase-test", async (req, res) => {
+  try {
+    const docRef = db.collection("test").doc("connection");
+    await docRef.set({ message: "Hello from backend!" });
 
-// Add a simple HTML endpoint to display the data
-app.get("/", (req, res) => {
-  // Render a simple HTML page with the current MQTT data
-  res.send(`
-    <html>
-      <head>
-        <title>MQTT Data</title>
-      </head>
-      <body>
-        <h1>Latest MQTT Data</h1>
-        <p><strong>Temperature:</strong> ${mqttData.temperature || "N/A"}</p>
-        <p><strong>Humidity:</strong> ${mqttData.humidity || "N/A"}</p>
-        <p><strong>Light:</strong> ${mqttData.light || "N/A"}</p>
-        <p><strong>Soil Moisture:</strong> ${mqttData.moisture || "N/A"}</p>
-        <p><em>Data is updated in real-time via MQTT messages!</em></p>
-      </body>
-    </html>
-  `);
+    const doc = await docRef.get();
+    if (doc.exists) {
+      res.json({ success: true, data: doc.data() });
+    } else {
+      res.json({ success: false, message: "No document found" });
+    }
+  } catch (err) {
+    console.error("Firebase test failed", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
-// Start HTTP server
+// Mount MQTT API routes under /api path
+app.use("/api", apiRoutes);
+
+// No HTML view routes included anymore
+
 server.listen(port, () => {
   console.log(`Proxy server running at http://localhost:${port}`);
-  console.log(`You can access the status page at http://localhost:${port}`);
+  console.log(`You can access the MQTT status at http://localhost:${port}/api/status`);
+  console.log(`Firebase test endpoint is at http://localhost:${port}/firebase-test`);
 });
