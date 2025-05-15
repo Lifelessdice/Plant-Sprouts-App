@@ -31,6 +31,23 @@ export default function HomeScreen({ navigation }) {
           return;
         }
 
+
+      //Send the ID token to the backend
+      const idToken = await user.getIdToken();
+      await fetch('https://mqtt-proxy-server.onrender.com/api/verifyUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          uid: user.uid,
+          email: user.email,
+        }),
+      });
+
+
+
         const db = getFirestore();
         const plantsCollection = collection(db, 'users', user.uid, 'plants');
         const snapshot = await getDocs(plantsCollection);
