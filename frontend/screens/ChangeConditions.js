@@ -21,7 +21,7 @@ export default function ChangeConditionsScreen() {
       if (!plant || !plant.id || !preferred) return;
 
       const userId = auth.currentUser.uid;
-      const plantRef = doc(db, 'users', userId, 'plants', plant.id);
+      const plantRef = doc(db, 'users', userId, 'plants', plant.userPlantId);
 
       const updatedPreferredConditions = {
         min: newMin ? parseFloat(newMin) : preferred.min,
