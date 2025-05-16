@@ -82,6 +82,12 @@ export default function ChangeConditionsScreen() {
               style={[styles.input]}
             />
             <CustomButton
+              title="Reset to Default"
+              onPress={handleSave}
+              style={{ marginTop: 20, backgroundColor: '#669169', paddingHorizontal: 10, paddingVertical: 10 }} 
+              textStyle={{ color: '#fff', fontSize: 13 }}
+            />
+            <CustomButton
               title="Save Changes"
               onPress={handleSave}
               style={{ marginTop: 20 }}
