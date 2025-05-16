@@ -41,6 +41,10 @@ export default function ChangeConditionsScreen() {
         updatePayload = {
           preferredLight: updatedPreferredConditions,
         };
+      } else if (label?.toLowerCase().includes('humidity')) {
+        updatePayload = {
+          preferredHumidity: updatedPreferredConditions,
+        };
       }
 
       try {
@@ -102,7 +106,9 @@ export default function ChangeConditionsScreen() {
         : 
         label?.toLowerCase().includes('soil') ? (EditConditions('Soil Moisture', preferred, unit))
         :
-        label?.toLowerCase().includes('light') ? (EditConditions('Soil Moisture', preferred, unit))
+        label?.toLowerCase().includes('light') ? (EditConditions('Light', preferred, unit))
+        :
+        label?.toLowerCase().includes('humidity') ? (EditConditions('Humidity', preferred, unit))
         : null}
         
       </>
