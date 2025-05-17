@@ -51,11 +51,13 @@ bool checkLightAndWarn(int lightLevel) {
 }
 
 // Temperature comparison logic
-void checkTemperatureAndWarn(int temperature) {
+bool checkTemperatureAndWarn(int temperature) {
   if (temperature < 20) {
     Serial.println("It's too cold for your plant.");
+    return true;
   } else {
     Serial.println("Temperature is suitable.");
+    return false;
   }
 }
 
@@ -183,7 +185,7 @@ void loop() {
     // Call comparison functions
     bool warnMoisture = checkMoistureAndWarn(soilMoisture);
     bool warnLight = checkLightAndWarn(light);
-    checkTemperatureAndWarn(temperature);
+    bool warnTemp = checkTemperatureAndWarn(temperature);
     checkHumidityAndWarn(humidity);
   }
 }
