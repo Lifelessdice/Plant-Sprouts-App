@@ -29,38 +29,46 @@ PubSubClient client(wifiClient);
 unsigned long lastMsgTime = 0;
 
 // Soil moisture comparison logic
-void checkMoistureAndWarn(int soilMoisture) {
+bool checkMoistureAndWarn(int soilMoisture) {
   if (soilMoisture < 40) {
     Serial.println("It's time to water your plant.");
+    return true;
   } else {
     Serial.println("Your plant is not thirsty right now.");
+    return false;
   }
 }
 
 // Light level comparison logic
-void checkLightAndWarn(int lightLevel) {
+bool checkLightAndWarn(int lightLevel) {
   if (lightLevel < 100) {
     Serial.println("It's too dark for your plant.");
+    return true;
   } else {
     Serial.println("Light level is sufficient.");
+    return false;
   }
 }
 
 // Temperature comparison logic
-void checkTemperatureAndWarn(int temperature) {
+bool checkTemperatureAndWarn(int temperature) {
   if (temperature < 20) {
     Serial.println("It's too cold for your plant.");
+    return true;
   } else {
     Serial.println("Temperature is suitable.");
+    return false;
   }
 }
 
 // Humidity comparison logic
-void checkHumidityAndWarn(int humidity) {
+bool checkHumidityAndWarn(int humidity) {
   if (humidity < 30) {
     Serial.println("Humidity is too low for your plant.");
+    return true;
   } else {
     Serial.println("Humidity level is good.");
+    return false;
   }
 }
 
@@ -177,9 +185,18 @@ void loop() {
     client.publish("CROWmium/rtl8720dn/moisture", soilStr);
 
     // Call comparison functions
-    checkMoistureAndWarn(soilMoisture);
-    checkLightAndWarn(light);
-    checkTemperatureAndWarn(temperature);
-    checkHumidityAndWarn(humidity);
+    bool warnMoisture = checkMoistureAndWarn(soilMoisture);
+    bool warnLight = checkLightAndWarn(light);
+    bool warnTemp = checkTemperatureAndWarn(temperature);
+    bool warnHumidity = checkHumidityAndWarn(humidity);
+
+    bool isWarning = warnMoisture || warnLight || warnTemp || warnHumidity;
+
+    // Check for warnings
+    if (isWarning) {
+      client.publish("CROWmium/rtl8720dn/warnings", "WARNING");
+    } else {
+      client.publish("CROWmium/rtl8720dn/warnings", "CLEAR");
+    }
   }
 }
