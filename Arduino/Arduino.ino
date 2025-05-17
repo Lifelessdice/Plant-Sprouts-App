@@ -37,6 +37,14 @@ void checkMoistureAndWarn(int soilMoisture) {
   }
 }
 
+void checkLightAndWarn(int lightLevel) {
+  if (lightLevel < 100) {
+    Serial.println("It's too dark for your plant.");
+  } else {
+    Serial.println("Light level is sufficient.");
+  }
+}
+
 void callback(char *topic, byte *payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -125,7 +133,7 @@ void loop() {
     int humidity = dht.readHumidity();
     int light = analogRead(WIO_LIGHT);
     int soilRaw = analogRead(SOIL_PIN);
-   
+
     // Mapping soil moisture values to percentage
     int soilMoisture = map(soilRaw, 1023, 0, 0, 100);
     soilMoisture = constrain(soilMoisture, 0, 100);
@@ -149,7 +157,8 @@ void loop() {
     client.publish("CROWmium/rtl8720dn/light", lightStr);
     client.publish("CROWmium/rtl8720dn/moisture", soilStr);
 
-    // Call moisture check function
+    // Call comparison functions
     checkMoistureAndWarn(soilMoisture);
+    checkLightAndWarn(light);
   }
 }
