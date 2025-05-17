@@ -55,6 +55,14 @@ void checkTemperatureAndWarn(int temperature) {
   }
 }
 
+void checkHumidityAndWarn(int humidity) {
+  if (humidity < 30) {
+    Serial.println("Humidity is too low for your plant.");
+  } else {
+    Serial.println("Humidity level is good.");
+  }
+}
+
 void callback(char *topic, byte *payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -171,5 +179,6 @@ void loop() {
     checkMoistureAndWarn(soilMoisture);
     checkLightAndWarn(light);
     checkTemperatureAndWarn(temperature);
+    checkHumidityAndWarn(humidity);
   }
 }
