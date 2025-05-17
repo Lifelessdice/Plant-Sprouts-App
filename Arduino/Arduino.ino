@@ -28,6 +28,15 @@ PubSubClient client(wifiClient);
 // Timing
 unsigned long lastMsgTime = 0;
 
+// Soil moisture comparison logic
+void checkMoistureAndWarn(int soilMoisture) {
+  if (soilMoisture < 40) {
+    Serial.println("It's time to water your plant.");
+  } else {
+    Serial.println("Your plant is not thirsty right now.");
+  }
+}
+
 void callback(char *topic, byte *payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -60,7 +69,7 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("rtl8720dnClient")) {
       Serial.println("connected!");
-      client.subscribe("CROWmium/rtl8720dn/#"); // Optionally subscribing to every topic which includes warnings
+      client.subscribe("CROWmium/rtl8720dn/#");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -96,7 +105,7 @@ void setup() {
   
   pinMode(BLUE_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
-  digitalWrite(BLUE_LED, HIGH); // Green LED turned on by default
+  digitalWrite(BLUE_LED, HIGH); // Blue LED turned on by default
   digitalWrite(RED_LED, LOW);   
 }
 
@@ -111,11 +120,13 @@ void loop() {
   if (now - lastMsgTime > publishInterval) {
     lastMsgTime = now;
 
+    // Read sensor values
     int temperature = dht.readTemperature();
     int humidity = dht.readHumidity();
     int light = analogRead(WIO_LIGHT);
-
     int soilRaw = analogRead(SOIL_PIN);
+   
+    // Mapping soil moisture values to percentage
     int soilMoisture = map(soilRaw, 1023, 0, 0, 100);
     soilMoisture = constrain(soilMoisture, 0, 100);
 
@@ -137,5 +148,8 @@ void loop() {
     client.publish("CROWmium/rtl8720dn/humidity", humStr);
     client.publish("CROWmium/rtl8720dn/light", lightStr);
     client.publish("CROWmium/rtl8720dn/moisture", soilStr);
+
+    // Call moisture check function
+    checkMoistureAndWarn(soilMoisture);
   }
 }
