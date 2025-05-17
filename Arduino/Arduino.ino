@@ -55,6 +55,7 @@ void checkTemperatureAndWarn(int temperature) {
   }
 }
 
+// Humidity comparison logic
 void checkHumidityAndWarn(int humidity) {
   if (humidity < 30) {
     Serial.println("Humidity is too low for your plant.");
