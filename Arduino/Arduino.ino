@@ -37,6 +37,14 @@ void checkMoistureAndWarn(int soilMoisture) {
   }
 }
 
+void checkLightAndWarn(int lightLevel) {
+  if (lightLevel < 100) {
+    Serial.println("It's too dark for your plant.");
+  } else {
+    Serial.println("Light level is sufficient.");
+  }
+}
+
 void callback(char *topic, byte *payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -50,7 +58,6 @@ void callback(char *topic, byte *payload, unsigned int length) {
   }
   Serial.println();
 
-  // Handle warning messages
   if (String(topic) == "CROWmium/rtl8720dn/warnings") {
     message.trim();
 
@@ -83,7 +90,6 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
 
-  // WiFi Setup
   Serial.println("Connecting to WiFi...");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -94,18 +100,16 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  // MQTT Setup
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
 
-  // Sensors and LEDs
   dht.begin();
   pinMode(WIO_LIGHT, INPUT);
   pinMode(SOIL_PIN, INPUT);
   
   pinMode(BLUE_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
-  digitalWrite(BLUE_LED, HIGH); // Blue LED turned on by default
+  digitalWrite(BLUE_LED, HIGH);
   digitalWrite(RED_LED, LOW);   
 }
 
@@ -120,36 +124,30 @@ void loop() {
   if (now - lastMsgTime > publishInterval) {
     lastMsgTime = now;
 
-    // Read sensor values
     int temperature = dht.readTemperature();
     int humidity = dht.readHumidity();
     int light = analogRead(WIO_LIGHT);
     int soilRaw = analogRead(SOIL_PIN);
-   
-    // Mapping soil moisture values to percentage
     int soilMoisture = map(soilRaw, 1023, 0, 0, 100);
     soilMoisture = constrain(soilMoisture, 0, 100);
 
-    // Convert values to strings
     char tempStr[10], humStr[10], lightStr[10], soilStr[10];
     snprintf(tempStr, sizeof(tempStr), "%d", temperature);
     snprintf(humStr, sizeof(humStr), "%d", humidity);
     snprintf(lightStr, sizeof(lightStr), "%d", light);
     snprintf(soilStr, sizeof(soilStr), "%d", soilMoisture);
 
-    // Print to Serial
     Serial.print("Temperature: "); Serial.println(tempStr);
     Serial.print("Humidity: "); Serial.println(humStr);
     Serial.print("Light: "); Serial.println(lightStr);
     Serial.print("Soil Moisture: "); Serial.println(soilStr);
 
-    // Publish to MQTT
     client.publish("CROWmium/rtl8720dn/temperature", tempStr);
     client.publish("CROWmium/rtl8720dn/humidity", humStr);
     client.publish("CROWmium/rtl8720dn/light", lightStr);
     client.publish("CROWmium/rtl8720dn/moisture", soilStr);
 
-    // Call moisture check function
     checkMoistureAndWarn(soilMoisture);
+    checkLightAndWarn(light);
   }
 }
