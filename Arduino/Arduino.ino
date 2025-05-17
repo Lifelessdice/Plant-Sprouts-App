@@ -189,5 +189,13 @@ void loop() {
     bool warnLight = checkLightAndWarn(light);
     bool warnTemp = checkTemperatureAndWarn(temperature);
     bool warnHumidity = checkHumidityAndWarn(humidity);
+
+    bool isWarning = warnMoisture || warnLight || warnTemp || warnHumidity;
+
+    if (isWarning) {
+      client.publish("CROWmium/rtl8720dn/warnings", "WARNING");
+    } else {
+      client.publish("CROWmium/rtl8720dn/warnings", "CLEAR");
+    }
   }
 }
