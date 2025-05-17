@@ -37,11 +37,21 @@ void checkMoistureAndWarn(int soilMoisture) {
   }
 }
 
+// Light level comparison logic
 void checkLightAndWarn(int lightLevel) {
   if (lightLevel < 100) {
     Serial.println("It's too dark for your plant.");
   } else {
     Serial.println("Light level is sufficient.");
+  }
+}
+
+// Temperature comparison logic
+void checkTemperatureAndWarn(int temperature) {
+  if (temperature < 20) {
+    Serial.println("It's too cold for your plant.");
+  } else {
+    Serial.println("Temperature is suitable.");
   }
 }
 
@@ -160,5 +170,6 @@ void loop() {
     // Call comparison functions
     checkMoistureAndWarn(soilMoisture);
     checkLightAndWarn(light);
+    checkTemperatureAndWarn(temperature);
   }
 }
