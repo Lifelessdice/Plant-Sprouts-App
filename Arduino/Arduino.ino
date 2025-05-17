@@ -192,6 +192,7 @@ void loop() {
 
     bool isWarning = warnMoisture || warnLight || warnTemp || warnHumidity;
 
+    // Check for warnings
     if (isWarning) {
       client.publish("CROWmium/rtl8720dn/warnings", "WARNING");
     } else {
