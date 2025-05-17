@@ -29,11 +29,13 @@ PubSubClient client(wifiClient);
 unsigned long lastMsgTime = 0;
 
 // Soil moisture comparison logic
-void checkMoistureAndWarn(int soilMoisture) {
+bool checkMoistureAndWarn(int soilMoisture) {
   if (soilMoisture < 40) {
     Serial.println("It's time to water your plant.");
+    return true;
   } else {
     Serial.println("Your plant is not thirsty right now.");
+    return false;
   }
 }
 
@@ -177,7 +179,7 @@ void loop() {
     client.publish("CROWmium/rtl8720dn/moisture", soilStr);
 
     // Call comparison functions
-    checkMoistureAndWarn(soilMoisture);
+    bool warnMoisture = checkMoistureAndWarn(soilMoisture);
     checkLightAndWarn(light);
     checkTemperatureAndWarn(temperature);
     checkHumidityAndWarn(humidity);
