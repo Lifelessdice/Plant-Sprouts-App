@@ -62,11 +62,13 @@ bool checkTemperatureAndWarn(int temperature) {
 }
 
 // Humidity comparison logic
-void checkHumidityAndWarn(int humidity) {
+bool checkHumidityAndWarn(int humidity) {
   if (humidity < 30) {
     Serial.println("Humidity is too low for your plant.");
+    return true;
   } else {
     Serial.println("Humidity level is good.");
+    return false;
   }
 }
 
@@ -186,6 +188,6 @@ void loop() {
     bool warnMoisture = checkMoistureAndWarn(soilMoisture);
     bool warnLight = checkLightAndWarn(light);
     bool warnTemp = checkTemperatureAndWarn(temperature);
-    checkHumidityAndWarn(humidity);
+    bool warnHumidity = checkHumidityAndWarn(humidity);
   }
 }
