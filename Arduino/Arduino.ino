@@ -40,11 +40,13 @@ bool checkMoistureAndWarn(int soilMoisture) {
 }
 
 // Light level comparison logic
-void checkLightAndWarn(int lightLevel) {
+bool checkLightAndWarn(int lightLevel) {
   if (lightLevel < 100) {
     Serial.println("It's too dark for your plant.");
+    return true;
   } else {
     Serial.println("Light level is sufficient.");
+    return false;
   }
 }
 
@@ -180,7 +182,7 @@ void loop() {
 
     // Call comparison functions
     bool warnMoisture = checkMoistureAndWarn(soilMoisture);
-    checkLightAndWarn(light);
+    bool warnLight = checkLightAndWarn(light);
     checkTemperatureAndWarn(temperature);
     checkHumidityAndWarn(humidity);
   }
