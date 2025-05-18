@@ -33,33 +33,53 @@ mqttClient.on("connect", function () {
 });
 
 mqttClient.on("message", function (topic, message) {
-  // Update the relevant data when a message is received
-  console.log(`Message received:`);
+  console.log(` Message received:`);
   console.log(`Topic: ${topic}`);
   console.log(`Payload: ${message.toString()}`);
 
   switch (topic) {
     case "CROWmium/rtl8720dn/temperature":
-      mqttData.temperature = message.toString();
+      mqttData.temperature = parseFloat(message.toString());
       break;
     case "CROWmium/rtl8720dn/humidity":
-      mqttData.humidity = message.toString();
+      mqttData.humidity = parseFloat(message.toString());
       break;
     case "CROWmium/rtl8720dn/light":
-      mqttData.light = message.toString();
+      mqttData.light = parseFloat(message.toString());
       break;
     case "CROWmium/rtl8720dn/moisture":
-      mqttData.moisture = message.toString();
+      mqttData.moisture = parseFloat(message.toString());
       break;
     default:
       break;
   }
 
-  // Display the updated data on the server side (to verify it's working)
-  console.log("Updated Data on Server:", mqttData);
+  console.log(" Updated Sensor Data:", mqttData);
 });
+
+// Reusable publish function
+function publishAlert(message) {
+  mqttClient.publish("CROWmium/alert", message, {}, (err) => {
+    if (err) {
+      console.error("Failed to publish alert:", err);
+    } else {
+      console.log(`Published alert: ${message}`);
+    }
+  });
+}
+
+// Sends a WARNING alert
+function sendWarning() {
+  publishAlert("WARNING");
+}
+
+// Sends a CLEAR alert
+function sendClear() {
+  publishAlert("CLEAR");
+}
 
 module.exports = {
   mqttClient,
   mqttData,
+  publishAlert, // Export so API can use this
 };
