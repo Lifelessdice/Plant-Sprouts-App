@@ -111,6 +111,11 @@ void callback(char *topic, byte *payload, unsigned int length) {
     lastAlertReceivedTime = millis();
     message.trim();
 
+    if (appWasSilent) {
+      Serial.println("App reconnected — resuming remote control.");
+      appWasSilent = false;
+    }
+
     if (message != lastAlertMessage) {
       Serial.print("Alert from app: ");
       Serial.println(message);
@@ -192,9 +197,6 @@ void loop() {
   if (appIsSilent && !appWasSilent) {
     Serial.println("App disconnected — switching to local control.");
     appWasSilent = true;
-  }
-  if (!appIsSilent) {
-    appWasSilent = false;
   }
 
   if (now - lastMsgTime > publishInterval) {
