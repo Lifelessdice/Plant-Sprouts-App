@@ -77,7 +77,7 @@ export default function PlantMonitoringScreen({ route }) {
           shadowRadius: 30,
           shadowOffset: { width: 0, height: 4 },
           elevation: 12,
-        }
+        } && preferred.max != null
       ]}>
         <Text style={styles.label}>{label}</Text>
 
@@ -103,7 +103,7 @@ export default function PlantMonitoringScreen({ route }) {
             strokeCap="round"
           />
         ) : (
-          <Text style={[styles.value, isOutOfRange && styles.alert]}>
+          <Text style={styles.value}>
             {value} {unit}
           </Text>
         )}
@@ -138,25 +138,32 @@ export default function PlantMonitoringScreen({ route }) {
   return (
     <>
       <TopBar
-        title={`${plantData.name}${plantData.nickname ? ' ' + plantData.nickname : ''}`}
+        title={plantData.id === 'custom'
+          ? plantData.nickname || 'Custom Plant'
+          : `${plantData.name}${plantData.nickname ? ' ' + plantData.nickname : ''}`}
         onBackPress={() => navigation.goBack()}
         onUserPress={() => navigation.navigate('Account')}
       />
 
       <ScrollView contentContainerStyle={styles.container}>
-        {/* General Info */}
-        <View style={styles.generalInfoBox}>
-          <Text style={styles.generalInfoText}>{plantData.generalInfo}</Text>
-        </View>
+        {/* General Info and Small Info Boxes for non-custom plants */}
+        {plantData.id !== 'custom' ? (
+          <>
+            <View style={styles.generalInfoBox}>
+              <Text style={styles.generalInfoText}>{plantData.generalInfo}</Text>
+            </View>
 
-        {/* Small Info Boxes */}
-        <View style={styles.infoBoxesContainer}>
-          <InfoBox imageSource={plantData.difficulty} />
-          <InfoBox imageSource={plantData.lightRecommendation} />
-          <InfoBox imageSource={plantData.humidityRecommendation} />
-          <InfoBox imageSource={plantData.toxicity} />
-          <InfoBox imageSource={plantData.watering} />
-        </View>
+            <View style={styles.infoBoxesContainer}>
+              <InfoBox imageSource={plantData.difficulty} />
+              <InfoBox imageSource={plantData.lightRecommendation} />
+              <InfoBox imageSource={plantData.humidityRecommendation} />
+              <InfoBox imageSource={plantData.toxicity} />
+              <InfoBox imageSource={plantData.watering} />
+            </View>
+          </>
+        ) : (
+          <View style={{ paddingTop: 40 }} />
+        )}
 
         {/* Monitoring Cards */}
         {renderCard('🌱 Soil Moisture', soilMoisture, 'kPa', plantData.preferredSoilMoisture, '#DAA06D')}
