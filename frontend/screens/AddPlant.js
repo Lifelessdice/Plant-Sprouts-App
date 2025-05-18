@@ -45,6 +45,24 @@ export default function AddPlantScreen({ navigation }) {
     };
   });
 
+  const customPlant = {
+    id: 'custom',
+    name: 'Custom Plant',
+    image: require('../assets/plants/custom_plant.jpg'),
+    generalInfo: '',
+    preferredSoilMoisture: {max: null, min: null},
+    preferredHumidity: {max: null, min: null},
+    preferredTemperature: {max: null, min: null},
+    preferredLight: {max: null, min: null},
+    difficulty: null,
+    lightRecommendation: null,
+    humidityRecommendation: null,
+    toxicity: null,
+    watering: null,
+  };
+
+  mergedPlants.push(customPlant);
+
   const handleSelectPlant = (plant) => {
     const auth = getAuth();
     const user = auth.currentUser;  // Get the current user
