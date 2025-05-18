@@ -1,4 +1,3 @@
-// screens/PlantMonitoringScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -19,41 +18,54 @@ export default function PlantMonitoringScreen({ route }) {
     return <Text>Plant not found</Text>;
   }
 
-  useFocusEffect(              // fetch plant data when screen is opened
+  // Fetch updated plant data from Firestore whenever screen is focused
+  useFocusEffect(
     React.useCallback(() => {
       const fetchUpdatedPlant = async () => {
         try {
           const plantRef = doc(db, 'users', auth.currentUser.uid, 'plants', plantData.userPlantId);
-          const snapshot = await getDoc(plantRef);  // realtime data from firebase
+          const snapshot = await getDoc(plantRef);
           if (snapshot.exists()) {
-            const updatedPlant = snapshot.data();
-            setPlantData(updatedPlant);
+            setPlantData(snapshot.data());
           }
         } catch (err) {
           console.error('Error fetching updated plant:', err);
         }
       };
-
       fetchUpdatedPlant();
-    }, [])
+    }, [plantData.userPlantId])
   );
 
-  const [soilMoisture, setSoilMoisture] = useState(dataStore.moisture || 45);
-  const [lightLevel, setLightLevel] = useState(dataStore.light || 800);
-  const [temperature, setTemperature] = useState(dataStore.temperature || 22);
-  const [humidity, setHumidity] = useState(dataStore.humidity || 55);
+  // Sensor data state — initialize with defaults or from dataStore if available
+  const [sensorData, setSensorData] = useState({
+    temperature: 22,
+    light: 800,
+    humidity: 55,
+    moisture: 45,
+  });
 
+  // Poll dataStore every 5 seconds to update sensor data state
   useEffect(() => {
+    if (!plantData?.userPlantId) return;
+
     const interval = setInterval(() => {
-      setTemperature(dataStore.temperature || 22);
-      setLightLevel(dataStore.light || 800);
-      setHumidity(dataStore.humidity || 55);
-      setSoilMoisture(dataStore.moisture || 45);
-    }, 5000); 
+      const plantId = plantData.userPlantId;
+      const currentData = dataStore[plantId]?.sensorData;
+
+      if (currentData) {
+        setSensorData({
+          temperature: currentData.temperature ?? 22,
+          light: currentData.light ?? 800,
+          humidity: currentData.humidity ?? 55,
+          moisture: currentData.moisture ?? 45,
+        });
+      }
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [plantData.userPlantId]);
 
+  // Reuse your renderCard helper from your example for each sensor metric
   const renderCard = (label, value, unit, preferred, theme) => {
     const isOutOfRange =
       preferred &&
@@ -70,18 +82,20 @@ export default function PlantMonitoringScreen({ route }) {
     };
 
     return (
-      <View style={[
-        styles.card,
-        isOutOfRange && {
-          borderColor: '#dc2626',
-          borderWidth: 2,
-          shadowColor: '#dc2626',
-          shadowOpacity: 0.7,
-          shadowRadius: 30,
-          shadowOffset: { width: 0, height: 4 },
-          elevation: 12,
-        }
-      ]}>
+      <View
+        style={[
+          styles.card,
+          isOutOfRange && {
+            borderColor: '#dc2626',
+            borderWidth: 2,
+            shadowColor: '#dc2626',
+            shadowOpacity: 0.7,
+            shadowRadius: 30,
+            shadowOffset: { width: 0, height: 4 },
+            elevation: 12,
+          },
+        ]}
+      >
         <Text style={styles.label}>{label}</Text>
 
         {preferred?.min != null && preferred?.max != null ? (
@@ -169,10 +183,10 @@ export default function PlantMonitoringScreen({ route }) {
         )}
 
         {/* Monitoring Cards */}
-        {renderCard('🌱 Soil Moisture', soilMoisture, 'kPa', plantData.preferredSoilMoisture, '#DAA06D')}
-        {renderCard('☀️ Light Level', lightLevel, 'lux', plantData.preferredLight, '#facc15')}
-        {renderCard('🌡️ Temperature', temperature, '°C', plantData.preferredTemperature, '#fb923c')}
-        {renderCard('💧 Humidity', humidity, 'g/m3', plantData.preferredHumidity, '#60a5fa')}
+        {renderCard('🌱 Soil Moisture', sensorData.moisture, 'kPa', plantData.preferredSoilMoisture, '#DAA06D')}
+        {renderCard('☀️ Light Level', sensorData.light, 'lux', plantData.preferredLight, '#facc15')}
+        {renderCard('🌡️ Temperature', sensorData.temperature, '°C', plantData.preferredTemperature, '#fb923c')}
+        {renderCard('💧 Humidity', sensorData.humidity, 'g/m3', plantData.preferredHumidity, '#60a5fa')}
       </ScrollView>
     </>
   );
@@ -245,8 +259,8 @@ const styles = StyleSheet.create({
   alert: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.danger,  },
-    
+    color: colors.danger,
+  },
   editButtonText: {
     fontWeight: 'bold',
     fontSize: 18,
