@@ -25,7 +25,6 @@ export default function HomeScreen({ navigation }) {
           return;
         }
 
-        // Get ID token and send to your backend
         const idToken = await user.getIdToken();
         console.log("Sending UID to backend:", user.uid);
         await fetch('https://mqtt-proxy-server.onrender.com/api/register-uid', {
@@ -40,7 +39,6 @@ export default function HomeScreen({ navigation }) {
           }),
         });
 
-        // Then fetch from Firestore directly
         const db = getFirestore();
         const plantsCollection = collection(db, 'users', user.uid, 'plants');
         const snapshot = await getDocs(plantsCollection);
@@ -139,15 +137,7 @@ export default function HomeScreen({ navigation }) {
               <TouchableOpacity
                 style={[
                   styles.card,
-                  isOutOfPreferredRange(item) && {
-                    borderColor: '#dc2626',
-                    borderWidth: 2,
-                    shadowColor: '#dc2626',
-                    shadowOpacity: 0.7,
-                    shadowRadius: 30,
-                    shadowOffset: { width: 0, height: 4 },
-                    elevation: 12,
-                  }
+                  isOutOfPreferredRange(item) && styles.outOfRangeBorder
                 ]}
                 onPress={() =>
                   navigation.navigate('PlantMonitoring', { plant: item })
@@ -245,6 +235,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 4,
+    borderWidth: 0,        // no border by default
+    borderColor: 'transparent',
+  },
+  outOfRangeBorder: {
+    borderColor: '#dc2626',
+    borderWidth: 2,
   },
   plantName: {
     ...fonts.cardTitle,
