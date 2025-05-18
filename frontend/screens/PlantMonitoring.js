@@ -121,12 +121,12 @@ export default function PlantMonitoringScreen({ route }) {
         )}
 
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-          {preferred?.min != null && preferred?.max != null ? (
-            <Text style={styles.recommendation}>
-              Preferred: {preferred.min} - {preferred.max} {unit}
-            </Text>
+        {preferred?.min == null && preferred?.max == null ? (
+            <Text style={styles.recommendation}> Preferred range not available </Text>
           ) : (
-            <Text style={styles.recommendation}>Preferred range not available</Text>
+            <Text style={styles.recommendation}>
+             Preferred: {preferred.min ?? 'N/A'} - {preferred.max ?? 'N/A'} {unit}
+              </Text>
           )}
           <TouchableOpacity
             onPress={() =>
