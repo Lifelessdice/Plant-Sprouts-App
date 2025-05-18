@@ -241,13 +241,12 @@ void loop() {
 
     bool isWarning = warnMoisture || warnLight || warnTemp || warnHumidity;
 
-    // Publish warning status and show face
     if (isWarning) {
-      client.publish("CROWmium/rtl8720dn/warnings", "WARNING");
-      drawSadFace();
+    digitalWrite(BLUE_LED, LOW);
+    digitalWrite(RED_LED, HIGH);
     } else {
-      client.publish("CROWmium/rtl8720dn/warnings", "CLEAR");
-      drawSmileyFace();
+      digitalWrite(BLUE_LED, HIGH);
+      digitalWrite(RED_LED, LOW);
     }
   }
 }
