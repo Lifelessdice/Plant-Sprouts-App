@@ -32,11 +32,11 @@ TFT_eSPI tft;
 // Timing
 unsigned long lastMsgTime = 0;
 unsigned long lastAlertTime = 0;
-const unsigned long alertTimeout = 15000;
+const unsigned long alertTimeout = 15000; // 15 seconds
 
 // Smiley face drawing function
 void drawSmileyFace() {
-    tft.fillScreen(TFT_WHITE); // White background
+  tft.fillScreen(TFT_WHITE); // White background
 
   // Face
   tft.fillCircle(160, 120, 60, TFT_YELLOW); // Yellow face
@@ -46,7 +46,7 @@ void drawSmileyFace() {
   tft.fillCircle(145, 105, 5, TFT_BLACK); // Left eye
   tft.fillCircle(175, 105, 5, TFT_BLACK); // Right eye
 
-  // Smile (inverted parabola)
+  // Smile
   for (int x = -35; x <= 35; x++) {
     int y = -0.02 * x * x;
     tft.drawPixel(160 + x, 150 + y, TFT_BLACK);
@@ -55,7 +55,7 @@ void drawSmileyFace() {
 
 // Sad face drawing function
 void drawSadFace() {
-    tft.fillScreen(TFT_WHITE); // White background
+  tft.fillScreen(TFT_WHITE); // White background
 
   // Face
   tft.fillCircle(160, 120, 60, TFT_CYAN); // Cyan face
@@ -72,7 +72,7 @@ void drawSadFace() {
   }
 }
 
-// Comparison Functions
+// Comparison functions
 bool checkMoistureAndWarn(int soilMoisture) {
   if (soilMoisture < 40) {
     Serial.println("It's time to water your plant.");
@@ -113,7 +113,7 @@ bool checkHumidityAndWarn(int humidity) {
   }
 }
 
-// MQTT Callback
+// MQTT callback
 void callback(char *topic, byte *payload, unsigned int length) {
   String message;
   for (int i = 0; i < length; i++) {
@@ -122,7 +122,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
   message.trim();
 
   if (String(topic) == "CROWmium/alert") {
-    lastAlertTime = millis(); // Update last time alert was received
+    lastAlertTime = millis(); // App sent a message recently
 
     if (message == "WARNING") {
       digitalWrite(BLUE_LED, LOW);
@@ -136,7 +136,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
   }
 }
 
-// MQTT Reconnect
+// MQTT reconnect
 void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
@@ -157,12 +157,10 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
 
-  // LCD
   tft.begin();
   tft.setRotation(3);
   drawSmileyFace();  // Default face
 
-  // WiFi Setup
   Serial.println("Connecting to WiFi...");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -173,17 +171,15 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  // MQTT Setup
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
 
-  // Sensors and LEDs
   dht.begin();
   pinMode(WIO_LIGHT, INPUT);
   pinMode(SOIL_PIN, INPUT);
   pinMode(BLUE_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
-  digitalWrite(BLUE_LED, HIGH); // Blue LED turned on by default
+  digitalWrite(BLUE_LED, HIGH); // Blue LED on by default
   digitalWrite(RED_LED, LOW);
 }
 
@@ -199,13 +195,12 @@ void loop() {
   if (now - lastMsgTime > publishInterval) {
     lastMsgTime = now;
 
-    // Read sensor values
+    // Read sensors
     int temperature = dht.readTemperature();
     int humidity = dht.readHumidity();
     int light = analogRead(WIO_LIGHT);
     int soilRaw = analogRead(SOIL_PIN);
 
-    // Mapping soil moisture values to percentage
     int soilMoisture = map(soilRaw, 1023, 0, 0, 100);
     soilMoisture = constrain(soilMoisture, 0, 100);
 
@@ -216,38 +211,36 @@ void loop() {
     snprintf(lightStr, sizeof(lightStr), "%d", light);
     snprintf(soilStr, sizeof(soilStr), "%d", soilMoisture);
 
-    // Print to Serial
     Serial.print("Temperature: "); Serial.println(tempStr);
     Serial.print("Humidity: "); Serial.println(humStr);
     Serial.print("Light: "); Serial.println(lightStr);
     Serial.print("Soil Moisture: "); Serial.println(soilStr);
 
-    // Publish to MQTT
+    // Publish values
     client.publish("CROWmium/rtl8720dn/temperature", tempStr);
     client.publish("CROWmium/rtl8720dn/humidity", humStr);
     client.publish("CROWmium/rtl8720dn/light", lightStr);
     client.publish("CROWmium/rtl8720dn/moisture", soilStr);
 
-    // Determine if app is silent
-    bool shouldRunChecks = (millis() - lastAlertTime > alertTimeout);
-
-    if (shouldRunChecks) {
-    // Perform sensor checks
+    // Check if app is silent
+    bool appIsSilent = (now - lastAlertTime > alertTimeout);
+    if (appIsSilent) {
       bool warnMoisture = checkMoistureAndWarn(soilMoisture);
       bool warnLight = checkLightAndWarn(light);
       bool warnTemp = checkTemperatureAndWarn(temperature);
       bool warnHumidity = checkHumidityAndWarn(humidity);
 
-    bool isWarning = warnMoisture || warnLight || warnTemp || warnHumidity;
+      bool isWarning = warnMoisture || warnLight || warnTemp || warnHumidity;
 
-    if (isWarning) {
-      digitalWrite(BLUE_LED, LOW);
-      digitalWrite(RED_LED, HIGH);
-      drawSadFace();
-  } else {
-      digitalWrite(BLUE_LED, HIGH);
-      digitalWrite(RED_LED, LOW);
-      drawSmileyFace();
+      if (isWarning) {
+        digitalWrite(BLUE_LED, LOW);
+        digitalWrite(RED_LED, HIGH);
+        drawSadFace();
+      } else {
+        digitalWrite(BLUE_LED, HIGH);
+        digitalWrite(RED_LED, LOW);
+        drawSmileyFace();
+      }
     }
   }
 }
