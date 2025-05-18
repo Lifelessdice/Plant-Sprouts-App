@@ -1,10 +1,6 @@
 import axios from 'axios';
 
-let dataStore = {};  // Stores tge sebsir data.
-
-//check if the values are null
-const allValuesNull = (data) =>
-  Object.values(data).every((value) => value === null);
+let dataStore = {};  // Stores the sensor data.
 
 // Fetch sensor data + plant statuses
 const fetchDashboardData = async () => {
@@ -18,23 +14,16 @@ const fetchDashboardData = async () => {
     console.log("Sensor Data Received:", sensorData);
     console.log("Plant Statuses Received:", plants);
 
-    if (allValuesNull(sensorData)) {
-      console.warn("All sensor values are null. Check MQTT proxy or sensor stream.");
-      dataStore = {};  // Clear datastore if no valid data
-    } else {
-      // For each plant, store sensorData + status keyed by plantId
-      dataStore = {};
+    // For each plant, store sensorData + status keyed by plantId
+    dataStore = {};
+    plants.forEach(({ plantId, status }) => {
+      dataStore[plantId] = {
+        sensorData,
+        status,
+      };
+    });
 
-      plants.forEach(({ plantId, status }) => {
-        dataStore[plantId] = {
-          sensorData,
-          status,
-        };
-      });
-
-      console.log("Updated DataStore keyed by plantId:", dataStore);
-    }
-
+    console.log("Updated DataStore keyed by plantId:", dataStore);
     console.log("Dashboard data processed successfully.");
   } catch (error) {
     console.error("Error fetching dashboard data:", error.message);
