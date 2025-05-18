@@ -32,7 +32,7 @@ TFT_eSPI tft;
 // Timing
 unsigned long lastMsgTime = 0;
 unsigned long lastAlertReceivedTime = 0;
-const unsigned long alertTimeout = 30000; // 15 seconds of silence = app disconnected
+const unsigned long alertTimeout = 30000; // 30 seconds of silence = app disconnected
 bool appWasSilent = false;
 String lastAlertMessage = "";
 
@@ -128,7 +128,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
     message.trim();
 
     if (appWasSilent) {
-      Serial.println("App reconnected — resuming remote control.");
+      Serial.println("App reconnected — resuming remote control."); // Print when app is reconnected
       appWasSilent = false;
     }
 
@@ -216,7 +216,7 @@ void loop() {
   bool appIsSilent = (now - lastAlertReceivedTime > alertTimeout);
 
   if (appIsSilent && !appWasSilent) {
-    Serial.println("App disconnected — switching to local control.");
+    Serial.println("App disconnected — switching to local control."); // Print if app is disconnected
     appWasSilent = true;
   }
 
