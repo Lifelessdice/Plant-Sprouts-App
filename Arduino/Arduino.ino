@@ -31,10 +31,14 @@ TFT_eSPI tft;
 
 // Timing
 unsigned long lastMsgTime = 0;
+unsigned long lastAlertReceivedTime = 0;
+const unsigned long alertTimeout = 30000; // 30 seconds of silence = app disconnected
+bool appWasSilent = false;
+String lastAlertMessage = "";
 
 // Smiley face drawing function
 void drawSmileyFace() {
-    tft.fillScreen(TFT_WHITE); // White background
+  tft.fillScreen(TFT_WHITE); // White background
 
   // Face
   tft.fillCircle(160, 120, 60, TFT_YELLOW); // Yellow face
@@ -53,7 +57,7 @@ void drawSmileyFace() {
 
 // Sad face drawing function
 void drawSadFace() {
-    tft.fillScreen(TFT_WHITE); // White background
+  tft.fillScreen(TFT_WHITE); // White background
 
   // Face
   tft.fillCircle(160, 120, 60, TFT_CYAN); // Cyan face
@@ -113,30 +117,36 @@ bool checkHumidityAndWarn(int humidity) {
 
 // MQTT Callback
 void callback(char *topic, byte *payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("]: ");
-
+  String topicStr = String(topic);
   String message;
-  for (int i = 0; i < length; i++) {
-    char c = (char)payload[i];
-    Serial.print(c);
-    message += c;
+  for (unsigned int i = 0; i < length; i++) {
+    message += (char)payload[i];
   }
-  Serial.println();
 
-  // Handle warning messages
-  if (String(topic) == "CROWmium/alert") {
+  if (topicStr == "CROWmium/alert") {
+    lastAlertReceivedTime = millis(); // update the time of last received alert
     message.trim();
 
-    if (message == "WARNING") {
-      digitalWrite(BLUE_LED, LOW);
-      digitalWrite(RED_LED, HIGH);
-      drawSadFace();
-    } else if (message == "CLEAR") {
-      digitalWrite(BLUE_LED, HIGH);
-      digitalWrite(RED_LED, LOW);
-      drawSmileyFace();
+    if (appWasSilent) {
+      Serial.println("App reconnected — resuming remote control."); // Print when app is reconnected
+      appWasSilent = false;
+    }
+
+    if (message != lastAlertMessage) {
+      Serial.print("Alert from app: ");
+      Serial.println(message);
+
+      if (message == "WARNING") {
+        digitalWrite(RED_LED, HIGH);
+        digitalWrite(BLUE_LED, LOW);
+        drawSadFace();
+      } else if (message == "CLEAR") {
+        digitalWrite(RED_LED, LOW);
+        digitalWrite(BLUE_LED, HIGH);
+        drawSmileyFace();
+      }
+
+      lastAlertMessage = message;
     }
   }
 }
@@ -201,6 +211,15 @@ void loop() {
 
   unsigned long now = millis();
   const unsigned long publishInterval = 10000;
+
+  // Check if app is silent
+  bool appIsSilent = (now - lastAlertReceivedTime > alertTimeout);
+
+  if (appIsSilent && !appWasSilent) {
+    Serial.println("App disconnected — switching to local control."); // Print if app is disconnected
+    appWasSilent = true;
+  }
+
   if (now - lastMsgTime > publishInterval) {
     lastMsgTime = now;
 
@@ -233,20 +252,25 @@ void loop() {
     client.publish("CROWmium/rtl8720dn/light", lightStr);
     client.publish("CROWmium/rtl8720dn/moisture", soilStr);
 
-    // Call comparison functions
-    bool warnMoisture = checkMoistureAndWarn(soilMoisture);
-    bool warnLight = checkLightAndWarn(light);
-    bool warnTemp = checkTemperatureAndWarn(temperature);
-    bool warnHumidity = checkHumidityAndWarn(humidity);
+    // Fallback to local control if app is silent
+    if (appIsSilent) {
+      bool warnMoisture = checkMoistureAndWarn(soilMoisture);
+      bool warnLight = checkLightAndWarn(light);
+      bool warnTemp = checkTemperatureAndWarn(temperature);
+      bool warnHumidity = checkHumidityAndWarn(humidity);
 
-    bool isWarning = warnMoisture || warnLight || warnTemp || warnHumidity;
+      bool isWarning = warnMoisture || warnLight || warnTemp || warnHumidity;
 
-    if (isWarning) {
-    digitalWrite(BLUE_LED, LOW);
-    digitalWrite(RED_LED, HIGH);
-    } else {
-      digitalWrite(BLUE_LED, HIGH);
-      digitalWrite(RED_LED, LOW);
+      // Show face and LED status
+      if (isWarning) {
+        digitalWrite(RED_LED, HIGH);
+        digitalWrite(BLUE_LED, LOW);
+        drawSadFace();
+      } else {
+        digitalWrite(RED_LED, LOW);
+        digitalWrite(BLUE_LED, HIGH);
+        drawSmileyFace();
+      }
     }
   }
 }
