@@ -91,10 +91,11 @@ export default function HomeScreen({ navigation }) {
     ];
 
     return checks.some(({ value, preferred }) => {
-      if (!preferred || preferred.min == null || preferred.max == null) {
-        return false;
-      }
-      return value < preferred.min || value > preferred.max;
+      if (!preferred) return false;
+      const { min, max } = preferred;
+      const belowMin = min != null && value < min;
+      const aboveMax = max != null && value > max;
+      return belowMin || aboveMax;
     });
   };
 
