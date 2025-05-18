@@ -32,7 +32,7 @@ TFT_eSPI tft;
 // Timing
 unsigned long lastMsgTime = 0;
 unsigned long lastAlertReceivedTime = 0;
-const unsigned long alertTimeout = 30000; // 30 seconds of silence = app disconnected
+const unsigned long alertTimeout = 18000; // 18 seconds of silence = app disconnected
 bool appWasSilent = false;
 String lastAlertMessage = "";
 
@@ -179,14 +179,27 @@ void setup() {
 
   // WiFi Setup
   Serial.println("Connecting to WiFi...");
+  tft.fillScreen(TFT_WHITE);                      // Clear screen
+  tft.setCursor(50, 110);                                  
+  tft.setTextColor(TFT_BLACK, TFT_WHITE);
+  tft.setTextSize(2);
+  tft.println("Connecting to WiFi...");          // Print on LCD display     
+
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(1000);
   }
+
   Serial.println("\nWiFi connected!");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
+
+  tft.fillScreen(TFT_WHITE);                      // Clear screen
+  tft.setCursor(80, 110);
+  tft.setTextColor(TFT_BLACK, TFT_WHITE);
+  tft.setTextSize(2);
+  tft.println("WiFi connected!");                // Print on LCD display 
 
   // MQTT Setup
   client.setServer(mqtt_server, mqtt_port);
