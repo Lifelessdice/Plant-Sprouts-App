@@ -126,7 +126,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
   Serial.println();
 
   // Handle warning messages
-  if (String(topic) == "CROWmium/rtl8720dn/warnings") {
+  if (String(topic) == "CROWmium/alert") {
     message.trim();
 
     if (message == "WARNING") {
