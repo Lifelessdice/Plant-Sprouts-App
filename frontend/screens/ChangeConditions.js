@@ -57,6 +57,54 @@ export default function ChangeConditionsScreen() {
       }
     };
 
+    const handleReset = async () => {
+      if (!plant || !plant.id || !preferred) return;
+    
+      const userId = auth.currentUser.uid;
+      const plantRef = doc(db, 'users', userId, 'plants', plant.userPlantId);
+    
+      let updatePayload = {};
+      if (label?.toLowerCase().includes('temperature')) {
+        updatePayload = {
+          preferredTemperature: plant.originalPreferredTemperature,
+        };
+      } else if (label?.toLowerCase().includes('soil')) {
+        updatePayload = {
+          preferredSoilMoisture: plant.originalPreferredSoilMoisture,
+        };
+      } else if (label?.toLowerCase().includes('light')) {
+        updatePayload = {
+          preferredLight: plant.originalPreferredLight,
+        };
+      } else if (label?.toLowerCase().includes('humidity')) {
+        updatePayload = {
+          preferredHumidity: plant.originalPreferredHumidity,
+        };
+      }
+    
+      try {
+        await updateDoc(plantRef, updatePayload);
+
+        // revert back to default values on screen
+        if (label?.toLowerCase().includes('temperature')) {
+          setNewMin(plant.originalPreferredTemperature.min.toString());
+          setNewMax(plant.originalPreferredTemperature.max.toString());
+        } else if (label?.toLowerCase().includes('soil')) {
+          setNewMin(plant.originalPreferredSoilMoisture.min.toString());
+          setNewMax(plant.originalPreferredSoilMoisture.max.toString());
+        } else if (label?.toLowerCase().includes('light')) {
+          setNewMin(plant.originalPreferredLight.min.toString());
+          setNewMax(plant.originalPreferredLight.max.toString());
+        } else if (label?.toLowerCase().includes('humidity')) {
+          setNewMin(plant.originalPreferredHumidity.min.toString());
+          setNewMax(plant.originalPreferredHumidity.max.toString());
+        }
+      } catch (error) {
+        console.error('Error restoring default preferred conditions:', error);
+        Alert.alert('Failed to update.');
+      }
+    };
+
     const EditConditions = (label, preferred, unit) => {
       return (<ScrollView contentContainerStyle={styles.scrollContent}>
         {preferred ? (
@@ -80,6 +128,12 @@ export default function ChangeConditionsScreen() {
               onChangeText={setNewMax}
               keyboardType="numeric"
               style={[styles.input]}
+            />
+            <CustomButton
+              title="Reset to Default"
+              onPress={handleReset}
+              style={{ marginTop: 20, backgroundColor: '#669169', paddingHorizontal: 10, paddingVertical: 12 }} 
+              textStyle={{ color: '#fff', fontSize: 13 }}
             />
             <CustomButton
               title="Save Changes"
