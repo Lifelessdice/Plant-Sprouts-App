@@ -2,61 +2,52 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 import { Video } from 'expo-av'; 
 import { getAuth } from 'firebase/auth';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import CustomButton from '../components/CustomButton';
-import { dataStore, setHandlerForTopic } from '../src/backendAPI';
-import { deleteDoc, doc } from 'firebase/firestore';
 import TopBar from '../components/TopBar';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 
-
-
 export default function HomeScreen({ navigation }) {
-  const [plants, setPlants] = useState([]);  // Local state to store user's plants
-  const [soilMoisture, setSoilMoisture] = useState(45);  // Default to 45 if no value
-  const [lightLevel, setLightLevel] = useState(800);  // Default to 800 if no value
-  const [temperature, setTemperature] = useState(22);  // Default to 22°C if no value
-  const [humidity, setHumidity] = useState(55);  // Default to 55% if no value
+  const [plants, setPlants] = useState([]);
+  const [soilMoisture, setSoilMoisture] = useState(45);
+  const [lightLevel, setLightLevel] = useState(800);
+  const [temperature, setTemperature] = useState(22);
+  const [humidity, setHumidity] = useState(55);
 
   useEffect(() => {
-    // Fetch the user's plants from Firestore 
     const fetchPlants = async () => {
       try {
         const auth = getAuth();
         const user = auth.currentUser;
-
         if (!user) {
           Alert.alert('Please log in to view your plants.');
           return;
         }
 
+        // Get ID token and send to your backend
+        const idToken = await user.getIdToken();
+        console.log("Sending UID to backend:", user.uid);
+        await fetch('https://mqtt-proxy-server.onrender.com/api/register-uid', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            uid: user.uid,
+            email: user.email,
+          }),
+        });
 
-      //Send the ID token to the backend
-      const idToken = await user.getIdToken();
-      await fetch('https://mqtt-proxy-server.onrender.com/api/verifyUser', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({
-          uid: user.uid,
-          email: user.email,
-        }),
-      });
-
-
-
+        // Then fetch from Firestore directly
         const db = getFirestore();
         const plantsCollection = collection(db, 'users', user.uid, 'plants');
         const snapshot = await getDocs(plantsCollection);
-
         const plantsList = snapshot.docs.map(doc => ({
-          userPlantId: doc.id, // Use the Firestore document ID as userPlantId
+          userPlantId: doc.id,
           ...doc.data(),
         }));
-
         setPlants(plantsList);
       } catch (error) {
         console.error('Error fetching plants:', error);
@@ -65,7 +56,7 @@ export default function HomeScreen({ navigation }) {
     };
 
     fetchPlants();
-  }, []); // Empty dependency array ensures this runs only once when the component mounts
+  }, []);
 
   const handleDeletePlant = (userPlantId) => {
     Alert.alert(
@@ -83,11 +74,10 @@ export default function HomeScreen({ navigation }) {
               const user = auth.currentUser;
               if (!user) return;
 
-              // Use the userPlantId to delete the plant
               const plantRef = doc(db, 'users', user.uid, 'plants', userPlantId);
               await deleteDoc(plantRef);
 
-              setPlants((prev) => prev.filter((p) => p.userPlantId !== userPlantId));
+              setPlants(prev => prev.filter(p => p.userPlantId !== userPlantId));
               Alert.alert('Plant deleted successfully');
             } catch (error) {
               console.error('Error deleting plant:', error);
@@ -114,10 +104,9 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.wrapper}>
-      {/* Transparent MP4 video overlay */}
       <View style={styles.videoWrapper}>
         <Video
-          source={require('../assets/animation.mp4')} // Replace with your MP4 file
+          source={require('../assets/animation.mp4')}
           style={styles.video}
           isLooping={true}
           shouldPlay={true}
@@ -126,10 +115,10 @@ export default function HomeScreen({ navigation }) {
         />
       </View>
 
-    <TopBar
-      title="Your Plants"
-      onUserPress={() => navigation.navigate('Account')} 
-    />
+      <TopBar
+        title="Your Plants"
+        onUserPress={() => navigation.navigate('Account')}
+      />
 
       <View style={styles.container}>
         {plants.length === 0 ? (
@@ -145,7 +134,7 @@ export default function HomeScreen({ navigation }) {
         ) : (
           <FlatList
             data={plants}
-            keyExtractor={(item) => item.userPlantId} // Use userPlantId for the key
+            keyExtractor={(item) => item.userPlantId}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={[
@@ -195,7 +184,6 @@ export default function HomeScreen({ navigation }) {
           }}
           style={styles.addButton}
         />
-
       </View>
     </View>
   );
@@ -280,6 +268,5 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     ...fonts.cardTitle,
-
   },
 });
