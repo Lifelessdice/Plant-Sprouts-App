@@ -46,7 +46,7 @@ void drawSmileyFace() {
 
   // Wider smile (inverted parabola)
   for (int x = -35; x <= 35; x++) {
-    int y = -0.02 * x * x; // Shallower, wider arc
+    int y = -0.02 * x * x;
     tft.drawPixel(160 + x, 150 + y, TFT_BLACK);
   }
 }
@@ -56,7 +56,7 @@ void drawSadFace() {
     tft.fillScreen(TFT_WHITE); // White background
 
   // Face
-  tft.fillCircle(160, 120, 60, TFT_CYAN); // Cyan
+  tft.fillCircle(160, 120, 60, TFT_CYAN); // Cyan face
   tft.drawCircle(160, 120, 60, TFT_BLACK);  // Black outline
 
   // Eyes
@@ -188,7 +188,7 @@ void setup() {
   pinMode(SOIL_PIN, INPUT);
   pinMode(BLUE_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
-  digitalWrite(BLUE_LED, HIGH);
+  digitalWrite(BLUE_LED, HIGH); // Blue LED turned on by default
   digitalWrite(RED_LED, LOW);
 }
 
