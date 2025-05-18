@@ -67,9 +67,12 @@ export default function PlantMonitoringScreen({ route }) {
 
   // Reuse your renderCard helper from your example for each sensor metric
   const renderCard = (label, value, unit, preferred, theme) => {
-    const isOutOfRange = preferred && (value < preferred.min || value > preferred.max);
-    const aboveRange = preferred && value > preferred.max;
-    const belowRange = preferred && value < preferred.min;
+    const isOutOfRange =
+      preferred &&
+      ((preferred.min != null && value < preferred.min) ||
+       (preferred.max != null && value > preferred.max));
+    const aboveRange = preferred && preferred.max != null && value > preferred.max;
+    const belowRange = preferred && preferred.min != null && value < preferred.min;
 
     const getProgress = () => {
       if (!preferred) return 0;
@@ -89,7 +92,7 @@ export default function PlantMonitoringScreen({ route }) {
           shadowRadius: 30,
           shadowOffset: { width: 0, height: 4 },
           elevation: 12,
-        } && preferred.max != null
+        }
       ]}>
         <Text style={styles.label}>{label}</Text>
 
@@ -115,7 +118,7 @@ export default function PlantMonitoringScreen({ route }) {
             strokeCap="round"
           />
         ) : (
-          <Text style={styles.value}>
+          <Text style={[styles.value, isOutOfRange && styles.alert]}>
             {value} {unit}
           </Text>
         )}
