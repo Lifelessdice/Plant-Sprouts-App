@@ -16,7 +16,7 @@ router.post("/register-uid", (req, res) => {
   }
 
   registeredUID = uid;
-  console.log("✅ UID registered and stored:", uid);
+  console.log("UID registered and stored:", uid);
 
   res.json({ message: "UID stored in memory" });
 });
