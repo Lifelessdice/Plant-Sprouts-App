@@ -180,7 +180,7 @@ void setup() {
   // WiFi Setup
   Serial.println("Connecting to WiFi...");
   tft.fillScreen(TFT_WHITE);                              
-  tft.setCursor(40, 100);                                  
+  tft.setCursor(50, 110);                                  
   tft.setTextColor(TFT_BLACK, TFT_WHITE);
   tft.setTextSize(2);
   tft.println("Connecting to WiFi...");                   
@@ -196,7 +196,7 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   tft.fillScreen(TFT_WHITE);
-  tft.setCursor(60, 100);
+  tft.setCursor(80, 110);
   tft.setTextColor(TFT_BLACK, TFT_WHITE);
   tft.setTextSize(2);
   tft.println("WiFi connected!");                         
