@@ -14,7 +14,7 @@ const int mqtt_port = 1883;
 // Sensor setup
 #define DHTPIN 2
 #define DHTTYPE DHT11
-#define SOIL_PIN A0  
+#define SOIL_PIN A0
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -22,52 +22,38 @@ DHT dht(DHTPIN, DHTTYPE);
 #define BLUE_LED 3
 #define RED_LED 4
 
-// MQTT client setup
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
-
-// LCD display
 TFT_eSPI tft;
 
 // Timing
 unsigned long lastMsgTime = 0;
-unsigned long lastAlertTime = 0;
-const unsigned long alertTimeout = 15000; // 15 seconds
+unsigned long lastAlertReceivedTime = 0;
+const unsigned long alertTimeout = 15000;
+bool appWasSilent = false;
+String lastAlertMessage = "";
 
-// Smiley face drawing function
+// Face drawing
 void drawSmileyFace() {
-  tft.fillScreen(TFT_WHITE); // White background
-
-  // Face
-  tft.fillCircle(160, 120, 60, TFT_YELLOW); // Yellow face
-  tft.drawCircle(160, 120, 60, TFT_BLACK);  // Black outline
-
-  // Eyes
-  tft.fillCircle(145, 105, 5, TFT_BLACK); // Left eye
-  tft.fillCircle(175, 105, 5, TFT_BLACK); // Right eye
-
-  // Smile
+  tft.fillScreen(TFT_WHITE);
+  tft.fillCircle(160, 120, 60, TFT_YELLOW);
+  tft.drawCircle(160, 120, 60, TFT_BLACK);
+  tft.fillCircle(145, 105, 5, TFT_BLACK);
+  tft.fillCircle(175, 105, 5, TFT_BLACK);
   for (int x = -35; x <= 35; x++) {
     int y = -0.02 * x * x;
     tft.drawPixel(160 + x, 150 + y, TFT_BLACK);
   }
 }
 
-// Sad face drawing function
 void drawSadFace() {
-  tft.fillScreen(TFT_WHITE); // White background
-
-  // Face
-  tft.fillCircle(160, 120, 60, TFT_CYAN); // Cyan face
-  tft.drawCircle(160, 120, 60, TFT_BLACK);  // Black outline
-
-  // Eyes
-  tft.fillCircle(145, 105, 5, TFT_BLACK); // Left eye
-  tft.fillCircle(175, 105, 5, TFT_BLACK); // Right eye
-
-  // Frown
+  tft.fillScreen(TFT_WHITE);
+  tft.fillCircle(160, 120, 60, TFT_CYAN);
+  tft.drawCircle(160, 120, 60, TFT_BLACK);
+  tft.fillCircle(145, 105, 5, TFT_BLACK);
+  tft.fillCircle(175, 105, 5, TFT_BLACK);
   for (int x = -20; x <= 20; x++) {
-    int y = 0.05 * x * x; // Parabolic arc
+    int y = 0.05 * x * x;
     tft.drawPixel(160 + x, 140 + y, TFT_BLACK);
   }
 }
@@ -115,23 +101,31 @@ bool checkHumidityAndWarn(int humidity) {
 
 // MQTT callback
 void callback(char *topic, byte *payload, unsigned int length) {
+  String topicStr = String(topic);
   String message;
-  for (int i = 0; i < length; i++) {
+  for (unsigned int i = 0; i < length; i++) {
     message += (char)payload[i];
   }
-  message.trim();
 
-  if (String(topic) == "CROWmium/alert") {
-    lastAlertTime = millis(); // App sent a message recently
+  if (topicStr == "CROWmium/alert") {
+    lastAlertReceivedTime = millis();
+    message.trim();
 
-    if (message == "WARNING") {
-      digitalWrite(BLUE_LED, LOW);
-      digitalWrite(RED_LED, HIGH);
-      drawSadFace();
-    } else if (message == "CLEAR") {
-      digitalWrite(BLUE_LED, HIGH);
-      digitalWrite(RED_LED, LOW);
-      drawSmileyFace();
+    if (message != lastAlertMessage) {
+      Serial.print("Alert from app: ");
+      Serial.println(message);
+
+      if (message == "WARNING") {
+        digitalWrite(RED_LED, HIGH);
+        digitalWrite(BLUE_LED, LOW);
+        drawSadFace();
+      } else if (message == "CLEAR") {
+        digitalWrite(RED_LED, LOW);
+        digitalWrite(BLUE_LED, HIGH);
+        drawSmileyFace();
+      }
+
+      lastAlertMessage = message;
     }
   }
 }
@@ -159,7 +153,7 @@ void setup() {
 
   tft.begin();
   tft.setRotation(3);
-  drawSmileyFace();  // Default face
+  drawSmileyFace();
 
   Serial.println("Connecting to WiFi...");
   WiFi.begin(ssid, password);
@@ -179,7 +173,7 @@ void setup() {
   pinMode(SOIL_PIN, INPUT);
   pinMode(BLUE_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
-  digitalWrite(BLUE_LED, HIGH); // Blue LED on by default
+  digitalWrite(BLUE_LED, HIGH);
   digitalWrite(RED_LED, LOW);
 }
 
@@ -192,19 +186,27 @@ void loop() {
 
   unsigned long now = millis();
   const unsigned long publishInterval = 10000;
+
+  bool appIsSilent = (now - lastAlertReceivedTime > alertTimeout);
+
+  if (appIsSilent && !appWasSilent) {
+    Serial.println("App disconnected — switching to local control.");
+    appWasSilent = true;
+  }
+  if (!appIsSilent) {
+    appWasSilent = false;
+  }
+
   if (now - lastMsgTime > publishInterval) {
     lastMsgTime = now;
 
-    // Read sensors
     int temperature = dht.readTemperature();
     int humidity = dht.readHumidity();
     int light = analogRead(WIO_LIGHT);
     int soilRaw = analogRead(SOIL_PIN);
-
     int soilMoisture = map(soilRaw, 1023, 0, 0, 100);
     soilMoisture = constrain(soilMoisture, 0, 100);
 
-    // Convert values to strings
     char tempStr[10], humStr[10], lightStr[10], soilStr[10];
     snprintf(tempStr, sizeof(tempStr), "%d", temperature);
     snprintf(humStr, sizeof(humStr), "%d", humidity);
@@ -216,14 +218,11 @@ void loop() {
     Serial.print("Light: "); Serial.println(lightStr);
     Serial.print("Soil Moisture: "); Serial.println(soilStr);
 
-    // Publish values
     client.publish("CROWmium/rtl8720dn/temperature", tempStr);
     client.publish("CROWmium/rtl8720dn/humidity", humStr);
     client.publish("CROWmium/rtl8720dn/light", lightStr);
     client.publish("CROWmium/rtl8720dn/moisture", soilStr);
 
-    // Check if app is silent
-    bool appIsSilent = (now - lastAlertTime > alertTimeout);
     if (appIsSilent) {
       bool warnMoisture = checkMoistureAndWarn(soilMoisture);
       bool warnLight = checkLightAndWarn(light);
@@ -233,12 +232,12 @@ void loop() {
       bool isWarning = warnMoisture || warnLight || warnTemp || warnHumidity;
 
       if (isWarning) {
-        digitalWrite(BLUE_LED, LOW);
         digitalWrite(RED_LED, HIGH);
+        digitalWrite(BLUE_LED, LOW);
         drawSadFace();
       } else {
-        digitalWrite(BLUE_LED, HIGH);
         digitalWrite(RED_LED, LOW);
+        digitalWrite(BLUE_LED, HIGH);
         drawSmileyFace();
       }
     }
