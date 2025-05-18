@@ -106,13 +106,18 @@ export default function ChangeConditionsScreen() {
     };
 
     const EditConditions = (label, preferred, unit) => {
-      return (<ScrollView contentContainerStyle={styles.scrollContent}>
-        {preferred ? (
+      return (
+        <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.formContainer}>
-              <Text style={[fonts.title, { color: colors.primaryText, marginBottom: 10 }]}>{label}</Text>
+            <Text style={[fonts.title, { color: colors.primaryText, marginBottom: 10 }]}>{label}</Text>
+
+            {preferred?.min != null && preferred?.max != null ? (
               <Text style={[fonts.body, { color: colors.secondaryText }]}>
-              Current range: {preferred.min} – {preferred.max} {unit}
+                Current range: {preferred.min} – {preferred.max} {unit}
               </Text>
+            ) : (
+              <Text style={[fonts.body, { marginBottom: 10 }]}>No preferred range set.</Text>
+            )}
 
             <TextInput
               placeholder={`Enter new min ${label}`}
@@ -120,7 +125,6 @@ export default function ChangeConditionsScreen() {
               onChangeText={setNewMin}
               keyboardType="numeric"
               style={[styles.input]}
-
             />
             <TextInput
               placeholder={`Enter new max ${label}`}
@@ -129,30 +133,38 @@ export default function ChangeConditionsScreen() {
               keyboardType="numeric"
               style={[styles.input]}
             />
+
             <CustomButton
               title="Reset to Default"
               onPress={handleReset}
-              style={{ marginTop: 20, backgroundColor: '#669169', paddingHorizontal: 10, paddingVertical: 12 }} 
+              style={{
+                marginTop: 20,
+                backgroundColor: '#669169',
+                paddingHorizontal: 10,
+                paddingVertical: 12,
+              }}
               textStyle={{ color: '#fff', fontSize: 13 }}
-              disabled={preferred?.min == null || preferred?.max == null}
+              disabled={plant.originalPreferredLight.min == null}
             />
+
+
             <CustomButton
               title="Save Changes"
               onPress={handleSave}
               style={{ marginTop: 20 }}
             />
           </View>
-        ) : (
-          <Text style={fonts.body}>No preferred range set.</Text>
-        )}
-    </ScrollView>
-    )}
+        </ScrollView>
+      );
+    };
 
     return (
     
         <>
         <TopBar
-          title={`${plant.name}${plant.nickname ? ` ${plant.nickname}` : ''}`}
+          title={plant.id === 'custom'
+            ? plant.nickname || 'Custom Plant'
+            : `${plant.name}${plant.nickname ? ' ' + plant.nickname : ''}`}
           onBackPress={() => navigation.goBack()}
           onUserPress={() => navigation.navigate('Account')}
         />
@@ -164,7 +176,13 @@ export default function ChangeConditionsScreen() {
         label?.toLowerCase().includes('light') ? (EditConditions('Light', preferred, unit))
         :
         label?.toLowerCase().includes('humidity') ? (EditConditions('Humidity', preferred, unit))
-        : null}
+        : (
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <View style={styles.formContainer}>
+              <Text style={[fonts.body]}>No preferred condition label matched.</Text>
+            </View>
+          </ScrollView>
+        )}
         
       </>
 
