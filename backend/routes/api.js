@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
+
 const { mqttData, publishAlert } = require("../mqtt/mqttClient");
 const { getPlantsByUserId } = require("../firebase/plant");
 const { checkPlantConditions } = require("../utils/plantStatusChecker");
-
 
 let registeredUID = null;
 
@@ -16,11 +16,10 @@ router.post("/register-uid", (req, res) => {
   }
 
   registeredUID = uid;
-  console.log("UID registered and stored:", uid);
+  console.log(" UID registered and stored:", uid);
 
   res.json({ message: "UID stored in memory" });
 });
-
 
 
 router.get("/dashboard", async (req, res) => {
@@ -40,13 +39,15 @@ router.get("/dashboard", async (req, res) => {
       }
 
       return {
-        plantId: plant.id,
+        plantId: plant.userPlantId,
         status,
       };
     });
 
     if (shouldSendAlert) {
-      publishAlert("danger");
+      publishAlert("danger");  // send danger if any out of range
+    } else {
+      publishAlert("CLEAR");   // send clear if all good
     }
 
     res.json({
@@ -54,11 +55,10 @@ router.get("/dashboard", async (req, res) => {
       plants: plantsStatusOnly,
     });
   } catch (error) {
-    console.error("Failed to fetch dashboard data:", error);
+    console.error(" Failed to fetch dashboard data:", error);
     res.status(500).json({ error: "Failed to fetch dashboard data" });
   }
 });
-
 
 
 module.exports = router;

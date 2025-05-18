@@ -34,7 +34,7 @@ app.get("/firebase-test", async (req, res) => {
 
 // Server start
 server.listen(port, () => {
-  console.log(`Proxy server running at http://localhost:${port}`);
-  console.log(`MQTT status: http://localhost:${port}/api/status`);
-  console.log(`Firebase test: http://localhost:${port}/firebase-test`);
+  console.log(`🚀 Proxy server running at http://localhost:${port}`);
+  console.log(`📡 MQTT status: http://localhost:${port}/api/status`);
+  console.log(`🧪 Firebase test: http://localhost:${port}/firebase-test`);
 });

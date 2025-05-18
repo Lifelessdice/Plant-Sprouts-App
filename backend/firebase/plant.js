@@ -13,8 +13,9 @@ async function getPlantsByUserId(uid) {
 
     const plants = [];
     snapshot.forEach(doc => {
-      plants.push({ id: doc.id, ...doc.data() });  // Spread syntax 
+      plants.push({ id: doc.id, ...doc.data() });  // Spread syntax fixed here too
     });
+    
 
     return plants;
   } catch (error) {
