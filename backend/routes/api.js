@@ -8,32 +8,22 @@ router.get("/status", (req, res) => {
   res.json(mqttData);
 });
 
-// Just return uid + email after token verification
-router.post("/verifyUser", async (req, res) => {
-  const authHeader = req.headers.authorization;
-  console.log("Authorization header:", authHeader);
+let registeredUID = null;
 
-  const idToken = authHeader?.split("Bearer ")[1];
-  console.log("Extracted ID token:", idToken);
+// POST /register-uid — store UID in memory
+router.post("/register-uid", (req, res) => {
+  const { uid } = req.body;
 
-  if (!idToken) {
-    return res.status(401).json({ error: "Missing ID token" });
+  if (!uid) {
+    return res.status(400).json({ error: "UID is required" });
   }
 
-  try {
-    const { uid, email } = await verifyIdToken(idToken);
-    console.log("User verified:", uid, email);
+  registeredUID = uid;
+  console.log("✅ UID registered and stored:", uid);
 
-    res.status(200).json({
-      success: true,
-      message: "User verified",
-      uid,
-      email,
-    });
-  } catch (err) {
-    console.error("Verification error:", err);
-    res.status(403).json({ success: false, error: err.message });
-  }
+  res.json({ message: "UID stored in memory" });
 });
+
+
 
 module.exports = router;
