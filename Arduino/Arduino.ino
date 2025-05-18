@@ -44,7 +44,7 @@ void drawSmileyFace() {
   tft.fillCircle(145, 105, 5, TFT_BLACK); // Left eye
   tft.fillCircle(175, 105, 5, TFT_BLACK); // Right eye
 
-  // Wider smile (inverted parabola)
+  // Smile (inverted parabola)
   for (int x = -35; x <= 35; x++) {
     int y = -0.02 * x * x;
     tft.drawPixel(160 + x, 150 + y, TFT_BLACK);
@@ -147,7 +147,7 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("rtl8720dnClient")) {
       Serial.println("connected!");
-      client.subscribe("CROWmium/rtl8720dn/#");
+      client.subscribe("CROWmium/alert");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -192,7 +192,7 @@ void setup() {
   digitalWrite(RED_LED, LOW);
 }
 
-// === Loop ===
+// Loop
 void loop() {
   if (!client.connected()) {
     reconnect();
