@@ -115,21 +115,14 @@ bool checkHumidityAndWarn(int humidity) {
 
 // MQTT Callback
 void callback(char *topic, byte *payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("]: ");
-
   String message;
   for (int i = 0; i < length; i++) {
-    char c = (char)payload[i];
-    Serial.print(c);
-    message += c;
+    message += (char)payload[i];
   }
-  Serial.println();
+  message.trim();
 
-  // Handle warning messages
   if (String(topic) == "CROWmium/alert") {
-    message.trim();
+    lastAlertTime = millis(); // Update last time alert was received
 
     if (message == "WARNING") {
       digitalWrite(BLUE_LED, LOW);
