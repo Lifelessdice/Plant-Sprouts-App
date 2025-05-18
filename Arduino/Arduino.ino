@@ -1,6 +1,7 @@
 #include "rpcWiFi.h"
 #include <PubSubClient.h>
 #include "Grove_Temperature_And_Humidity_Sensor.h"
+#include "TFT_eSPI.h"
 
 // WiFi credentials
 const char *ssid = "Octane_5G";
@@ -25,10 +26,51 @@ DHT dht(DHTPIN, DHTTYPE);
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 
+// LCD display
+TFT_eSPI tft;
+
 // Timing
 unsigned long lastMsgTime = 0;
 
-// Soil moisture comparison logic
+// Smiley face drawing function
+void drawSmileyFace() {
+    tft.fillScreen(TFT_WHITE); // White background
+
+  // Face
+  tft.fillCircle(160, 120, 60, TFT_YELLOW); // Yellow face
+  tft.drawCircle(160, 120, 60, TFT_BLACK);  // Black outline
+
+  // Eyes
+  tft.fillCircle(145, 105, 5, TFT_BLACK); // Left eye
+  tft.fillCircle(175, 105, 5, TFT_BLACK); // Right eye
+
+  // Wider smile (inverted parabola)
+  for (int x = -35; x <= 35; x++) {
+    int y = -0.02 * x * x;
+    tft.drawPixel(160 + x, 150 + y, TFT_BLACK);
+  }
+}
+
+// Sad face drawing function
+void drawSadFace() {
+    tft.fillScreen(TFT_WHITE); // White background
+
+  // Face
+  tft.fillCircle(160, 120, 60, TFT_CYAN); // Cyan face
+  tft.drawCircle(160, 120, 60, TFT_BLACK);  // Black outline
+
+  // Eyes
+  tft.fillCircle(145, 105, 5, TFT_BLACK); // Left eye
+  tft.fillCircle(175, 105, 5, TFT_BLACK); // Right eye
+
+  // Frown
+  for (int x = -20; x <= 20; x++) {
+    int y = 0.05 * x * x; // Parabolic arc
+    tft.drawPixel(160 + x, 140 + y, TFT_BLACK);
+  }
+}
+
+// Comparison Functions
 bool checkMoistureAndWarn(int soilMoisture) {
   if (soilMoisture < 40) {
     Serial.println("It's time to water your plant.");
@@ -39,7 +81,6 @@ bool checkMoistureAndWarn(int soilMoisture) {
   }
 }
 
-// Light level comparison logic
 bool checkLightAndWarn(int lightLevel) {
   if (lightLevel < 100) {
     Serial.println("It's too dark for your plant.");
@@ -50,7 +91,6 @@ bool checkLightAndWarn(int lightLevel) {
   }
 }
 
-// Temperature comparison logic
 bool checkTemperatureAndWarn(int temperature) {
   if (temperature < 20) {
     Serial.println("It's too cold for your plant.");
@@ -61,7 +101,6 @@ bool checkTemperatureAndWarn(int temperature) {
   }
 }
 
-// Humidity comparison logic
 bool checkHumidityAndWarn(int humidity) {
   if (humidity < 30) {
     Serial.println("Humidity is too low for your plant.");
@@ -72,6 +111,7 @@ bool checkHumidityAndWarn(int humidity) {
   }
 }
 
+// MQTT Callback
 void callback(char *topic, byte *payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -92,13 +132,16 @@ void callback(char *topic, byte *payload, unsigned int length) {
     if (message == "WARNING") {
       digitalWrite(BLUE_LED, LOW);
       digitalWrite(RED_LED, HIGH);
+      drawSadFace();
     } else if (message == "CLEAR") {
       digitalWrite(BLUE_LED, HIGH);
       digitalWrite(RED_LED, LOW);
+      drawSmileyFace();
     }
   }
 }
 
+// MQTT Reconnect
 void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
@@ -114,9 +157,15 @@ void reconnect() {
   }
 }
 
+// Setup
 void setup() {
   Serial.begin(115200);
   delay(1000);
+
+  // LCD
+  tft.begin();
+  tft.setRotation(3);
+  drawSmileyFace();  // Default face
 
   // WiFi Setup
   Serial.println("Connecting to WiFi...");
@@ -137,13 +186,13 @@ void setup() {
   dht.begin();
   pinMode(WIO_LIGHT, INPUT);
   pinMode(SOIL_PIN, INPUT);
-  
   pinMode(BLUE_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
   digitalWrite(BLUE_LED, HIGH); // Blue LED turned on by default
-  digitalWrite(RED_LED, LOW);   
+  digitalWrite(RED_LED, LOW);
 }
 
+// === Loop ===
 void loop() {
   if (!client.connected()) {
     reconnect();
@@ -192,11 +241,13 @@ void loop() {
 
     bool isWarning = warnMoisture || warnLight || warnTemp || warnHumidity;
 
-    // Check for warnings
+    // Publish warning status and show face
     if (isWarning) {
       client.publish("CROWmium/rtl8720dn/warnings", "WARNING");
+      drawSadFace();
     } else {
       client.publish("CROWmium/rtl8720dn/warnings", "CLEAR");
+      drawSmileyFace();
     }
   }
 }
