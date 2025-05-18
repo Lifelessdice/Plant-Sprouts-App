@@ -1,12 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { mqttData } = require("../mqtt/mqttClient");
-const { verifyIdToken } = require("../firebase/firebase");
+const { mqttData, publishAlert } = require("../mqtt/mqttClient");
+const { getPlantsByUserId } = require("../firebase/plant");
+const { checkPlantConditions } = require("../utils/plantStatusChecker");
 
-// Serve MQTT data
-router.get("/status", (req, res) => {
-  res.json(mqttData);
-});
 
 let registeredUID = null;
 
@@ -22,6 +19,44 @@ router.post("/register-uid", (req, res) => {
   console.log("✅ UID registered and stored:", uid);
 
   res.json({ message: "UID stored in memory" });
+});
+
+
+
+router.get("/dashboard", async (req, res) => {
+  try {
+    if (!registeredUID) {
+      return res.status(400).json({ error: "No UID registered" });
+    }
+
+    const plants = await getPlantsByUserId(registeredUID);
+
+    let shouldSendAlert = false;
+
+    const plantsStatusOnly = plants.map((plant) => {
+      const status = checkPlantConditions(plant, mqttData);
+      if (Object.values(status).includes("out of range")) {
+        shouldSendAlert = true;
+      }
+
+      return {
+        plantId: plant.id,
+        status,
+      };
+    });
+
+    if (shouldSendAlert) {
+      publishAlert("danger");
+    }
+
+    res.json({
+      sensorData: mqttData,
+      plants: plantsStatusOnly,
+    });
+  } catch (error) {
+    console.error("Failed to fetch dashboard data:", error);
+    res.status(500).json({ error: "Failed to fetch dashboard data" });
+  }
 });
 
 
