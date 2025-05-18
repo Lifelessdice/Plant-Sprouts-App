@@ -228,20 +228,26 @@ void loop() {
     client.publish("CROWmium/rtl8720dn/light", lightStr);
     client.publish("CROWmium/rtl8720dn/moisture", soilStr);
 
-    // Call comparison functions
-    bool warnMoisture = checkMoistureAndWarn(soilMoisture);
-    bool warnLight = checkLightAndWarn(light);
-    bool warnTemp = checkTemperatureAndWarn(temperature);
-    bool warnHumidity = checkHumidityAndWarn(humidity);
+    // Determine if app is silent
+    bool shouldRunChecks = (millis() - lastAlertTime > alertTimeout);
+
+    if (shouldRunChecks) {
+    // Perform sensor checks
+      bool warnMoisture = checkMoistureAndWarn(soilMoisture);
+      bool warnLight = checkLightAndWarn(light);
+      bool warnTemp = checkTemperatureAndWarn(temperature);
+      bool warnHumidity = checkHumidityAndWarn(humidity);
 
     bool isWarning = warnMoisture || warnLight || warnTemp || warnHumidity;
 
     if (isWarning) {
-    digitalWrite(BLUE_LED, LOW);
-    digitalWrite(RED_LED, HIGH);
-    } else {
+      digitalWrite(BLUE_LED, LOW);
+      digitalWrite(RED_LED, HIGH);
+      drawSadFace();
+  } else {
       digitalWrite(BLUE_LED, HIGH);
       digitalWrite(RED_LED, LOW);
+      drawSmileyFace();
     }
   }
 }
