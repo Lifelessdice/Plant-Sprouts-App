@@ -31,6 +31,8 @@ TFT_eSPI tft;
 
 // Timing
 unsigned long lastMsgTime = 0;
+unsigned long lastAlertTime = 0;
+const unsigned long alertTimeout = 15000;
 
 // Smiley face drawing function
 void drawSmileyFace() {
