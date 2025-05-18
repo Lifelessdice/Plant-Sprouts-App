@@ -95,9 +95,12 @@ export default function HomeScreen({ navigation }) {
       { value: humidity, preferred: plant.preferredHumidity },
     ];
 
-    return checks.some(({ value, preferred }) =>
-      preferred && (value < preferred.min || value > preferred.max)
-    );
+    return checks.some(({ value, preferred }) => {
+      if (!preferred || preferred.min == null || preferred.max == null) {
+        return false;
+      }
+      return value < preferred.min || value > preferred.max;
+    });
   };
 
   return (
@@ -137,7 +140,15 @@ export default function HomeScreen({ navigation }) {
               <TouchableOpacity
                 style={[
                   styles.card,
-                  isOutOfPreferredRange(item) && styles.outOfRangeBorder
+                  isOutOfPreferredRange(item) && {
+                    borderColor: '#dc2626',
+                    borderWidth: 2,
+                    shadowColor: '#dc2626',
+                    shadowOpacity: 0.7,
+                    shadowRadius: 30,
+                    shadowOffset: { width: 0, height: 4 },
+                    elevation: 12,
+                  } 
                 ]}
                 onPress={() =>
                   navigation.navigate('PlantMonitoring', { plant: item })
@@ -151,7 +162,9 @@ export default function HomeScreen({ navigation }) {
                   )
                 )}
                 <Text style={styles.plantName}>
-                  {`${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
+                  {item.id === 'custom'
+                    ? item.nickname || 'Custom Plant'
+                    : `${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
                 </Text>
                 <View style={styles.deleteButtonContainer}>
                   <TouchableOpacity onPress={() => handleDeletePlant(item.userPlantId)}>

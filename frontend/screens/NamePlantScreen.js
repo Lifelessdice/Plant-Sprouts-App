@@ -84,17 +84,21 @@ export default function NamePlantScreen({ route, navigation }) {
         </View>
 
         <View style={styles.container}>
-          <View style={styles.generalInfoBox}>
-            <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
-          </View>
+          {plant.id !== 'custom' && (
+            <>
+              <View style={styles.generalInfoBox}>
+                <Text style={styles.generalInfoText}>{plant.generalInfo}</Text>
+              </View>
 
-          <View style={styles.infoBoxesContainer}>
-            <InfoBox imageSource={plant.difficulty} />
-            <InfoBox imageSource={plant.lightRecommendation} />
-            <InfoBox imageSource={plant.humidityRecommendation} />
-            <InfoBox imageSource={plant.toxicity} />
-            <InfoBox imageSource={plant.watering} />
-          </View>
+              <View style={styles.infoBoxesContainer}>
+                <InfoBox imageSource={plant.difficulty} />
+                <InfoBox imageSource={plant.lightRecommendation} />
+                <InfoBox imageSource={plant.humidityRecommendation} />
+                <InfoBox imageSource={plant.toxicity} />
+                <InfoBox imageSource={plant.watering} />
+              </View>
+            </>
+          )}
 
           <Text style={styles.label}>Give your {plant.name} a name</Text>
 
