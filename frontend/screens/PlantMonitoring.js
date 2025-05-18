@@ -81,39 +81,55 @@ export default function PlantMonitoringScreen({ route }) {
       ]}>
         <Text style={styles.label}>{label}</Text>
 
-        <Progress.Circle
-          size={100}
-          endAngle={0.75}
-          progress={getProgress()}
-          thickness={10}
-          color={aboveRange ? '#dc2626' : belowRange ? '#f3f4f6': theme}
-          unfilledColor={value > (preferred?.max ?? 100) ? '#fee2e2' : '#f3f4f6'}
-          borderWidth={0}
-          showsText={true}
-          formatText={() => (
-            <Text style={[styles.value, isOutOfRange && styles.alert]}>
-              {aboveRange
-                ? `  High\n${value} ${unit}`
-                : belowRange
-                ? `   Low\n${value} ${unit}`
-                : `${value} ${unit}`}
-            </Text>
-          )}
-          strokeCap="round"
-        />
+        {preferred?.min != null && preferred?.max != null ? (
+          <Progress.Circle
+            size={100}
+            endAngle={0.75}
+            progress={getProgress()}
+            thickness={10}
+            color={aboveRange ? '#dc2626' : belowRange ? '#f3f4f6': theme}
+            unfilledColor={value > (preferred?.max ?? 100) ? '#fee2e2' : '#f3f4f6'}
+            borderWidth={0}
+            showsText={true}
+            formatText={() => (
+              <Text style={[styles.value, isOutOfRange && styles.alert]}>
+                {aboveRange
+                  ? `  High\n${value} ${unit}`
+                  : belowRange
+                  ? `   Low\n${value} ${unit}`
+                  : `${value} ${unit}`}
+              </Text>
+            )}
+            strokeCap="round"
+          />
+        ) : (
+          <Text style={[styles.value, isOutOfRange && styles.alert]}>
+            {value} {unit}
+          </Text>
+        )}
 
-        {preferred ? (
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+          {preferred?.min != null && preferred?.max != null ? (
             <Text style={styles.recommendation}>
               Preferred: {preferred.min} - {preferred.max} {unit}
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('ChangeConditions', {label, preferred, plant: plantData, unit})} style={{ marginLeft: 8 }}>
-              <Text style={styles.editButtonText}>✏️</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <Text style={styles.recommendation}>Preferred range not available</Text>
-        )}
+          ) : (
+            <Text style={styles.recommendation}>Preferred range not available</Text>
+          )}
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('ChangeConditions', {
+                label,
+                preferred,
+                plant: plantData,
+                unit,
+              })
+            }
+            style={{ marginLeft: 8 }}
+          >
+            <Text style={styles.editButtonText}>✏️</Text>
+          </TouchableOpacity>
+        </View>
 
       </View>
     );
