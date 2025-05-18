@@ -179,11 +179,11 @@ void setup() {
 
   // WiFi Setup
   Serial.println("Connecting to WiFi...");
-  tft.fillScreen(TFT_WHITE);                              
+  tft.fillScreen(TFT_WHITE);                      // Clear screen
   tft.setCursor(50, 110);                                  
   tft.setTextColor(TFT_BLACK, TFT_WHITE);
   tft.setTextSize(2);
-  tft.println("Connecting to WiFi...");                   
+  tft.println("Connecting to WiFi...");          // Print on LCD display     
 
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -195,11 +195,11 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  tft.fillScreen(TFT_WHITE);
+  tft.fillScreen(TFT_WHITE);                      // Clear screen
   tft.setCursor(80, 110);
   tft.setTextColor(TFT_BLACK, TFT_WHITE);
   tft.setTextSize(2);
-  tft.println("WiFi connected!");                         
+  tft.println("WiFi connected!");                // Print on LCD display 
 
   // MQTT Setup
   client.setServer(mqtt_server, mqtt_port);
