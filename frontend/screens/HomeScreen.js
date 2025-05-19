@@ -42,10 +42,16 @@ export default function HomeScreen({ navigation }) {
         const db = getFirestore();
         const plantsCollection = collection(db, 'users', user.uid, 'plants');
         const snapshot = await getDocs(plantsCollection);
-        const plantsList = snapshot.docs.map(doc => ({
-          userPlantId: doc.id,
-          ...doc.data(),
-        }));
+        const plantsList = snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            userPlantId: doc.id,
+            ...data,
+            ...(data.id === 'custom' && {
+              image: require('../assets/plants/custom_plant.jpg'),
+            }),
+          };
+        });
         setPlants(plantsList);
       } catch (error) {
         console.error('Error fetching plants:', error);
