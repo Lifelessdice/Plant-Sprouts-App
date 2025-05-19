@@ -42,10 +42,16 @@ export default function HomeScreen({ navigation }) {
         const db = getFirestore();
         const plantsCollection = collection(db, 'users', user.uid, 'plants');
         const snapshot = await getDocs(plantsCollection);
-        const plantsList = snapshot.docs.map(doc => ({
-          userPlantId: doc.id,
-          ...doc.data(),
-        }));
+        const plantsList = snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            userPlantId: doc.id,
+            ...data,
+            ...(data.id === 'custom' && {
+              image: require('../assets/plants/custom_plant.jpg'),
+            }),
+          };
+        });
         setPlants(plantsList);
       } catch (error) {
         console.error('Error fetching plants:', error);
@@ -95,9 +101,13 @@ export default function HomeScreen({ navigation }) {
       { value: humidity, preferred: plant.preferredHumidity },
     ];
 
-    return checks.some(({ value, preferred }) =>
-      preferred && (value < preferred.min || value > preferred.max)
-    );
+    return checks.some(({ value, preferred }) => {
+      if (!preferred) return false;
+      const { min, max } = preferred;
+      const belowMin = min != null && value < min;
+      const aboveMax = max != null && value > max;
+      return belowMin || aboveMax;
+    });
   };
 
   return (
@@ -151,7 +161,9 @@ export default function HomeScreen({ navigation }) {
                   )
                 )}
                 <Text style={styles.plantName}>
-                  {`${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
+                  {item.id === 'custom'
+                    ? item.nickname || 'Custom Plant'
+                    : `${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
                 </Text>
                 <View style={styles.deleteButtonContainer}>
                   <TouchableOpacity onPress={() => handleDeletePlant(item.userPlantId)}>

@@ -67,9 +67,12 @@ export default function PlantMonitoringScreen({ route }) {
 
   // Reuse your renderCard helper from your example for each sensor metric
   const renderCard = (label, value, unit, preferred, theme) => {
-    const isOutOfRange = preferred && (value < preferred.min || value > preferred.max);
-    const aboveRange = preferred && value > preferred.max;
-    const belowRange = preferred && value < preferred.min;
+    const isOutOfRange =
+      preferred &&
+      ((preferred.min != null && value < preferred.min) ||
+       (preferred.max != null && value > preferred.max));
+    const aboveRange = preferred && preferred.max != null && value > preferred.max;
+    const belowRange = preferred && preferred.min != null && value < preferred.min;
 
     const getProgress = () => {
       if (!preferred) return 0;
@@ -95,38 +98,56 @@ export default function PlantMonitoringScreen({ route }) {
       >
         <Text style={styles.label}>{label}</Text>
 
-        <Progress.Circle
-          size={100}
-          endAngle={0.75}
-          progress={getProgress()}
-          thickness={10}
-          color={aboveRange ? '#dc2626' : belowRange ? '#f3f4f6' : theme}
-          unfilledColor={value > (preferred?.max ?? 100) ? '#fee2e2' : '#f3f4f6'}
-          borderWidth={0}
-          showsText={true}
-          formatText={() => (
-            <Text style={[styles.value, isOutOfRange && styles.alert]}>
-              {aboveRange ? `  High\n${value} ${unit}` : belowRange ? `   Low\n${value} ${unit}` : `${value} ${unit}`}
-            </Text>
-          )}
-          strokeCap="round"
-        />
-
-        {preferred ? (
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-            <Text style={styles.recommendation}>
-              Preferred: {preferred.min} - {preferred.max} {unit}
-            </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('ChangeConditions', { label, preferred, plant: plantData, unit })}
-              style={{ marginLeft: 8 }}
-            >
-              <Text style={styles.editButtonText}>✏️</Text>
-            </TouchableOpacity>
-          </View>
+        {preferred?.min != null && preferred?.max != null ? (
+          <Progress.Circle
+            size={100}
+            endAngle={0.75}
+            progress={getProgress()}
+            thickness={10}
+            color={aboveRange ? '#dc2626' : belowRange ? '#f3f4f6': theme}
+            unfilledColor={value > (preferred?.max ?? 100) ? '#fee2e2' : '#f3f4f6'}
+            borderWidth={0}
+            showsText={true}
+            formatText={() => (
+              <Text style={[styles.value, isOutOfRange && styles.alert]}>
+                {aboveRange
+                  ? `  High\n${value} ${unit}`
+                  : belowRange
+                  ? `   Low\n${value} ${unit}`
+                  : `${value} ${unit}`}
+              </Text>
+            )}
+            strokeCap="round"
+          />
         ) : (
-          <Text style={styles.recommendation}>Preferred range not available</Text>
+          <Text style={[styles.value, isOutOfRange && styles.alert]}>
+            {value} {unit}
+          </Text>
         )}
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+        {preferred?.min == null && preferred?.max == null ? (
+            <Text style={styles.recommendation}> Preferred range not available </Text>
+          ) : (
+            <Text style={styles.recommendation}>
+             Preferred: {preferred.min ?? 'N/A'} - {preferred.max ?? 'N/A'} {unit}
+              </Text>
+          )}
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('ChangeConditions', {
+                label,
+                preferred,
+                plant: plantData,
+                unit,
+              })
+            }
+            style={{ marginLeft: 8 }}
+          >
+            <Text style={styles.editButtonText}>✏️</Text>
+          </TouchableOpacity>
+        </View>
+
       </View>
     );
   };
@@ -134,25 +155,32 @@ export default function PlantMonitoringScreen({ route }) {
   return (
     <>
       <TopBar
-        title={`${plantData.name}${plantData.nickname ? ' ' + plantData.nickname : ''}`}
+        title={plantData.id === 'custom'
+          ? plantData.nickname || 'Custom Plant'
+          : `${plantData.name}${plantData.nickname ? ' ' + plantData.nickname : ''}`}
         onBackPress={() => navigation.goBack()}
         onUserPress={() => navigation.navigate('Account')}
       />
 
       <ScrollView contentContainerStyle={styles.container}>
-        {/* General Info */}
-        <View style={styles.generalInfoBox}>
-          <Text style={styles.generalInfoText}>{plantData.generalInfo}</Text>
-        </View>
+        {/* General Info and Small Info Boxes for non-custom plants */}
+        {plantData.id !== 'custom' ? (
+          <>
+            <View style={styles.generalInfoBox}>
+              <Text style={styles.generalInfoText}>{plantData.generalInfo}</Text>
+            </View>
 
-        {/* Small Info Boxes */}
-        <View style={styles.infoBoxesContainer}>
-          <InfoBox imageSource={plantData.difficulty} />
-          <InfoBox imageSource={plantData.lightRecommendation} />
-          <InfoBox imageSource={plantData.humidityRecommendation} />
-          <InfoBox imageSource={plantData.toxicity} />
-          <InfoBox imageSource={plantData.watering} />
-        </View>
+            <View style={styles.infoBoxesContainer}>
+              <InfoBox imageSource={plantData.difficulty} />
+              <InfoBox imageSource={plantData.lightRecommendation} />
+              <InfoBox imageSource={plantData.humidityRecommendation} />
+              <InfoBox imageSource={plantData.toxicity} />
+              <InfoBox imageSource={plantData.watering} />
+            </View>
+          </>
+        ) : (
+          <View style={{ paddingTop: 40 }} />
+        )}
 
         {/* Monitoring Cards */}
         {renderCard('🌱 Soil Moisture', sensorData.moisture, 'kPa', plantData.preferredSoilMoisture, '#DAA06D')}
