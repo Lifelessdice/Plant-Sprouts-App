@@ -1,3 +1,5 @@
+// The screen that allows to change the preferred conditions of a plant 
+
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -12,22 +14,27 @@ import { fonts } from '../theme/fonts';
 export default function ChangeConditionsScreen() {
     const navigation = useNavigation();
     const route = useRoute();
+    // Extract parameters passed through navigation
     const { label, preferred, plant, unit } = route.params || {};
+    // Store the original preferred value and input states
     const [initialPreferred] = useState(preferred); 
     const [newMax, setNewMax] = useState(preferred?.max?.toString() || '');
     const [newMin, setNewMin] = useState(preferred?.min?.toString() || '');
-
+    
+    // Save the new preferred values to Firestore
     const handleSave = async () => {
       if (!plant || !plant.id || !preferred) return;
 
       const userId = auth.currentUser.uid;
       const plantRef = doc(db, 'users', userId, 'plants', plant.userPlantId);
-
+      
+      // Convert inputs to floats, or fall back to original values
       const updatedPreferredConditions = {
         min: newMin ? parseFloat(newMin) : preferred.min,
         max: newMax ? parseFloat(newMax) : preferred.max,
       };
-
+    
+      // Prepare payload based on label type
       let updatePayload = {};
       if (label?.toLowerCase().includes('temperature')) {
         updatePayload = {
@@ -57,6 +64,7 @@ export default function ChangeConditionsScreen() {
       }
     };
 
+    // Reset the condition values to their original/default values
     const handleReset = async () => {
       if (!plant || !plant.id || !preferred) return;
     
@@ -85,7 +93,7 @@ export default function ChangeConditionsScreen() {
       try {
         await updateDoc(plantRef, updatePayload);
 
-        // revert back to default values on screen
+        // Revert back to default values on screen
         if (label?.toLowerCase().includes('temperature')) {
           setNewMin(plant.originalPreferredTemperature.min.toString());
           setNewMax(plant.originalPreferredTemperature.max.toString());
@@ -104,7 +112,8 @@ export default function ChangeConditionsScreen() {
         Alert.alert('Failed to update.');
       }
     };
-
+    
+    // Component that renders the input UI for editing a preferred condition
     const EditConditions = (label, preferred, unit) => {
       return (
         <ScrollView contentContainerStyle={styles.scrollContent}>

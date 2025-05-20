@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+// components/TopBar.js
 import { View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import { User, ArrowLeft } from 'lucide-react-native';
 import { colors } from '../theme/colors';
