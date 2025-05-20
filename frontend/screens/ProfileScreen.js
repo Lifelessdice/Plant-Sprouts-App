@@ -157,7 +157,7 @@ onPress={() => {
 }}
 />
 <CustomButton
-title="Logout"
+title="Logout 🔒"
 onPress={UserSignOut}
 />
 </View>
@@ -174,7 +174,7 @@ onPress={UserSignOut}
 
 
 <CustomButton
-title="Change Profile"
+title="Change Information"
 onPress={() => {
   seteditProfile(true);
 }}
