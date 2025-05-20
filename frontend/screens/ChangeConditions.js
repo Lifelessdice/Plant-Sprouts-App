@@ -134,6 +134,7 @@ export default function ChangeConditionsScreen() {
               onPress={handleReset}
               style={{ marginTop: 20, backgroundColor: '#669169', paddingHorizontal: 10, paddingVertical: 12 }} 
               textStyle={{ color: '#fff', fontSize: 13 }}
+              disabled={preferred?.min == null || preferred?.max == null}
             />
             <CustomButton
               title="Save Changes"
