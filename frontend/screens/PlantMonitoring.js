@@ -1,3 +1,5 @@
+// The screen that displays sensor data for a user plant
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -12,13 +14,14 @@ import { fonts } from '../theme/fonts';
 
 export default function PlantMonitoringScreen({ route }) {
   const navigation = useNavigation();
-  const [plantData, setPlantData] = useState(route.params.plant);
-
+  const [plantData, setPlantData] = useState(route.params.plant); // Initialize plant data from route params
+  
+  // Handle missing plant data
   if (!plantData) {
     return <Text>Plant not found</Text>;
   }
 
-  // Fetch updated plant data from Firestore whenever screen is focused
+  // Fetch updated plant data from Firestore every time the user navigates to this screen to ensure that the latest data is displayed
   useFocusEffect(
     React.useCallback(() => {
       const fetchUpdatedPlant = async () => {
@@ -50,8 +53,9 @@ export default function PlantMonitoringScreen({ route }) {
 
     const interval = setInterval(() => {
       const plantId = plantData.userPlantId;
-      const currentData = dataStore[plantId]?.sensorData;
+      const currentData = dataStore[plantId]?.sensorData;  // Get current data for the plant
 
+      // Update the local state
       if (currentData) {
         setSensorData({
           temperature: currentData.temperature ?? 22,
@@ -60,12 +64,12 @@ export default function PlantMonitoringScreen({ route }) {
           moisture: currentData.moisture ?? 45,
         });
       }
-    }, 5000);
+    }, 5000); // every 5 seconds
 
     return () => clearInterval(interval);
   }, [plantData.userPlantId]);
 
-  // Reuse your renderCard helper from your example for each sensor metric
+  // Render monitoring card with progress circle and preferred range logic
   const renderCard = (label, value, unit, preferred, theme) => {
     const isOutOfRange =
       preferred &&
@@ -161,7 +165,7 @@ export default function PlantMonitoringScreen({ route }) {
       />
 
       <ScrollView contentContainerStyle={styles.container}>
-        {/* General Info and Small Info Boxes for non-custom plants */}
+        {/* General Info and InfoBoxes — shown only for non-custom plants */}
         {plantData.id !== 'custom' ? (
           <>
             <View style={styles.generalInfoBox}>

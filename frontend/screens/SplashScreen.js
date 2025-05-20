@@ -1,4 +1,5 @@
-import React from 'react';
+// The screen with the logo when the app is loading
+
 import { View, Image, StyleSheet } from 'react-native';
 
 export default function SplashScreen() {

@@ -1,3 +1,5 @@
+// Stores the list of popular plants with related images (firestore doesn't support images). 
+
 export const popularPlants = [
   {
     id: 'oBUTYhpXhHErfz7NtwFd',
