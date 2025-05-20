@@ -3,7 +3,7 @@
     "slug": "SmartSprout",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon":  "./assets/app-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "jsEngine": "jsc",
@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo.png",
+        "foregroundImage":  "./assets/app-icon.png",
         "backgroundColor": "#ffffff"
       }
     },

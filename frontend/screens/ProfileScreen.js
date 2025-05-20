@@ -9,6 +9,7 @@ import { TouchableOpacity } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 
 
+
 const ProfileScreen = ({ navigation }) => {
 const [editProfile, seteditProfile] = useState(false);
 const [showAccount, setAccount] = useState(false);
