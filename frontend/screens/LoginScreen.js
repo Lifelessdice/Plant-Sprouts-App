@@ -7,6 +7,7 @@ import { View, StyleSheet, Text,TextInput } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import { Video } from 'expo-av';
 
+
 const LoginScreen = ({ navigation }) => {
 const[email, setEmail]=useState('');
 const[password, setPassword]=useState('');
@@ -14,192 +15,215 @@ const [username, setUsername] = useState('');
 const [showPassword, setShowPassword] = useState(false);
 const [showname, setname] = useState(false);
 
+
+{/* Function for password reset emails */}
 const forgotPassword  = async () => {
 if (!email.trim()){
-  Alert.alert('Enter your email');
-   return;
- }
- try { await sendPasswordResetEmail(auth, email);
-  Alert.alert('A reset link has been sent to your email');
+ Alert.alert('Enter your email');
+  return;
+}
+try { await sendPasswordResetEmail(auth, email);
+ Alert.alert('A reset link has been sent to your email');
 } catch (error) {
-  Alert.alert('error', error.message);
+ Alert.alert('error', error.message);
 }
 };
+
+
+{/* login Function*/}
 
 
 const  userLogin = async () => {
- if (email.trim() === '') {
-   Alert.alert(' Enter your email');
-     return; }
-    if (password.trim() === '') {
-     Alert.alert(' Enter your password');
-     return; }
+if (email.trim() === '') {
+  Alert.alert(' Enter your email');
+    return; }
+   if (password.trim() === '') {
+    Alert.alert(' Enter your password');
+    return; }
 try {
-    const result = await signInWithEmailAndPassword(auth, email, password);
-    const user = result.user;
+   const result = await signInWithEmailAndPassword(auth, email, password);
+   const user = result.user;
 
-    await user.reload();
-  
+
+   await user.reload();
     if (!user.emailVerified) {
-        await sendEmailVerification(user);
-        Alert.alert('Email is not verified, a verification email has been sent')
-        return;
-      }
+       await sendEmailVerification(user);
+       Alert.alert('Email is not verified, a verification email has been sent')
+       return;
+     }
 
 
 
 
-       Alert.alert('Welcome' );
 
 
 
 
-       navigation.navigate('Home');
-  
+      Alert.alert('Welcome' );
+
+
+
+
+
+
+
+
+      navigation.navigate('Home');
      }
 catch(error) {
- if (error.code === 'auth/user-not-found') {   
-   Alert.alert('Please create account. No account exists for this email');
- } else if (error.code === 'auth/wrong-password') {
-   Alert.alert('Incorrect password');
- }
-   else if (error.code === 'auth/invalid-credential') {
-     Alert.alert('Try again. The email or password is incorrect.');
- } else if (error.code === 'auth/invalid-email') {
-     Alert.alert('Please enter a valid Email.');
- }
-  else {
-   Alert.alert(error.message);
- }
+if (error.code === 'auth/user-not-found') {  
+  Alert.alert('Please create account. No account exists for this email');
+} else if (error.code === 'auth/wrong-password') {
+  Alert.alert('Incorrect password');
+}
+  else if (error.code === 'auth/invalid-credential') {
+    Alert.alert('Try again. The email or password is incorrect.');
+} else if (error.code === 'auth/invalid-email') {
+    Alert.alert('Please enter a valid Email.');
+}
+ else {
+  Alert.alert(error.message);
+}
 }
 };
 
 
- const Signup = async() => {
-   if (email.trim() === '') {
-       Alert.alert(' Enter your email');
-     return; }
-    if (password.trim() === '') {
-     Alert.alert(' Enter your password');
-     return;}
-  try {
-  const result = await createUserWithEmailAndPassword(auth, email, password);
-
- const user = result.user;
-
- await sendEmailVerification(user);
 
 
- await setDoc(doc(db, "accounts", user.uid), {
-       email: user.email,
-       username: username,
-       registeredTime: new Date().toISOString(),
-   });
+{/* sign up Function*/}
+const Signup = async() => {
+  if (email.trim() === '') {
+      Alert.alert(' Enter your email');
+    return; }
+   if (password.trim() === '') {
+    Alert.alert(' Enter your password');
+    return;}
+ try {
+
+
+ {/* Create new user with email and password*/}
+ const result = await createUserWithEmailAndPassword(auth, email, password);
+
+
+const user = result.user;
+
+
+await sendEmailVerification(user);
+
+
+ {/* Create user document in Firestore */}
+await setDoc(doc(db, "accounts", user.uid), {
+      email: user.email,
+      username: username,
+      registeredTime: new Date().toISOString(),
+  });
+  Alert.alert('Your account is created successfully 🌱');
+
+
+  Alert.alert('Please verify your email.A verification link has been sent');
  
-   Alert.alert('Your account is created successfully 🌱');
-
-   Alert.alert('Please verify your email.A verification link has been sent');
- 
-  
-   navigation.navigate('Login');
+  {/* Navigate back to Login */}
+  navigation.navigate('Login');
 }
 catch (error)  {
- if (error.code === 'auth/email-already-in-use') {
-   Alert.alert('You already have an account, just log in');
- } else if (error.code === 'auth/invalid-email') {
-   Alert.alert('Enter a valid Email');
- } else if (error.code === 'auth/wrong-password') {
-     alert('Incorrect password.');
- } else if (error.code === 'auth/user-not-found') {
-   Alert.alert('Please create account. No account exists for this email');
- } else if (error.code === 'auth/invalid-credential') {
-   Alert.alert('Try again. The email or password is incorrect.');
+if (error.code === 'auth/email-already-in-use') {
+  Alert.alert('You already have an account, just log in');
+} else if (error.code === 'auth/invalid-email') {
+  Alert.alert('Enter a valid Email');
+} else if (error.code === 'auth/wrong-password') {
+    alert('Incorrect password.');
+} else if (error.code === 'auth/user-not-found') {
+  Alert.alert('Please create account. No account exists for this email');
+} else if (error.code === 'auth/invalid-credential') {
+  Alert.alert('Try again. The email or password is incorrect.');
 
 
- } else if (error.code === 'auth/weak-password') {
-  Alert.alert('Password should be at least 6 characters');}
-  else {
-   Alert.alert(error.message);
- }
+
+
+} else if (error.code === 'auth/weak-password') {
+ Alert.alert('Password should be at least 6 characters');}
+ else {
+  Alert.alert(error.message);
+}
 }
 };
-  
+
 
 return (
 <View style={styles.wrapper}>
- {/* Background video */}
- <View style={styles.videoWrapper}>
-   <Video
-     source={require('../assets/animation3.mp4')}
-     style={styles.video}
-     isLooping
-     shouldPlay
-     isMuted
-     resizeMode="cover"
-   />
- </View>
+{/* Background video */}
+<View style={styles.videoWrapper}>
+  <Video
+    source={require('../assets/animation3.mp4')}
+    style={styles.video}
+    isLooping
+    shouldPlay
+    isMuted
+    resizeMode="cover"
+  />
+</View>
 
 
 
- {/* Login form */}
- <View style={styles.page}>
-   <Text style={styles.header}>SmartSprout</Text>
+{/* Login form UI */}
+<View style={styles.page}>
+  <Text style={styles.header}>SmartSprout</Text>
 
 
 
-   <TextInput
-     style={styles.UserInput}
-     value={email}
-     placeholder="Enter your email"
-     onChangeText={setEmail}
-   />
+  <TextInput
+    style={styles.UserInput}
+    value={email}
+    placeholder="Enter your email"
+    onChangeText={setEmail}
+  />
 
 
-   <TextInput
-     style={styles.UserInput}
-     value={password}
-     placeholder="Enter your password"
-     onChangeText={setPassword}
-     secureTextEntry={!showPassword}
-   />
-   {showname &&
-   <TextInput
-   style={styles.UserInput}
-   value={username}
-   placeholder="Enter your name optional"
-   onChangeText={setUsername}
-  /> 
- }
-
-
-   <Text style={styles.showPasswordstyle} onPress={() => setShowPassword(!showPassword)}>
-     {showPassword ? 'Hide password' : 'Show password'}
-   </Text>
-   <Text style={styles.ForgetPasswordstyle} onPress=  {forgotPassword}>
-   Forgot Password?
-   </Text>
+  <TextInput
+    style={styles.UserInput}
+    value={password}
+    placeholder="Enter your password"
+    onChangeText={setPassword}
+    secureTextEntry={!showPassword}
+  />
+  {showname &&
+  <TextInput
+  style={styles.UserInput}
+  value={username}
+  placeholder="Enter your name optional"
+  onChangeText={setUsername}
+ />
+}
 
 
 
 
+  <Text style={styles.showPasswordstyle} onPress={() => setShowPassword(!showPassword)}>
+    {showPassword ? 'Hide password' : 'Show password'}
+  </Text>
+  <Text style={styles.ForgetPasswordstyle} onPress=  {forgotPassword}>
+  Forgot Password?
+  </Text>
 
 
 
 
-   <View style={styles.loginSignupStyle}>
-   <CustomButton title="Login" onPress={userLogin} style={{marginRight:15}}/>
-   <CustomButton title="Create account"  onPress = {() => {
-   if (!showname) {
-     setname(true);
-   } else {
-     Signup(); }
-   }} />
-   </View>
- </View>
+  <View style={styles.loginSignupStyle}>
+  <CustomButton title="Login" onPress={userLogin} style={{marginRight:15}}/>
+  <CustomButton title="Create account"  onPress = {() => {
+  if (!showname) {
+    setname(true);
+  } else {
+    Signup(); }
+  }} />
+  </View>
+</View>
 </View>
 );
 };
 
+
+{/*Stylesheet all components*/}
 
 
 const styles = StyleSheet.create({
@@ -252,6 +276,9 @@ marginTop: 20,
 
 
 
+
+
+
 showPasswordstyle: {
 color: '#202b4a',
 textAlign: 'left',
@@ -273,7 +300,25 @@ fontWeight: 'bold',
 });
 
 
+
+
 export default LoginScreen;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

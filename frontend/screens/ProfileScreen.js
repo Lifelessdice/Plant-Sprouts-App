@@ -9,6 +9,7 @@ import { TouchableOpacity } from 'react-native';
 import TopBar from '../components/TopBar';
 
 
+
 const ProfileScreen = ({ navigation }) => {
 const [editProfile, seteditProfile] = useState(false);
 const [showAccount, setAccount] = useState(false);
@@ -19,14 +20,18 @@ const [newPassword, setnewPassword] = useState('');
 const [oldEmail, setoldEmail] = useState('');
 
 
+{/* sign out Function */}
 const UserSignOut = () => {
 signOut(auth)
- .catch((error) => {
-  Alert.alert('logout failed.');
+.catch((error) => {
+ Alert.alert('logout failed.');
 });
 };
 
 
+
+
+{/* Gets current user information  */}
 useEffect(() => {
 const getUserinformation = async () => {
 const user = auth.currentUser;
@@ -46,24 +51,33 @@ Alert.alert('Not Logged in');
 };
 
 
+
+
 getUserinformation();
 }, []);
 
 
 
 
+
+
+{/* Function for user information update */}
 const  changeUserInfo = async () => {
 const user = auth.currentUser;
 
 
+
+
 if (!user) {
-  Alert.alert('Not Logged in');
-  return;
+ Alert.alert('Not Logged in');
+ return;
 }
 if (password.trim() === '') {
-  Alert.alert('Enter your current password');
-  return;
+ Alert.alert('Enter your current password');
+ return;
 }
+
+
 
 
 try {
@@ -71,7 +85,10 @@ const userCredential = EmailAuthProvider.credential(user.email, password);
 await reauthenticateWithCredential(user, userCredential);
 
 
+
+
 await user.reload();
+
 
 if (!user.emailVerified) {
 await sendEmailVerification(user);
@@ -81,31 +98,39 @@ return;
 }
 
 
+
+
 if (newPassword.trim() !== '') {
 await updatePassword(user, newPassword);
 Alert.alert('Password updated successfully 🌱');
 setnewPassword('');
-  }
+ }
+
+
+{/* Update or create user information document in Firestore*/}
 
 
 const userInformation = doc(db, 'accounts', user.uid);
 const currentData = await getDoc(userInformation);
 if (!currentData.exists()) {
 await setDoc(userInformation, {
-  username: username,
-  email: user.email,
-  registeredTime: new Date().toISOString(),
+ username: username,
+ email: user.email,
+ registeredTime: new Date().toISOString(),
 });
 Alert.alert('You changed your username successfully🌱');
 }
 else {
 const currentName = currentData.data().username || '';
 if (username.trim() !== '' && username !== currentName) {
-  await updateDoc(userInformation, { username: username });
-  Alert.alert('You changed your username successfully 🌱');
+ await updateDoc(userInformation, { username: username });
+ Alert.alert('You changed your username successfully 🌱');
 }
 
+
 }
+{/*Reset UI state after updates*/}
+
 
 setAccount(false);
 seteditProfile(false);
@@ -113,33 +138,43 @@ setPassword('');
 
 
 
+
+
+
 } catch (error) {
-   if (error.code === 'auth/invalid-credential') {
-    Alert.alert('Incorrect Password', 'Please try again.');
+  if (error.code === 'auth/invalid-credential') {
+   Alert.alert('Incorrect Password', 'Please try again.');
 } else {
 Alert.alert('Error', error.message);
+
+
 
 
 }
 }
 };
+
+
+{/* component UI*/}
 return (
-    <View style={styles.wrapper}>
-      {/* arrow return button */}
-      <TopBar 
-      title="" 
-      onBackPress={() => navigation.goBack()} />
-    {/* Background video */}
-    <View style={styles.videoWrapper}>
-      <Video
-        source={require('../assets/animation3.mp4')}
-        style={styles.video}
-        isLooping
-        shouldPlay
-        isMuted
-        resizeMode="cover"
-        />
+   <View style={styles.wrapper}>
+     {/* arrow return button */}
+     <TopBar
+     title=""
+     onBackPress={() => navigation.goBack()} />
+   {/* Background video */}
+   <View style={styles.videoWrapper}>
+     <Video
+       source={require('../assets/animation3.mp4')}
+       style={styles.video}
+       isLooping
+       shouldPlay
+       isMuted
+       resizeMode="cover"
+       />
 </View>
+
+
 
 
 {/* Profile */}
@@ -147,13 +182,14 @@ return (
 <Text style={styles.header}>SmartSprout 🌱</Text>
 {/* Settings button */}
 
+
 {!editProfile &&!showAccount&&(
 <View style={styles.spaceBetween}>
 <CustomButton
 title="Settings ⚙️"
 onPress={() => {
- setAccount(true);
- seteditProfile(false);
+setAccount(true);
+seteditProfile(false);
 }}
 />
 <CustomButton
@@ -164,11 +200,17 @@ onPress={UserSignOut}
 )}
 
 
+
+
 {showAccount && ! editProfile && (
 <View style={styles.middleView}>
-<Text style = {styles.text}>Your account information</Text>
+<Text style = {styles.accountInformationStyle}>Your account information</Text>
 <Text style={styles.textStyle}>Email: {email}</Text>
 <Text style={styles.textStyle}>Username: {username}</Text>
+
+
+
+
 
 
 
@@ -176,49 +218,44 @@ onPress={UserSignOut}
 <CustomButton
 title="Change Information"
 onPress={() => {
-  seteditProfile(true);
+ seteditProfile(true);
 }}
 />
 </View>
 )}
 { editProfile   && (
 <View style={ styles.middleView}>
+     <TextInput
+       placeholder="Your new Username"
+       style={styles.input}
+       value={username}
+       onChangeText={setUsername}
+/>
       <TextInput
-        placeholder="Your new Username"
-        style={styles.input}
-        value={username}
-        onChangeText={setUsername}
-
-
-
-
-
-
-
-
-      />
-  
+       placeholder="Your new password optional:"
+       style={styles.input}
+       value={newPassword}
+       onChangeText={setnewPassword}
  
+     />
       <TextInput
-        placeholder="Your new password optional:"
-        style={styles.input}
-        value={newPassword}
-        onChangeText={setnewPassword}
-   
-      />
-       <TextInput
-        placeholder="Enter your current password"
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-      />
-      <CustomButton title="Save" onPress={changeUserInfo} />
-      </View>
-      )}
-      </View>
-      </View>
-  );
+       placeholder="Enter your current password"
+       style={styles.input}
+       value={password}
+       onChangeText={setPassword}
+     />
+     <CustomButton title="Save" onPress={changeUserInfo} />
+     </View>
+     )}
+     </View>
+     </View>
+ );
 };
+
+
+
+
+{/*Stylesheet all components*/}
 
 
 
@@ -234,60 +271,59 @@ paddingHorizontal: 20,
 width: '100%',
 },
 
+
 videoWrapper: {
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  width: '100%',
-  height: '100%',
-  zIndex: 0,
+ position: 'absolute',
+ top: 0,
+ left: 0,
+ width: '100%',
+ height: '100%',
+ zIndex: 0,
 },
 video: {
-  width: '100%',
-  height: '100%',
-  position: 'absolute',
+ width: '100%',
+ height: '100%',
+ position: 'absolute',
 },
 page: {
-  flex: 1,
-  alignItems: 'center',
-  justifyContent: 'center',
-  zIndex: 1,
-  paddingHorizontal: 20,
+ flex: 1,
+ alignItems: 'center',
+ justifyContent: 'center',
+ zIndex: 1,
+ paddingHorizontal: 20,
 },
 header: {
-  fontSize: 40,
-  marginBottom: 10,
-  fontWeight: 'bold',
+ fontSize: 40,
+ marginBottom: 10,
+ fontWeight: 'bold',
 },
 setting: {
-  fontSize: 20,
-  color: 'black',
-  marginRight: 40,
-  fontWeight: 'bold',
+ fontSize: 20,
+ color: 'black',
+ marginRight: 40,
+ fontWeight: 'bold',
 },
 input: {
-  backgroundColor: '#fff',
-  width: '80%',
-  borderRadius: 10,
-  padding: 15,
-  borderWidth: 1,
-  marginBottom: 20,
-  borderColor: '#ccc',
+ backgroundColor: '#fff',
+ width: '80%',
+ borderRadius: 10,
+ padding: 15,
+ borderWidth: 1,
+ marginBottom: 20,
+ borderColor: '#ccc',
 },
 
 
 
 
 spaceBetween : {
-  justifyContent:'space-between',
-  height: 130,
-  alignItems: 'center',
-  flexDirection: 'row',
-  width: '70%',
-  marginTop: 20,
+ justifyContent:'space-between',
+ height: 130,
+ alignItems: 'center',
+ flexDirection: 'row',
+ width: '70%',
+ marginTop: 20,
 },
-
-
 
 
 
@@ -295,41 +331,180 @@ spaceBetween : {
 
 
 textStyle: {
-  backgroundColor: '#fff',
-  width: '80%',
-  borderRadius: 10,
-  padding: 15,
-  borderWidth: 1,
-  marginBottom: 20,
-  borderColor: '#ccc',
+ backgroundColor: '#fff',
+ width: '80%',
+ borderRadius: 10,
+ padding: 15,
+ borderWidth: 1,
+ marginBottom: 20,
+ marginTop: 20,
+ borderColor: '#ccc',
 },
 text : {
-  fontSize: 20,
-  color: 'black',
-  marginRight: 40,
-  fontWeight: 'bold',
+ fontSize: 20,
+ color: 'black',
+ marginRight: 40,
+ fontWeight: 'bold',
 },
 
 
 
 
-
-
+accountInformationStyle: {
+   fontSize: 20,
+   fontWeight: 'bold',
+   color: 'black',
+   textAlign: 'center', 
+   padding: 20,
+   width: '100%',         
+ },
 
 
 backButtonArrow :{
- backgroundColor: '#fff',
- position: 'absolute',
- padding: 15,
- top: 40,
- left: 25,
- borderRadius: 15,
- zIndex: 25,
+backgroundColor: '#fff',
+position: 'absolute',
+padding: 15,
+top: 40,
+left: 25,
+borderRadius: 15,
+zIndex: 25,
 },
+
+
 });
 
 
+
+
 export default ProfileScreen;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
