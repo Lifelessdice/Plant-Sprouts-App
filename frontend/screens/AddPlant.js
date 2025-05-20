@@ -9,19 +9,21 @@ import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 
 export default function AddPlantScreen({ navigation }) {
-  const [firebaseData, setFirebaseData] = useState([]);
-  const [loading, setLoading] = useState(true); // Added loading state
+  const [firebaseData, setFirebaseData] = useState([]); // State to store Firebase data
+  const [loading, setLoading] = useState(true); // State to track loading status
 
   // Fetch data from Firebase when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Get all documents from 'plants' collection
         const snapshot = await getDocs(collection(db, 'plants'));
+        // Map the documents into usable objects with ids
         const plantsFromFirebase = snapshot.docs.map(doc => ({
           id: doc.id, // get the document id
           ...doc.data(), // get the plant data
         }));
-        setFirebaseData(plantsFromFirebase);
+        setFirebaseData(plantsFromFirebase); // Store data in state
         setLoading(false); // Set loading to false once data is fetched
       } catch (error) {
         console.error('Error fetching Firebase data:', error);
@@ -34,6 +36,8 @@ export default function AddPlantScreen({ navigation }) {
 
   // Merge Firebase data into static local data
   const mergedPlants = popularPlants.map((localPlant) => {
+    
+    // Try to find matching Firebase data by id
     const cloudPlant = firebaseData.find(p => p.id === localPlant.id) || {};
     return {
       ...localPlant, 
@@ -45,13 +49,12 @@ export default function AddPlantScreen({ navigation }) {
     };
   });
 
+  // Handle plant selection
   const handleSelectPlant = (plant) => {
     const auth = getAuth();
     const user = auth.currentUser;  // Get the current user
     if (user) {
       const uid = user.uid;  // Get the user's UID
-      console.log("Navigating with plant:", plant);  // Debug log
-      console.log("User UID:", uid);  // Debug log
       navigation.navigate('NamePlant', { plant, uid });  // Pass the plant and UID
     } else {
       Alert.alert('Please log in to proceed.');
@@ -60,6 +63,7 @@ export default function AddPlantScreen({ navigation }) {
 
   return (
     <>
+      {/* Top navigation bar */}
       <TopBar
         title="List of available plants"
         onBackPress={() => navigation.goBack()}
@@ -91,6 +95,7 @@ export default function AddPlantScreen({ navigation }) {
   );
 }
 
+// Styles for the screen
 const styles = StyleSheet.create({
   title: {
     ...fonts.title,  
@@ -102,7 +107,7 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    paddingTop: 80, // adjusted to accommodate header
+    paddingTop: 80, 
     paddingHorizontal: 20,
     backgroundColor: colors.background, 
   },

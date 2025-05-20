@@ -1,3 +1,5 @@
+// Screen to name a new plant and save it to the database
+
 import React, { useState } from 'react';
 import {
   View,
@@ -19,12 +21,14 @@ import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 
 export default function NamePlantScreen({ route, navigation }) {
-  const { plant } = route.params;
-  const [nickname, setNickname] = useState('');
+  const { plant } = route.params;  // Extract the plant object passed via navigation
+  const [nickname, setNickname] = useState(''); // Local state for nickname input
 
+  // Function to handle the "Add plant" button press
   const handleConfirm = async () => {
     const trimmedNickname = nickname.trim();
-    if (trimmedNickname) {
+    if (trimmedNickname) { 
+      // Add nickname and original preferred values to the plant object
       const plantWithNickname = {
         ...plant,
         nickname: trimmedNickname,
@@ -35,6 +39,7 @@ export default function NamePlantScreen({ route, navigation }) {
       };
   
       try {
+        // Check if the user is logged in
         if (!auth.currentUser) {
           Alert.alert('Please log in to save your plant.');
           return;
@@ -65,7 +70,7 @@ export default function NamePlantScreen({ route, navigation }) {
     }
   };
   
-
+  // Navigate back to the previous screen
   const handleGoBack = () => {
     navigation.goBack();
   };
@@ -100,8 +105,10 @@ export default function NamePlantScreen({ route, navigation }) {
             </>
           )}
 
+          {/* Prompt for naming the plant */}
           <Text style={styles.label}>Give your {plant.name} a name</Text>
-
+          
+          {/* Input for nickname */}
           <TextInput
             style={styles.input}
             placeholder="Enter plant name"
@@ -109,6 +116,7 @@ export default function NamePlantScreen({ route, navigation }) {
             onChangeText={setNickname}
           />
 
+          {/* Buttons: Back and Add Plant */}
           <View style={styles.buttonRow}>
             <View style={styles.buttonWrapper}>
               <CustomButton title="Back" onPress={handleGoBack} />
@@ -127,9 +135,11 @@ export default function NamePlantScreen({ route, navigation }) {
   );
 }
 
+// Screen dimensions for image sizing
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
+// Styles for the component
 const styles = StyleSheet.create({
   scrollViewContent: {
     flexGrow: 1,
