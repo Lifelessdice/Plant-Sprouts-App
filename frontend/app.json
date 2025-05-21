@@ -1,28 +1,36 @@
-{
-  "expo": {
+{ "expo": {
     "name": "SmartSprout",
     "slug": "SmartSprout",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/app-icon.png",
+    "icon":  "./assets/app-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "jsEngine": "jsc",
     "splash": {
       "image": "./assets/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "jsEngine": "jsc"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/app-icon.png",
+        "foregroundImage":  "./assets/app-icon.png",
         "backgroundColor": "#ffffff"
       }
     },
     "web": {
       "favicon": "./assets/app-icon.png"
+    },
+      "experiments": {
+      "turboModules": false
     }
   }
-}
+ }
+ 
+ 
+ 
+ 

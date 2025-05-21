@@ -91,20 +91,18 @@ export default function PlantMonitoringScreen({ route }) {
     };
 
     return (
-      <View
-        style={[
-          styles.card,
-          isOutOfRange && {
-            borderColor: '#dc2626',
-            borderWidth: 2,
-            shadowColor: '#dc2626',
-            shadowOpacity: 0.7,
-            shadowRadius: 30,
-            shadowOffset: { width: 0, height: 4 },
-            elevation: 12,
-          },
-        ]}
-      >
+      <View style={[
+        styles.card,
+        isOutOfRange && {
+          borderColor: '#dc2626',
+          borderWidth: 2,
+          shadowColor: '#dc2626',
+          shadowOpacity: 0.7,
+          shadowRadius: 30,
+          shadowOffset: { width: 0, height: 4 },
+          elevation: 12,
+        }
+      ]}>
         <Text style={styles.label}>{label}</Text>
 
         {noData ? (

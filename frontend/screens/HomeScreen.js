@@ -159,7 +159,15 @@ export default function HomeScreen({ navigation }) {
               <TouchableOpacity
                 style={[
                   styles.card,
-                  isOutOfPreferredRange(item) && styles.outOfRangeBorder
+                  isOutOfPreferredRange(item) && {
+                    borderColor: '#dc2626',
+                    borderWidth: 2,
+                    shadowColor: '#dc2626',
+                    shadowOpacity: 0.7,
+                    shadowRadius: 30,
+                    shadowOffset: { width: 0, height: 4 },
+                    elevation: 12,
+                  } 
                 ]}
                 onPress={() =>
                   navigation.navigate('PlantMonitoring', { plant: item })
