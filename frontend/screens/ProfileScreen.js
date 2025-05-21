@@ -5,7 +5,6 @@ import{ View, Text, StyleSheet,TextInput,Alert }from 'react-native';
 import { Video } from 'expo-av';
 import CustomButton from '../components/CustomButton';
 import { doc, updateDoc, getDoc,setDoc } from 'firebase/firestore';
-import { TouchableOpacity } from 'react-native';
 import TopBar from '../components/TopBar';
 
 
@@ -20,7 +19,7 @@ const [newPassword, setnewPassword] = useState('');
 const [oldEmail, setoldEmail] = useState('');
 
 
-{/* sign out Function */}
+{/* Sign out Function */}
 const UserSignOut = () => {
 signOut(auth)
 .catch((error) => {
@@ -160,7 +159,7 @@ return (
    <View style={styles.wrapper}>
      {/* arrow return button */}
      <TopBar
-     title=""
+     title="Account"
      onBackPress={() => navigation.goBack()} />
    {/* Background video */}
    <View style={styles.videoWrapper}>
@@ -193,7 +192,7 @@ seteditProfile(false);
 }}
 />
 <CustomButton
-title="Logout 🔒"
+title=" Logout 🔒 "
 onPress={UserSignOut}
 />
 </View>
@@ -321,7 +320,8 @@ spaceBetween : {
  height: 130,
  alignItems: 'center',
  flexDirection: 'row',
- width: '70%',
+ width: '85%',
+ gap: 10,
  marginTop: 20,
 },
 
