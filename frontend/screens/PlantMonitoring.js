@@ -61,87 +61,89 @@ export default function PlantMonitoringScreen({ route }) {
   }, [plantData.userPlantId]);
 
   const renderCard = (label, value, unit, preferred, theme, statusKey) => {
-    const noData = value == null;
-    const condition = status?.[statusKey]; // "low", "high", or "ok"
+  const noData = value == null;
+  const condition = status?.[statusKey]; // "low", "high", or "ok"
 
-    const getProgress = () => {
-      if (!preferred || noData) return 0;
-      return (value - preferred.min) / (preferred.max - preferred.min);
-    };
+  const getProgress = () => {
+    if (!preferred || noData) return 0;
+    const raw = (value - preferred.min) / (preferred.max - preferred.min);
+    return Math.max(0.05, Math.min(1, raw)); // Ensure visible progress, clamped to [0.05, 1]
+  };
 
-    const isLow = condition === 'low';
-    const isHigh = condition === 'high';
+  const isLow = condition === 'low';
+  const isHigh = condition === 'high';
 
-    return (
-      <View
-        style={[
-          styles.card,
-          (isLow || isHigh) && {
-            borderColor: '#dc2626',
-            borderWidth: 2,
-            shadowColor: '#dc2626',
-            shadowOpacity: 0.7,
-            shadowRadius: 30,
-            shadowOffset: { width: 0, height: 4 },
-            elevation: 12,
-          },
-        ]}
-      >
-        <Text style={styles.label}>{label}</Text>
+  return (
+    <View
+      style={[
+        styles.card,
+        (isLow || isHigh) && {
+          borderColor: '#dc2626',
+          borderWidth: 2,
+          shadowColor: '#dc2626',
+          shadowOpacity: 0.7,
+          shadowRadius: 30,
+          shadowOffset: { width: 0, height: 4 },
+          elevation: 12,
+        },
+      ]}
+    >
+      <Text style={styles.label}>{label}</Text>
 
-        {noData ? (
-          <Text style={[styles.value, { color: '#9ca3af' }]}>No data</Text>
-        ) : preferred?.min != null && preferred?.max != null ? (
-          <Progress.Circle
-            size={100}
-            endAngle={0.75}
-            progress={getProgress()}
-            thickness={10}
-            color={isHigh ? '#dc2626' : isLow ? '#f3f4f6' : theme}
-            unfilledColor={isHigh ? '#fee2e2' : '#f3f4f6'}
-            borderWidth={0}
-            showsText={true}
-            formatText={() => (
-              <Text style={[styles.value, (isLow || isHigh) && styles.alert]}>
-                {isHigh
-                  ? `  High\n${value} ${unit}`
-                  : isLow
-                  ? `   Low\n${value} ${unit}`
-                  : `${value} ${unit}`}
-              </Text>
-            )}
-            strokeCap="round"
-          />
-        ) : (
-          <Text style={[styles.value, (isLow || isHigh) && styles.alert]}>
-            {value} {unit}
-          </Text>
-        )}
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-          {preferred?.min == null && preferred?.max == null ? (
-            <Text style={styles.recommendation}>Preferred range not available</Text>
-          ) : (
-            <Text style={styles.recommendation}>
-              Preferred: {preferred.min ?? 'N/A'} - {preferred.max ?? 'N/A'} {unit}
+      {noData ? (
+        <Text style={[styles.value, { color: '#9ca3af' }]}>No data</Text>
+      ) : preferred?.min != null && preferred?.max != null ? (
+        <Progress.Circle
+          size={100}
+          endAngle={0.75}
+          progress={getProgress()}
+          thickness={10}
+          color={isHigh ? '#dc2626' : isLow ? '#f3f4f6' : theme}
+          unfilledColor={isHigh ? '#fee2e2' : '#f3f4f6'}
+          borderWidth={0}
+          showsText={true}
+          formatText={() => (
+            <Text style={[styles.value, (isLow || isHigh) && styles.alert]}>
+              {isHigh
+                ? `  High\n${value} ${unit}`
+                : isLow
+                ? `   Low\n${value} ${unit}`
+                : `${value} ${unit}`}
             </Text>
           )}
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('ChangeConditions', {
-                label,
-                preferred,
-                plant: plantData,
-                unit,
-              })
-            }
-            style={{ marginLeft: 8 }}
-          >
-            <Text style={styles.editButtonText}>✏️</Text>
-          </TouchableOpacity>
-        </View>
+          strokeCap="round"
+        />
+      ) : (
+        <Text style={[styles.value, (isLow || isHigh) && styles.alert]}>
+          {value} {unit}
+        </Text>
+      )}
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+        {preferred?.min == null && preferred?.max == null ? (
+          <Text style={styles.recommendation}>Preferred range not available</Text>
+        ) : (
+          <Text style={styles.recommendation}>
+            Preferred: {preferred.min ?? 'N/A'} - {preferred.max ?? 'N/A'} {unit}
+          </Text>
+        )}
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('ChangeConditions', {
+              label,
+              preferred,
+              plant: plantData,
+              unit,
+            })
+          }
+          style={{ marginLeft: 8 }}
+        >
+          <Text style={styles.editButtonText}>✏️</Text>
+        </TouchableOpacity>
       </View>
-    );
-  };
+    </View>
+  );
+};
+
 
   return (
     <>
