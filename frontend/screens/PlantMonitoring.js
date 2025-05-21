@@ -13,15 +13,17 @@ import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 
 export default function PlantMonitoringScreen({ route }) {
+  // Navigation hook for routing
   const navigation = useNavigation();
-  const [plantData, setPlantData] = useState(route.params.plant); // Initialize plant data from route params
+  // plantData holds metadata for the selected plants passed via navigation params
+  const [plantData, setPlantData] = useState(route.params.plant);
   
-  // Handle missing plant data
+  // Early return if no plant data was provided.
   if (!plantData) {
     return <Text>Plant not found</Text>;
   }
 
-  // Fetch updated plant data from Firestore every time the user navigates to this screen to ensure that the latest data is displayed
+  //Refetch plant details from Firestore whenever the screen gains focus.
   useFocusEffect(
     React.useCallback(() => {
       const fetchUpdatedPlant = async () => {
@@ -29,7 +31,7 @@ export default function PlantMonitoringScreen({ route }) {
           const plantRef = doc(db, 'users', auth.currentUser.uid, 'plants', plantData.userPlantId);
           const snapshot = await getDoc(plantRef);
           if (snapshot.exists()) {
-            setPlantData(snapshot.data());
+            setPlantData(snapshot.data()); // Update the state with the lastes plant info.
           }
         } catch (err) {
           console.error('Error fetching updated plant:', err);
@@ -39,15 +41,11 @@ export default function PlantMonitoringScreen({ route }) {
     }, [plantData.userPlantId])
   );
 
-  // Sensor data state — initialize with defaults or from dataStore if available
-  const [sensorData, setSensorData] = useState({
-    temperature: 22,
-    light: 800,
-    humidity: 55,
-    moisture: 45,
-  });
+  // seonsorData state holds the lastest sensor readings; null indicates no data has been received yet.
+  const [sensorData, setSensorData] = useState(null);
 
-  // Poll dataStore every 5 seconds to update sensor data state
+
+  //Poll the datastore every 5 second for new sensor data.
   useEffect(() => {
     if (!plantData?.userPlantId) return;
 
@@ -57,29 +55,36 @@ export default function PlantMonitoringScreen({ route }) {
 
       // Update the local state
       if (currentData) {
+        // Set sensorData to the latest readings (could be null if missing)
         setSensorData({
-          temperature: currentData.temperature ?? 22,
-          light: currentData.light ?? 800,
-          humidity: currentData.humidity ?? 55,
-          moisture: currentData.moisture ?? 45,
+          temperature: currentData.temperature,
+          light: currentData.light,
+          humidity: currentData.humidity,
+          moisture: currentData.moisture,
         });
       }
     }, 5000); // every 5 seconds
 
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); //Cleanup on unmount.
   }, [plantData.userPlantId]);
 
-  // Render monitoring card with progress circle and preferred range logic
   const renderCard = (label, value, unit, preferred, theme) => {
+    // Determine if we have no reading
+    const noData = value == null;
+    
+    // Check if reading is outside preferred range
     const isOutOfRange =
+      !noData &&
       preferred &&
       ((preferred.min != null && value < preferred.min) ||
        (preferred.max != null && value > preferred.max));
-    const aboveRange = preferred && preferred.max != null && value > preferred.max;
-    const belowRange = preferred && preferred.min != null && value < preferred.min;
+       //Flags for high/low to adjust styling/text
+    const aboveRange = !noData && preferred?.max != null && value > preferred.max;
+    const belowRange = !noData && preferred?.min != null && value < preferred.min;
 
+    // Calculate normalized progress for dot indicator
     const getProgress = () => {
-      if (!preferred) return 0;
+      if (!preferred || noData) return 0;
       if (belowRange) return 0;
       if (aboveRange) return 1;
       return (value - preferred.min) / (preferred.max - preferred.min);
@@ -102,13 +107,17 @@ export default function PlantMonitoringScreen({ route }) {
       >
         <Text style={styles.label}>{label}</Text>
 
-        {preferred?.min != null && preferred?.max != null ? (
+        {noData ? (
+          // Show 'No data' when null value.
+          <Text style={[styles.value, { color: '#9ca3af' }]}>No data</Text>
+        ) : //If we have preferred range, show progress indicator.
+        preferred?.min != null && preferred?.max != null ? (
           <Progress.Circle
             size={100}
             endAngle={0.75}
             progress={getProgress()}
             thickness={10}
-            color={aboveRange ? '#dc2626' : belowRange ? '#f3f4f6': theme}
+            color={aboveRange ? '#dc2626' : belowRange ? '#f3f4f6' : theme}
             unfilledColor={value > (preferred?.max ?? 100) ? '#fee2e2' : '#f3f4f6'}
             borderWidth={0}
             showsText={true}
@@ -124,18 +133,18 @@ export default function PlantMonitoringScreen({ route }) {
             strokeCap="round"
           />
         ) : (
+          // Else just show the raw values.
           <Text style={[styles.value, isOutOfRange && styles.alert]}>
             {value} {unit}
           </Text>
         )}
-
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-        {preferred?.min == null && preferred?.max == null ? (
-            <Text style={styles.recommendation}> Preferred range not available </Text>
+          {preferred?.min == null && preferred?.max == null ? (
+            <Text style={styles.recommendation}>Preferred range not available</Text>
           ) : (
             <Text style={styles.recommendation}>
-             Preferred: {preferred.min ?? 'N/A'} - {preferred.max ?? 'N/A'} {unit}
-              </Text>
+              Preferred: {preferred.min ?? 'N/A'} - {preferred.max ?? 'N/A'} {unit}
+            </Text>
           )}
           <TouchableOpacity
             onPress={() =>
@@ -151,7 +160,6 @@ export default function PlantMonitoringScreen({ route }) {
             <Text style={styles.editButtonText}>✏️</Text>
           </TouchableOpacity>
         </View>
-
       </View>
     );
   };
@@ -159,15 +167,16 @@ export default function PlantMonitoringScreen({ route }) {
   return (
     <>
       <TopBar
-        title={plantData.id === 'custom'
-          ? plantData.nickname || 'Custom Plant'
-          : `${plantData.name}${plantData.nickname ? ' ' + plantData.nickname : ''}`}
+        title={
+          plantData.id === 'custom'
+            ? plantData.nickname || 'Custom Plant'
+            : `${plantData.name}${plantData.nickname ? ' ' + plantData.nickname : ''}`
+        }
         onBackPress={() => navigation.goBack()}
         onUserPress={() => navigation.navigate('Account')}
       />
 
       <ScrollView contentContainerStyle={styles.container}>
-        {/* General Info and InfoBoxes — shown only for non-custom plants */}
         {plantData.id !== 'custom' ? (
           <>
             <View style={styles.generalInfoBox}>
@@ -186,11 +195,11 @@ export default function PlantMonitoringScreen({ route }) {
           <View style={{ paddingTop: 40 }} />
         )}
 
-        {/* Monitoring Cards */}
-        {renderCard('🌱 Soil Moisture', sensorData.moisture, 'kPa', plantData.preferredSoilMoisture, '#DAA06D')}
-        {renderCard('☀️ Light Level', sensorData.light, 'lux', plantData.preferredLight, '#facc15')}
-        {renderCard('🌡️ Temperature', sensorData.temperature, '°C', plantData.preferredTemperature, '#fb923c')}
-        {renderCard('💧 Humidity', sensorData.humidity, 'g/m3', plantData.preferredHumidity, '#60a5fa')}
+        {/*Sensor data cards*/}
+        {renderCard('🌱 Soil Moisture', sensorData?.moisture, 'kPa', plantData.preferredSoilMoisture, '#DAA06D')}
+        {renderCard('☀️ Light Level', sensorData?.light, 'lux', plantData.preferredLight, '#facc15')}
+        {renderCard('🌡️ Temperature', sensorData?.temperature, '°C', plantData.preferredTemperature, '#fb923c')}
+        {renderCard('💧 Humidity', sensorData?.humidity, 'g/m3', plantData.preferredHumidity, '#60a5fa')}
       </ScrollView>
     </>
   );
