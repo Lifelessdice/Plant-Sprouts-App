@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { View, StyleSheet, Text,TextInput } from 'react-native';
 import CustomButton from '../components/CustomButton';
@@ -32,8 +32,7 @@ Alert.alert('error', error.message);
 
 
 
-{/* login Function*/}
-
+{/* Login Function*/}
 
 const  userLogin = async () => {
 if (email.trim() === '') {
@@ -53,8 +52,20 @@ try {
       return;
     }
 
+  {/* Welcome message with the user name*/}
+  
+  const userDocRef = doc(db, "accounts", user.uid);
+  const userDocSnap = await getDoc(userDocRef);
 
-  Alert.alert('Welcome' );
+  let nameToDisplay = "Welcome!";
+  if (userDocSnap.exists()) {
+    const userData = userDocSnap.data();
+    if (userData.username && userData.username.trim() !== "") {
+      nameToDisplay = `Welcome ${userData.username}!`;
+    }
+  }
+
+    Alert.alert(nameToDisplay);
 
 
      navigation.navigate('Home');
@@ -77,7 +88,8 @@ else {
 };
 
 
-// Function to create a new account 
+{/* Function to create a new account */}
+
 const Signup = async () => {
   if (email.trim() === '') {
     Alert.alert('Enter your email');
