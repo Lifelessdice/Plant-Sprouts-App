@@ -9,13 +9,10 @@ import CustomButton from '../components/CustomButton';
 import TopBar from '../components/TopBar';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
+import { dataStore } from '../src/backendAPI.js';
 
 export default function HomeScreen({ navigation }) {
   const [plants, setPlants] = useState([]);
-  const [soilMoisture, setSoilMoisture] = useState(45);
-  const [lightLevel, setLightLevel] = useState(800);
-  const [temperature, setTemperature] = useState(22);
-  const [humidity, setHumidity] = useState(55);
 
   // Fetch plants when component mounts
   useEffect(() => {
@@ -53,7 +50,7 @@ export default function HomeScreen({ navigation }) {
             userPlantId: doc.id,
             ...data,
             ...(data.id === 'custom' && {
-              image: require('../assets/plants/custom_plant.jpg'), // Set default image for custom plants
+              image: require('../assets/plants/custom_plant.jpg'), // Default image for custom plants
             }),
           };
         });
@@ -100,22 +97,14 @@ export default function HomeScreen({ navigation }) {
     );
   };
 
-  // Check if current sensor values are outside the preferred range for a plant
+  // New comparison logic: Use dataStore to check plant status
   const isOutOfPreferredRange = (plant) => {
-    const checks = [
-      { value: soilMoisture, preferred: plant.preferredSoilMoisture },
-      { value: lightLevel, preferred: plant.preferredLight },
-      { value: temperature, preferred: plant.preferredTemperature },
-      { value: humidity, preferred: plant.preferredHumidity },
-    ];
-    // Return true if any value is outside the min-max range
-    return checks.some(({ value, preferred }) => {
-      if (!preferred) return false;
-      const { min, max } = preferred;
-      const belowMin = min != null && value < min;
-      const aboveMax = max != null && value > max;
-      return belowMin || aboveMax;
-    });
+    // dataStore keys are plant.userPlantId
+    const plantData = dataStore[plant.userPlantId];
+    if (!plantData || !plantData.status) return false;
+
+    // If any status value is NOT 'ok', mark as out of range
+    return Object.values(plantData.status).some(statusValue => statusValue !== 'ok');
   };
 
   return (
