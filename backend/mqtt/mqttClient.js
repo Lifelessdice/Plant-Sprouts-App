@@ -54,7 +54,7 @@ mqttClient.on("message", function (topic, message) {
       break;
   }
 
-  console.log(" Updated Sensor Data:", mqttData);
+  console.log("Updated Sensor Data:", mqttData);
 });
 
 // Reusable publish function

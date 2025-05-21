@@ -1,4 +1,3 @@
-// utils/plantStatusChecker.js
 function checkPlantConditions(plant, sensorData) {
   const results = {};
 
