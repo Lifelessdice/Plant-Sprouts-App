@@ -1,6 +1,6 @@
 import { Alert } from 'react-native';
 import { auth, db } from '../firebase';
-import { createUserWithEmailAndPassword, sendEmailVerification,signInWithEmailAndPassword,sendPasswordResetEmail} from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { View, StyleSheet, Text,TextInput } from 'react-native';
@@ -77,64 +77,61 @@ else {
 };
 
 
-{/* sign up Function*/}
-const Signup = async() => {
- if (email.trim() === '') {
-     Alert.alert(' Enter your email');
-   return; }
+// Function to create a new account 
+const Signup = async () => {
+  if (email.trim() === '') {
+    Alert.alert('Enter your email');
+    return;
+  }
   if (password.trim() === '') {
-   Alert.alert(' Enter your password');
-   return;}
-try {
+    Alert.alert('Enter your password');
+    return;
+  }
 
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    const user = result.user;
 
+    await sendEmailVerification(user);
 
+    await setDoc(doc(db, "accounts", user.uid), {
+      email: user.email,
+      username: username,
+      registeredTime: new Date().toISOString(),
+    });
 
-{/* Create new user with email and password*/}
-const result = await createUserWithEmailAndPassword(auth, email, password);
+    Alert.alert('Your account is created successfully. Please log in 🌱');
+    Alert.alert('Please verify your email. A verification link has been sent');
 
+    //  Sign the user out so they stay on LoginScreen
+    await signOut(auth);
 
-const user = result.user;
+    // Clear input fields
+    setEmail('');
+    setPassword('');
+    setUsername('');
+    setname(false); // Hide name input again
 
-
-await sendEmailVerification(user);
-
-
-
-
-{/* Create user document in Firestore */}
-await setDoc(doc(db, "accounts", user.uid), {
-     email: user.email,
-     username: username,
-     registeredTime: new Date().toISOString(),
- });
- Alert.alert('Your account is created successfully 🌱');
-
-
- Alert.alert('Please verify your email.A verification link has been sent');
- {/* Navigate back to Login */}
- navigation.navigate('LoginScreen');
-}
-catch (error)  {
-if (error.code === 'auth/email-already-in-use') {
- Alert.alert('You already have an account, just log in');
-} else if (error.code === 'auth/invalid-email') {
- Alert.alert('Enter a valid Email');
-} else if (error.code === 'auth/wrong-password') {
-   alert('Incorrect password.');
-} else if (error.code === 'auth/user-not-found') {
- Alert.alert('Please create account. No account exists for this email');
-} else if (error.code === 'auth/invalid-credential') {
- Alert.alert('Try again. The email or password is incorrect.');
-
-
-} else if (error.code === 'auth/weak-password') {
-Alert.alert('Password should be at least 6 characters');}
-else {
- Alert.alert(error.message);
-}
-}
+  } catch (error) {
+    if (error.code === 'auth/email-already-in-use') {
+      Alert.alert('You already have an account, just log in');
+    } else if (error.code === 'auth/invalid-email') {
+      Alert.alert('Enter a valid Email');
+    } else if (error.code === 'auth/wrong-password') {
+      alert('Incorrect password.');
+    } else if (error.code === 'auth/user-not-found') {
+      Alert.alert('Please create account. No account exists for this email');
+    } else if (error.code === 'auth/invalid-credential') {
+      Alert.alert('Try again. The email or password is incorrect.');
+    } else if (error.code === 'auth/weak-password') {
+      Alert.alert('Password should be at least 6 characters');
+    } else {
+      Alert.alert(error.message);
+    }
+  }
 };
+
+
 
 
 return (
@@ -205,8 +202,6 @@ return (
 
 
 {/*Stylesheet all components*/}
-
-
 const styles = StyleSheet.create({
 wrapper: {
 flex: 1,
@@ -255,17 +250,6 @@ alignItems: 'center',
 marginTop: 20,
 },
 
-
-
-
-
-
-
-
-
-
-
-
 showPasswordstyle: {
 color: '#202b4a',
 textAlign: 'left',
@@ -288,70 +272,4 @@ fontWeight: 'bold',
 
 
 
-
-
-
-
-
 export default LoginScreen;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
