@@ -14,7 +14,6 @@ import { dataStore } from '../src/backendAPI.js';
 export default function HomeScreen({ navigation }) {
   const [plants, setPlants] = useState([]);
 
-  // Fetch plants when component mounts
   useEffect(() => {
     const fetchPlants = async () => {
       try {
@@ -24,7 +23,7 @@ export default function HomeScreen({ navigation }) {
           Alert.alert('Please log in to view your plants.');
           return;
         }
-        // Get ID token and register UID with backend for MQTT push
+
         const idToken = await user.getIdToken();
         console.log("Sending UID to backend:", user.uid);
         await fetch('https://mqtt-proxy-server.onrender.com/api/register-uid', {
@@ -39,18 +38,16 @@ export default function HomeScreen({ navigation }) {
           }),
         });
 
-        // Fetch plants from Firestore
         const db = getFirestore();
         const plantsCollection = collection(db, 'users', user.uid, 'plants');
         const snapshot = await getDocs(plantsCollection);
-        // Transform Firestore documents into list items
         const plantsList = snapshot.docs.map(doc => {
           const data = doc.data();
           return {
             userPlantId: doc.id,
             ...data,
             ...(data.id === 'custom' && {
-              image: require('../assets/plants/custom_plant.jpg'), // Default image for custom plants
+              image: require('../assets/plants/custom_plant.jpg'),
             }),
           };
         });
@@ -64,7 +61,6 @@ export default function HomeScreen({ navigation }) {
     fetchPlants();
   }, []);
 
-  // Handle plant deletion from Firestore and update local state
   const handleDeletePlant = (userPlantId) => {
     Alert.alert(
       'Delete Plant',
@@ -83,8 +79,6 @@ export default function HomeScreen({ navigation }) {
 
               const plantRef = doc(db, 'users', user.uid, 'plants', userPlantId);
               await deleteDoc(plantRef);
-
-              // Remove deleted plant from UI
               setPlants(prev => prev.filter(p => p.userPlantId !== userPlantId));
               Alert.alert('Plant deleted successfully');
             } catch (error) {
@@ -97,20 +91,22 @@ export default function HomeScreen({ navigation }) {
     );
   };
 
-  // New comparison logic: Use dataStore to check plant status
+  // Updated logic: check for exact keys in the status object
   const isOutOfPreferredRange = (plant) => {
-    // dataStore keys are plant.userPlantId
     const plantData = dataStore[plant.userPlantId];
     if (!plantData || !plantData.status) return false;
 
-    // If any status value is NOT 'ok', mark as out of range
-    return Object.values(plantData.status).some(statusValue => statusValue !== 'ok');
+    const status = plantData.status;
+    return (
+      status.humidity !== 'ok' ||
+      status.light !== 'ok' ||
+      status.temperature !== 'ok' ||
+      status.soilMoisture !== 'ok'
+    );
   };
 
   return (
     <View style={styles.wrapper}>
-
-      {/* Background video */}
       <View style={styles.videoWrapper}>
         <Video
           source={require('../assets/animation.mp4')}
@@ -122,14 +118,12 @@ export default function HomeScreen({ navigation }) {
         />
       </View>
 
-      {/* Top bar with title and user account button */}
       <TopBar
         title="Your Plants"
         onUserPress={() => navigation.navigate('Account')}
       />
 
       <View style={styles.container}>
-        {/* If no plants exist, show empty state message */}
         {plants.length === 0 ? (
           <View style={styles.emptyWrapper}>
             <Text style={styles.emptyTitle}>No plants yet.{'\n'}But that’s easy to fix!</Text>
@@ -154,7 +148,6 @@ export default function HomeScreen({ navigation }) {
                   navigation.navigate('PlantMonitoring', { plant: item })
                 }
               >
-                {/* Plant image*/}
                 {item.image && (
                   typeof item.image === 'string' ? (
                     <Image source={{ uri: item.image }} style={styles.image} />
@@ -162,13 +155,11 @@ export default function HomeScreen({ navigation }) {
                     <Image source={item.image} style={styles.image} />
                   )
                 )}
-                {/* Plant name and nickname */}
                 <Text style={styles.plantName}>
                   {item.id === 'custom'
                     ? item.nickname || 'Custom Plant'
                     : `${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
                 </Text>
-                {/* Delete button */}
                 <View style={styles.deleteButtonContainer}>
                   <TouchableOpacity onPress={() => handleDeletePlant(item.userPlantId)}>
                     <Text style={styles.deleteButtonText}>❌</Text>
@@ -178,7 +169,6 @@ export default function HomeScreen({ navigation }) {
             )}
           />
         )}
-        {/* Button to add a new plant (max 5 plants allowed) */}
         <CustomButton
           title="Add New Plant"
           onPress={() => {
@@ -195,7 +185,6 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
-// Styling for the screen
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
@@ -214,7 +203,6 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
   },
-
   container: {
     flex: 1,
     alignItems: 'center',
@@ -252,7 +240,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 4,
-    borderWidth: 0,        
+    borderWidth: 0,
     borderColor: 'transparent',
   },
   outOfRangeBorder: {
