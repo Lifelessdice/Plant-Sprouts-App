@@ -9,6 +9,7 @@ import CustomButton from '../components/CustomButton';
 import TopBar from '../components/TopBar';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function HomeScreen({ navigation }) {
   const [plants, setPlants] = useState([]);
@@ -18,54 +19,56 @@ export default function HomeScreen({ navigation }) {
   const [humidity, setHumidity] = useState(55);
 
   // Fetch plants when component mounts
-  useEffect(() => {
-    const fetchPlants = async () => {
-      try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (!user) {
-          Alert.alert('Please log in to view your plants.');
-          return;
-        }
-        // Get ID token and register UID with backend for MQTT push
-        const idToken = await user.getIdToken();
-        console.log("Sending UID to backend:", user.uid);
-        await fetch('https://mqtt-proxy-server.onrender.com/api/register-uid', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({
-            uid: user.uid,
-            email: user.email,
-          }),
-        });
-
-        // Fetch plants from Firestore
-        const db = getFirestore();
-        const plantsCollection = collection(db, 'users', user.uid, 'plants');
-        const snapshot = await getDocs(plantsCollection);
-        // Transform Firestore documents into list items
-        const plantsList = snapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            userPlantId: doc.id,
-            ...data,
-            ...(data.id === 'custom' && {
-              image: require('../assets/plants/custom_plant.jpg'), // Set default image for custom plants
+  useFocusEffect(  
+    React.useCallback(() => {
+      const fetchPlants = async () => {
+        try {
+          const auth = getAuth();
+          const user = auth.currentUser;
+          if (!user) {
+            Alert.alert('Please log in to view your plants.');
+            return;
+          }
+          // Get ID token and register UID with backend for MQTT push
+          const idToken = await user.getIdToken();
+          console.log("Sending UID to backend:", user.uid);
+          await fetch('https://mqtt-proxy-server.onrender.com/api/register-uid', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({
+              uid: user.uid,
+              email: user.email,
             }),
-          };
-        });
-        setPlants(plantsList);
-      } catch (error) {
-        console.error('Error fetching plants:', error);
-        Alert.alert('Failed to load plants.');
-      }
-    };
+          });
 
-    fetchPlants();
-  }, []);
+          // Fetch plants from Firestore
+          const db = getFirestore();
+          const plantsCollection = collection(db, 'users', user.uid, 'plants');
+          const snapshot = await getDocs(plantsCollection);
+          // Transform Firestore documents into list items
+          const plantsList = snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              userPlantId: doc.id,
+              ...data,
+              ...(data.id === 'custom' && {
+                image: require('../assets/plants/custom_plant.jpg'), // Set default image for custom plants
+              }),
+            };
+          });
+          setPlants(plantsList);
+        } catch (error) {
+          console.error('Error fetching plants:', error);
+          Alert.alert('Failed to load plants.');
+        }
+      };
+
+      fetchPlants();
+    }, [])
+  );
 
   // Handle plant deletion from Firestore and update local state
   const handleDeletePlant = (userPlantId) => {
@@ -110,7 +113,7 @@ export default function HomeScreen({ navigation }) {
     ];
     // Return true if any value is outside the min-max range
     return checks.some(({ value, preferred }) => {
-      if (!preferred) return false;
+      if (!preferred || !value) return false;
       const { min, max } = preferred;
       const belowMin = min != null && value < min;
       const aboveMax = max != null && value > max;
