@@ -1,3 +1,5 @@
+// The screen that displays sensor data for a user plant
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -49,8 +51,9 @@ export default function PlantMonitoringScreen({ route }) {
 
     const interval = setInterval(() => {
       const plantId = plantData.userPlantId;
-      const currentData = dataStore[plantId]?.sensorData;
+      const currentData = dataStore[plantId]?.sensorData;  // Get current data for the plant
 
+      // Update the local state
       if (currentData) {
         // Set sensorData to the latest readings (could be null if missing)
         setSensorData({
@@ -60,7 +63,7 @@ export default function PlantMonitoringScreen({ route }) {
           moisture: currentData.moisture,
         });
       }
-    }, 5000);
+    }, 5000); // every 5 seconds
 
     return () => clearInterval(interval); //Cleanup on unmount.
   }, [plantData.userPlantId]);
