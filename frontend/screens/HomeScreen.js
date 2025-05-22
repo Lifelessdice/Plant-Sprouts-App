@@ -10,13 +10,10 @@ import TopBar from '../components/TopBar';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 import { useFocusEffect } from '@react-navigation/native';
+import { dataStore } from '../src/backendAPI.js';
 
 export default function HomeScreen({ navigation }) {
   const [plants, setPlants] = useState([]);
-  const [soilMoisture, setSoilMoisture] = useState(45);
-  const [lightLevel, setLightLevel] = useState(800);
-  const [temperature, setTemperature] = useState(22);
-  const [humidity, setHumidity] = useState(55);
 
   // Fetch plants when component mounts
   useFocusEffect(  
@@ -70,7 +67,6 @@ export default function HomeScreen({ navigation }) {
     }, [])
   );
 
-  // Handle plant deletion from Firestore and update local state
   const handleDeletePlant = (userPlantId) => {
     Alert.alert(
       'Delete Plant',
@@ -89,8 +85,6 @@ export default function HomeScreen({ navigation }) {
 
               const plantRef = doc(db, 'users', user.uid, 'plants', userPlantId);
               await deleteDoc(plantRef);
-
-              // Remove deleted plant from UI
               setPlants(prev => prev.filter(p => p.userPlantId !== userPlantId));
               Alert.alert('Plant deleted successfully');
             } catch (error) {
@@ -103,28 +97,22 @@ export default function HomeScreen({ navigation }) {
     );
   };
 
-  // Check if current sensor values are outside the preferred range for a plant
+  // Updated logic: check for exact keys in the status object
   const isOutOfPreferredRange = (plant) => {
-    const checks = [
-      { value: soilMoisture, preferred: plant.preferredSoilMoisture },
-      { value: lightLevel, preferred: plant.preferredLight },
-      { value: temperature, preferred: plant.preferredTemperature },
-      { value: humidity, preferred: plant.preferredHumidity },
-    ];
-    // Return true if any value is outside the min-max range
-    return checks.some(({ value, preferred }) => {
-      if (!preferred || !value) return false;
-      const { min, max } = preferred;
-      const belowMin = min != null && value < min;
-      const aboveMax = max != null && value > max;
-      return belowMin || aboveMax;
-    });
+    const plantData = dataStore[plant.userPlantId];
+    if (!plantData || !plantData.status) return false;
+
+    const status = plantData.status;
+    return (
+      status.humidity !== 'ok' ||
+      status.light !== 'ok' ||
+      status.temperature !== 'ok' ||
+      status.soilMoisture !== 'ok'
+    );
   };
 
   return (
     <View style={styles.wrapper}>
-
-      {/* Background video */}
       <View style={styles.videoWrapper}>
         <Video
           source={require('../assets/animation.mp4')}
@@ -136,14 +124,12 @@ export default function HomeScreen({ navigation }) {
         />
       </View>
 
-      {/* Top bar with title and user account button */}
       <TopBar
         title="Your Plants"
         onUserPress={() => navigation.navigate('Account')}
       />
 
       <View style={styles.container}>
-        {/* If no plants exist, show empty state message */}
         {plants.length === 0 ? (
           <View style={styles.emptyWrapper}>
             <Text style={styles.emptyTitle}>No plants yet.{'\n'}But that’s easy to fix!</Text>
@@ -162,13 +148,20 @@ export default function HomeScreen({ navigation }) {
               <TouchableOpacity
                 style={[
                   styles.card,
-                  isOutOfPreferredRange(item) && styles.outOfRangeBorder
+                  isOutOfPreferredRange(item) && {
+                    borderColor: '#dc2626',
+                    borderWidth: 2,
+                    shadowColor: '#dc2626',
+                    shadowOpacity: 0.7,
+                    shadowRadius: 30,
+                    shadowOffset: { width: 0, height: 4 },
+                    elevation: 12,
+                  } 
                 ]}
                 onPress={() =>
                   navigation.navigate('PlantMonitoring', { plant: item })
                 }
               >
-                {/* Plant image*/}
                 {item.image && (
                   typeof item.image === 'string' ? (
                     <Image source={{ uri: item.image }} style={styles.image} />
@@ -176,13 +169,11 @@ export default function HomeScreen({ navigation }) {
                     <Image source={item.image} style={styles.image} />
                   )
                 )}
-                {/* Plant name and nickname */}
                 <Text style={styles.plantName}>
                   {item.id === 'custom'
                     ? item.nickname || 'Custom Plant'
                     : `${item.name}${item.nickname ? ' ' + item.nickname : ''}`}
                 </Text>
-                {/* Delete button */}
                 <View style={styles.deleteButtonContainer}>
                   <TouchableOpacity onPress={() => handleDeletePlant(item.userPlantId)}>
                     <Text style={styles.deleteButtonText}>❌</Text>
@@ -192,7 +183,6 @@ export default function HomeScreen({ navigation }) {
             )}
           />
         )}
-        {/* Button to add a new plant (max 5 plants allowed) */}
         <CustomButton
           title="Add New Plant"
           onPress={() => {
@@ -209,7 +199,6 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
-// Styling for the screen
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
@@ -228,7 +217,6 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
   },
-
   container: {
     flex: 1,
     alignItems: 'center',
@@ -266,7 +254,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 4,
-    borderWidth: 0,        
+    borderWidth: 0,
     borderColor: 'transparent',
   },
   outOfRangeBorder: {

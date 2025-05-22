@@ -1,7 +1,7 @@
 // The screen that allows to change the preferred conditions of a plant 
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CustomButton from '../components/CustomButton';
 import TopBar from '../components/TopBar';
@@ -9,6 +9,7 @@ import { db, auth } from '../firebase';
 import { updateDoc, doc } from 'firebase/firestore';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
+import { Video } from 'expo-av';
 
 
 export default function ChangeConditionsScreen() {
@@ -17,7 +18,6 @@ export default function ChangeConditionsScreen() {
     // Extract parameters passed through navigation
     const { label, preferred, plant, unit } = route.params || {};
     // Store the original preferred value and input states
-    const [initialPreferred] = useState(preferred); 
     const [newMax, setNewMax] = useState(preferred?.max?.toString() || '');
     const [newMin, setNewMin] = useState(preferred?.min?.toString() || '');
     
@@ -168,38 +168,61 @@ export default function ChangeConditionsScreen() {
     };
 
     return (
-    
-        <>
+    <View style={styles.container}>
+      <Video
+        source={require('../assets/animation2.mp4')}
+        style={styles.video}
+        isLooping
+        shouldPlay
+        isMuted
+        resizeMode="cover"
+      />
+
+      <View style={styles.overlay}>
         <TopBar
-          title={plant.id === 'custom'
-            ? plant.nickname || 'Custom Plant'
-            : `${plant.name}${plant.nickname ? ' ' + plant.nickname : ''}`}
+          title={
+            plant.id === 'custom'
+              ? plant.nickname || 'Custom Plant'
+              : `${plant.name}${plant.nickname ? ' ' + plant.nickname : ''}`
+          }
           onBackPress={() => navigation.goBack()}
           onUserPress={() => navigation.navigate('Account')}
         />
-
-        {label?.toLowerCase().includes('temperature') ? (EditConditions('Temperature', preferred, unit)) 
-        : 
-        label?.toLowerCase().includes('soil') ? (EditConditions('Soil Moisture', preferred, unit))
-        :
-        label?.toLowerCase().includes('light') ? (EditConditions('Light', preferred, unit))
-        :
-        label?.toLowerCase().includes('humidity') ? (EditConditions('Humidity', preferred, unit))
-        : (
+    
+ 
+        {label?.toLowerCase().includes('temperature') ? (
+          EditConditions('Temperature', preferred, unit)
+        ) : label?.toLowerCase().includes('soil') ? (
+          EditConditions('Soil Moisture', preferred, unit)
+        ) : label?.toLowerCase().includes('light') ? (
+          EditConditions('Light', preferred, unit)
+        ) : label?.toLowerCase().includes('humidity') ? (
+          EditConditions('Humidity', preferred, unit)
+        ) : (
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.formContainer}>
               <Text style={[fonts.body]}>No preferred condition label matched.</Text>
             </View>
           </ScrollView>
         )}
-        
-      </>
-
-    );
-
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    video: {
+      ...StyleSheet.absoluteFillObject,
+      zIndex: 0,
+    },
+    overlay: {
+      flex: 1,
+      zIndex: 1,
+      backgroundColor: 'transparent',
+    },
     input: {
       width: '80%',
       backgroundColor: colors.cardBackground,
@@ -218,7 +241,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
       padding: 20,
-      backgroundColor: colors.background,
+      backgroundColor: 'transparent',
       flexGrow: 1,
     },
   });

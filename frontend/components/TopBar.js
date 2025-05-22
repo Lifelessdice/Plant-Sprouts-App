@@ -1,6 +1,6 @@
 // components/TopBar.js
 import { View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import { User, ArrowLeft } from 'lucide-react-native';
+import { Menu, ArrowLeft } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 
@@ -18,7 +18,7 @@ export default function TopBar({ title = '', onUserPress, onBackPress }) {
 
       {onUserPress && (
         <TouchableOpacity style={styles.accountButton} onPress={onUserPress}>
-          <User color={colors.primaryText} size={24} />
+          <Menu color={colors.primaryText} size={24} />
         </TouchableOpacity>
       )}
     </View>
