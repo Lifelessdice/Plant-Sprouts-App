@@ -9,57 +9,63 @@ import CustomButton from '../components/CustomButton';
 import TopBar from '../components/TopBar';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
+import { useFocusEffect } from '@react-navigation/native';
 import { dataStore } from '../src/backendAPI.js';
 
 export default function HomeScreen({ navigation }) {
   const [plants, setPlants] = useState([]);
 
-  useEffect(() => {
-    const fetchPlants = async () => {
-      try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (!user) {
-          Alert.alert('Please log in to view your plants.');
-          return;
-        }
-
-        const idToken = await user.getIdToken();
-        console.log("Sending UID to backend:", user.uid);
-        await fetch('https://mqtt-proxy-server.onrender.com/api/register-uid', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({
-            uid: user.uid,
-            email: user.email,
-          }),
-        });
-
-        const db = getFirestore();
-        const plantsCollection = collection(db, 'users', user.uid, 'plants');
-        const snapshot = await getDocs(plantsCollection);
-        const plantsList = snapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            userPlantId: doc.id,
-            ...data,
-            ...(data.id === 'custom' && {
-              image: require('../assets/plants/custom_plant.jpg'),
+  // Fetch plants when component mounts
+  useFocusEffect(  
+    React.useCallback(() => {
+      const fetchPlants = async () => {
+        try {
+          const auth = getAuth();
+          const user = auth.currentUser;
+          if (!user) {
+            Alert.alert('Please log in to view your plants.');
+            return;
+          }
+          // Get ID token and register UID with backend for MQTT push
+          const idToken = await user.getIdToken();
+          console.log("Sending UID to backend:", user.uid);
+          await fetch('https://mqtt-proxy-server.onrender.com/api/register-uid', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({
+              uid: user.uid,
+              email: user.email,
             }),
-          };
-        });
-        setPlants(plantsList);
-      } catch (error) {
-        console.error('Error fetching plants:', error);
-        Alert.alert('Failed to load plants.');
-      }
-    };
+          });
 
-    fetchPlants();
-  }, []);
+          // Fetch plants from Firestore
+          const db = getFirestore();
+          const plantsCollection = collection(db, 'users', user.uid, 'plants');
+          const snapshot = await getDocs(plantsCollection);
+          // Transform Firestore documents into list items
+          const plantsList = snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              userPlantId: doc.id,
+              ...data,
+              ...(data.id === 'custom' && {
+                image: require('../assets/plants/custom_plant.jpg'), // Set default image for custom plants
+              }),
+            };
+          });
+          setPlants(plantsList);
+        } catch (error) {
+          console.error('Error fetching plants:', error);
+          Alert.alert('Failed to load plants.');
+        }
+      };
+
+      fetchPlants();
+    }, [])
+  );
 
   const handleDeletePlant = (userPlantId) => {
     Alert.alert(
