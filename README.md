@@ -53,6 +53,7 @@ For project automation and dependency management, we use the internal Expo build
 - [Seeed_Arduino_FS library](https://github.com/Seeed-Studio/Seeed_Arduino_FS/tree/master) - v2.1.3 by SEEED Studio
 - [Seeed_Arduino_SFUD library](https://github.com/Seeed-Studio/Seeed_Arduino_SFUD) - v2.0.2  by SEEED Studio
 - [Seeed_Arduino_LCD library](https://github.com/Seeed-Studio/Seeed_Arduino_LCD) - v2.0.3 by SEEED Studio
+- [PubSubClient](https://github.com/knolleary/pubsubclient)
 
 ### Wio Terminal & Sensors
 
