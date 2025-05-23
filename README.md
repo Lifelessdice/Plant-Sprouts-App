@@ -16,3 +16,34 @@ To securely store user data and plant information, the system uses Firebase Fire
 
 For project automation and dependency management, we use the internal Expo builder for an automated build and maintain a CI/CD pipeline to ensure reliable builds and deployments.
 
+## Getting Started
+### Installation
+- [Arduino IDE](https://www.arduino.cc/en/software)
+  Install the Arduino IDE for programming the microcontroller.
+- Your IDE of choice for React Native(we recommend [VSCode](https://code.visualstudio.com/))
+  Set up your preferred code editor for frontend development.
+- [Node.js](https://nodejs.org/en) and npm
+  Install Node.js, which includes npm, the package manager.
+- Expo CLI(global install)
+  Run the following command once to installl Expo CLI globally:
+    ```bash
+    
+    npm install -g expo-cli
+    
+    ```
+- Install Project Dependencies,
+  From the root directory:
+    ```bash
+    npm install
+    ```
+
+### Running the App
+- You can start the app in development rode by runnind the ollowing from the project root directory:
+    ```bash
+    npm start
+    ```
+  The app can be run on a physical mobile device using the [Expo Go](https://expo.dev/go) app as long asit and the computer is on the same network or an IDE which has an integrated emulator like [Android Studio](https://developer.android.com/studio).
+
+  Alternatively, as a user, you can simply download the [APK file](https://expo.dev/artifacts/eas/ppdvYRdy7mZx4NdxtPQ8xh.apk), install it on your Android device, and start using the app immediately.
+
+
