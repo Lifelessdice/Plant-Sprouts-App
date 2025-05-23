@@ -47,7 +47,7 @@ For project automation and dependency management, we use the internal Expo build
 
 
 ### Libraries
-- [Seeed_Arduino_rpcWiFi library](https://github.com/Seeed-Studio/Seeed_Arduino_rpcWiFi)
+- [Seeed_Arduino_rpcWiFi library](https://github.com/Seeed-Studio/Seeed_Arduino_rpcWiFi) - V1.1.0 by SEEED Studio
 
 ### Wio Terminal & Sensors
 
