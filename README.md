@@ -4,7 +4,7 @@
 
 SmartSprout is an innovative smart plant monitoring system designed to help users keep their plants healthy effortlessly. It consists of two main components: a sensor device equipped with sensors to measure temperature, humidity, light, and soil moisture, and a mobile application that displays real-time data and alerts users when their plants need attention.
 
-You can check out this video summary that highlights the motivation behind the project, the system’s key features, and a quick walkthrough of the mobile app interface.
+You can check out this [video summary](https://youtu.be/gEOn5OL3ei8) that highlights the motivation behind the project, the system’s key features, and a quick walkthrough of the mobile app interface.
 
 SmartSrpout is a great project for anyone interested in learning about Wio terminals, sensor integration, MQTT connectivity, real-time data visualization, and mobile app development.
 
