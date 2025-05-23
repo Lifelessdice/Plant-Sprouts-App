@@ -18,12 +18,10 @@ For project automation and dependency management, we use the internal Expo build
 
 ## Getting Started
 ### Installation
-- [Arduino IDE](https://www.arduino.cc/en/software)
-  Install the Arduino IDE for programming the microcontroller.
-- Your IDE of choice for React Native(we recommend [VSCode](https://code.visualstudio.com/))
-  Set up your preferred code editor for frontend development.
-- [Node.js](https://nodejs.org/en) and npm
-  Install Node.js, which includes npm, the package manager.
+- Download and install the [Arduino IDE](https://www.arduino.cc/en/software) to flash code to the microcontroller.
+- Your IDE of choice for React Native(we recommend [VSCode](https://code.visualstudio.com/)).
+- Download and install [Node.js](https://nodejs.org/en) which comes bundled with `npm`.
+ 
 - Expo CLI(global install)
   Run the following command once to installl Expo CLI globally:
 
