@@ -1,4 +1,6 @@
-![logo](uploads/9d4712268f39c2db550dcad2bb3a2139/logo.png)
+![SmartSprout Logo](https://git.chalmers.se/courses/dit113/2025/group-20/system-development/-/wikis/uploads/9d4712268f39c2db550dcad2bb3a2139/logo.png)
+
+
 
 SmartSprout is an innovative smart plant monitoring system designed to help users keep their plants healthy effortlessly. It consists of two main components: a sensor device equipped with sensors to measure temperature, humidity, light, and soil moisture, and a mobile application that displays real-time data and alerts users when their plants need attention.
 
