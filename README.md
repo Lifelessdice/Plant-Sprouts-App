@@ -46,3 +46,23 @@ For project automation and dependency management, we use the internal Expo build
   Alternatively, as a user, you can simply download the [APK file](https://expo.dev/artifacts/eas/ppdvYRdy7mZx4NdxtPQ8xh.apk), install it on your Android device, and start using the app immediately.
 
 
+### Libraries
+
+### Wio Terminal & Sensors
+
+## System Design 
+The **SmartSprout** mobile app uses **Firebase Firestore** to store plant-specific metadata and user authentication. Firestore is a scalable, cloud-hosted NoSQL datbase that updated in real time across all devices.
+
+---
+
+The system is composed of the following core components:
+- A **React Native** frontend built with **Expo**
+- A **Node.js + Express** backend
+- A **Firebase Firestore** cloud database
+- MQTT integration via **HiveMQ** for real-time communication with IoT devices
+
+The frontend and backend together form the complete application. The frontend handles all user interactions, while the backend manages data processing and serves as the bridge between Firebase, MQTT, and the app.
+
+
+
+
