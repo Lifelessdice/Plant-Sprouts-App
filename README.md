@@ -63,6 +63,9 @@ The system is composed of the following core components:
 
 The frontend and backend together form the complete application. The frontend handles all user interactions, while the backend manages data processing and serves as the bridge between Firebase, MQTT, and the app.
 
+
+![System Architecture Diagram](docs/system_architecture.png)
+
 ## Acknowledgements
 
 The SmartSprout system is our project for the course **DIT114: Project - Systems Development** at the University of Gothenburg during the spring semester of 2025. We would like to thank the Department of Computer Science and Engineering for providing us with the necessary hardware, sensors, and resources to carry out this project.
