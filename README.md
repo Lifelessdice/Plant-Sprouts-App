@@ -69,7 +69,7 @@ The SmartSprout system is our project for the course **DIT114: Project - Systems
 
 A special thanks to our teaching assistants **Julia** and **Karl** for their continuous guidance and valuable feedback throughout the development process.
 
-We also wish to acknowledge the [Quiet Quest](https://github.com/Lifelessdice/quiet-quest/tree/main) project group from a previous iteration of a related course. Their well-documented repository served as an important reference and source of inspiration for our own development work.
+We also wish to acknowledge the [Quiet Quest](https://github.com/m-berggren/quiet-quest) project group from a previous iteration of a related course. Their well-documented repository served as an important reference and source of inspiration for our own development work.
 
 We are also grateful to the online developer community, particularly **Reddit** and **Stack Overflow**, for helping us find answers to countless technical questions throughout the project.
 
