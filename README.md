@@ -57,6 +57,47 @@ For project automation and dependency management, we use the internal Expo build
 - [PubSubClient](https://github.com/knolleary/pubsubclient) - v2.8 by Nick O'Leary
 
 ### Wio Terminal & Sensors
+Connect the sensors to the WIO terminal as shown below. Use the pin layout for reference.
+
+![WioT-Pinout](uploads/2d318d0ea9ae02bf454ece4c238a6f6a/WioT-Pinout.jpg)
+
+**[Grove Temperature and Humidity Sensor](https://wiki.seeedstudio.com/Grove-TemperatureAndHumidity_Sensor/)**
+| WIO terminal | Temperature&Humidity Sensor|
+| ------ | ------ |
+|    5V    |    Red    |
+|    GND    |     Black   |
+|     D2   |     Yellow   |
+|   Not connected     |    White    |
+
+**[Grove Moisture Sensor](https://wiki.seeedstudio.com/Grove-Moisture_Sensor/)**
+| WIO Terminal| Moisture Sensor|
+| ------ | ------ |
+|    5V    |    Red    |
+|     GND   |    Brown    |
+|     A0   |     Orange   |
+
+**Blue LED**
+| WIO Terminal| LED|
+| ------ | ------ |
+|     D3   |     Anode   |
+|    GND    |     Cathode   |
+
+_**Note:** Connect cathode through a current-limiting resistor (e.g., 220Ω) to GND._
+
+**Red LED**
+| WIO Terminal| LED|
+| ------ | ------ |
+|   D4     |    Anode    |
+|   GND     |      Cathode  |
+
+_**Note:** Connect cathode through a current-limiting resistor (e.g., 220Ω) to GND._
+
+# Establishing Wi-Fi connection
+1. Connect the WIO terminal to your computer via a USB-C cable and switch it on. 
+2. Download and open [this file](https://git.chalmers.se/courses/dit113/2025/group-20/system-development/-/blob/main/Arduino/Arduino.ino?ref_type=heads) with Arduino IDE. 
+3. Enter your Wi-Fi SSID and Wi-Fi password between the quotation marks under WiFi credentials. 
+4. Upload the code to the WIO terminal.
+5. Now you can switch off the WIO terminal and disconnect it from your computer if you wish to place it further away. If you do, make sure to connect it to another power source
 
 ## System Design 
 The **SmartSprout** mobile app uses **Firebase Firestore** to store plant-specific metadata and user authentication. Firestore is a scalable, cloud-hosted NoSQL datbase that updated in real time across all devices.
