@@ -36,12 +36,12 @@ For project automation and dependency management, we use the internal Expo build
     ```
 
 ### Running the App
-- You can start the app in development rode by runnind the ollowing from the project root directory:
+- You can start the app in development mode by running the following from the project root directory:
 
     ```bash
     npm start
     ```
-  The app can be run on a physical mobile device using the [Expo Go](https://expo.dev/go) app as long asit and the computer is on the same network or an IDE which has an integrated emulator like [Android Studio](https://developer.android.com/studio).
+  The app can be run on a physical mobile device using the [Expo Go](https://expo.dev/go) app as long as it and the computer are on the same network or an IDE which has an integrated emulator like [Android Studio](https://developer.android.com/studio).
 
   Alternatively, as a user, you can simply download the [APK file](https://expo.dev/artifacts/eas/ppdvYRdy7mZx4NdxtPQ8xh.apk), install it on your Android device, and start using the app immediately.
 
