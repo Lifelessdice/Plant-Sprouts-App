@@ -59,7 +59,7 @@ For project automation and dependency management, we use the internal Expo build
 ### Wio Terminal & Sensors
 Connect the sensors to the WIO terminal as shown below. Use the pin layout for reference.
 
-![WioT-Pinout](https://git.chalmers.se/courses/dit113/2025/group-20/system-development/-/blob/8b5202384972d8648cda7fdc16206ce1c128f5f6/docs/WioT-Pinout.jpg)
+![WioT-Pinout](https://git.chalmers.se/courses/dit113/2025/group-20/system-development/-/raw/main/docs/WioT-Pinout.jpg?ref_type=heads)
 
 **[Grove Temperature and Humidity Sensor](https://wiki.seeedstudio.com/Grove-TemperatureAndHumidity_Sensor/)**
 | WIO terminal | Temperature&Humidity Sensor|
