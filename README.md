@@ -75,5 +75,11 @@ We are also grateful to the online developer community, particularly **Reddit** 
 
 Lastly, a huge thank you to **ChatGPT** for assisting us with explanations, debugging help, and technical writing support across every phase of development.
 
+## Team
+
+| ![Vijaykrishnan](docs/profiles/vijay-placeholder.png)                                     | ![Ulyana](docs/profiles/ulyana-placeholder.png)                                                  | ![Rahat](docs/profiles/rahat-placeholder.png)                                         | ![Sumaya](docs/profiles/sumaya-placeholder.png)                                | ![Mirza](docs/profiles/mirza-placeholder.png)                                                      |
+|-------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| **Vijaykrishnan Gopalakrishnan**                                                          | **Ulyana Harabets**                                                                              | **Rahat Mir**                                                                          | **Sumaya Omar**                                                                   | **Mirza Raian Ahmad**                                                                                 |
+| Made significant contributions to the frontend UI  .                                      | Led frontend development with animations, code refactoring, and interface polish.                | Developed the  backend, MQTT connection on the app side, and sensor UI logic. Refactored the code into the backend and the frontend       | Worked on login page and connected frontend to Firebase authentication database. | Responsible for all Arduino, Wio Terminal, and sensor integration and MQTT setup on hardware side. |
 
 
