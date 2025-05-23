@@ -102,6 +102,8 @@ _**Note:** Connect cathode through a current-limiting resistor (e.g., 220Ω) to 
 ## System Design 
 The **SmartSprout** mobile app uses **Firebase Firestore** to store plant-specific metadata and user authentication. Firestore is a scalable, cloud-hosted NoSQL datbase that updated in real time across all devices.
 
+![EER Diagram](docs\eer_diagram.png)
+
 ---
 
 The system is composed of the following core components:
