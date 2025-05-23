@@ -63,6 +63,17 @@ The system is composed of the following core components:
 
 The frontend and backend together form the complete application. The frontend handles all user interactions, while the backend manages data processing and serves as the bridge between Firebase, MQTT, and the app.
 
+## Acknowledgements
+
+The SmartSprout system is our project for the course **DIT114: Project - Systems Development** at the University of Gothenburg during the spring semester of 2025. We would like to thank the Department of Computer Science and Engineering for providing us with the necessary hardware, sensors, and resources to carry out this project.
+
+A special thanks to our teaching assistants **Julia** and **Karl** for their continuous guidance and valuable feedback throughout the development process.
+
+We also wish to acknowledge the [Quiet Quest](https://github.com/Lifelessdice/quiet-quest/tree/main) project group from a previous iteration of a related course. Their well-documented repository served as an important reference and source of inspiration for our own development work.
+
+We are also grateful to the online developer community, particularly **Reddit** and **Stack Overflow**, for helping us find answers to countless technical questions throughout the project.
+
+Lastly, a huge thank you to **ChatGPT** for assisting us with explanations, debugging help, and technical writing support across every phase of development.
 
 
 
