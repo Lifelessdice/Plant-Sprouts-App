@@ -26,6 +26,7 @@ For project automation and dependency management, we use the internal Expo build
   Install Node.js, which includes npm, the package manager.
 - Expo CLI(global install)
   Run the following command once to installl Expo CLI globally:
+
     ```bash
     
     npm install -g expo-cli
@@ -33,12 +34,14 @@ For project automation and dependency management, we use the internal Expo build
     ```
 - Install Project Dependencies,
   From the root directory:
+
     ```bash
     npm install
     ```
 
 ### Running the App
 - You can start the app in development rode by runnind the ollowing from the project root directory:
+
     ```bash
     npm start
     ```
