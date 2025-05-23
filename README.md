@@ -51,6 +51,7 @@ For project automation and dependency management, we use the internal Expo build
 - [Seeed_Arduino_rpcUnified library](https://github.com/Seeed-Studio/Seeed_Arduino_rpcUnified) - v2.1.4 by SEEED Studio
 - [Seeed_Arduino_mbedtls library](https://github.com/Seeed-Studio/Seeed_Arduino_mbedtls/tree/dev) - v3.0.2 by SEEED Studio
 - [Seeed_Arduino_FS library](https://github.com/Seeed-Studio/Seeed_Arduino_FS/tree/master) - v2.1.3 by SEEED Studio
+- [Seeed_Arduino_SFUD library](https://github.com/Seeed-Studio/Seeed_Arduino_SFUD)
 - [Seeed_Arduino_LCD library](https://github.com/Seeed-Studio/Seeed_Arduino_LCD) - v2.0.3 by SEEED Studio
 
 ### Wio Terminal & Sensors
