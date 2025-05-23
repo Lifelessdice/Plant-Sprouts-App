@@ -28,9 +28,7 @@ For project automation and dependency management, we use the internal Expo build
   Run the following command once to installl Expo CLI globally:
 
     ```bash
-    
     npm install -g expo-cli
-    
     ```
 - Install Project Dependencies,
   From the root directory:
