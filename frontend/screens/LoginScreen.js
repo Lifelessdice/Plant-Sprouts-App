@@ -1,6 +1,6 @@
 import { Alert } from 'react-native';
 import { auth, db } from '../firebase';
-import { createUserWithEmailAndPassword, sendEmailVerification,signInWithEmailAndPassword,sendPasswordResetEmail} from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification,signInWithEmailAndPassword,sendPasswordResetEmail,signOut} from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { View, StyleSheet, Text,TextInput } from 'react-native';
@@ -16,7 +16,7 @@ const [showPassword, setShowPassword] = useState(false);
 const [showname, setname] = useState(false);
 
 
-{/* Function for password reset emails */}
+// Function for password reset emails 
 const forgotPassword  = async () => {
 if (!email.trim()){
 Alert.alert('Enter your email');
@@ -30,9 +30,7 @@ Alert.alert('error', error.message);
 };
 
 
-
-
-{/* login Function*/}
+// login Function
 
 
 const  userLogin = async () => {
@@ -77,7 +75,7 @@ else {
 };
 
 
-{/* sign up Function*/}
+// sign up Function
 const Signup = async() => {
  if (email.trim() === '') {
      Alert.alert(' Enter your email');
@@ -85,12 +83,17 @@ const Signup = async() => {
   if (password.trim() === '') {
    Alert.alert(' Enter your password');
    return;}
+   if (password.length < 8) {
+    Alert.alert('Password must be 8 characters long');
+    return;
+  }
+   
 try {
 
 
 
 
-{/* Create new user with email and password*/}
+//Create new user with email and password
 const result = await createUserWithEmailAndPassword(auth, email, password);
 
 
@@ -102,7 +105,7 @@ await sendEmailVerification(user);
 
 
 
-{/* Create user document in Firestore */}
+//Create user document in Firestore 
 await setDoc(doc(db, "accounts", user.uid), {
      email: user.email,
      username: username,
@@ -112,8 +115,8 @@ await setDoc(doc(db, "accounts", user.uid), {
 
 
  Alert.alert('Please verify your email.A verification link has been sent');
- {/* Navigate back to Login */}
- navigation.navigate('LoginScreen');
+ 
+ await signOut(auth);
 }
 catch (error)  {
 if (error.code === 'auth/email-already-in-use') {
@@ -129,7 +132,7 @@ if (error.code === 'auth/email-already-in-use') {
 
 
 } else if (error.code === 'auth/weak-password') {
-Alert.alert('Password should be at least 6 characters');}
+Alert.alert('Password should be at least 8 characters');}
 else {
  Alert.alert(error.message);
 }
