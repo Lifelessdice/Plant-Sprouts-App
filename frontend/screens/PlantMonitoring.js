@@ -13,17 +13,13 @@ import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 
 export default function PlantMonitoringScreen({ route }) {
-  // Navigation hook for routing
   const navigation = useNavigation();
-  // plantData holds metadata for the selected plants passed via navigation params
   const [plantData, setPlantData] = useState(route.params.plant);
-  
-  // Early return if no plant data was provided.
+
   if (!plantData) {
     return <Text>Plant not found</Text>;
   }
 
-  //Refetch plant details from Firestore whenever the screen gains focus.
   useFocusEffect(
     React.useCallback(() => {
       const fetchUpdatedPlant = async () => {
@@ -31,7 +27,7 @@ export default function PlantMonitoringScreen({ route }) {
           const plantRef = doc(db, 'users', auth.currentUser.uid, 'plants', plantData.userPlantId);
           const snapshot = await getDoc(plantRef);
           if (snapshot.exists()) {
-            setPlantData(snapshot.data()); // Update the state with the lastes plant info.
+            setPlantData(snapshot.data());
           }
         } catch (err) {
           console.error('Error fetching updated plant:', err);
@@ -41,59 +37,47 @@ export default function PlantMonitoringScreen({ route }) {
     }, [plantData.userPlantId])
   );
 
-  // seonsorData state holds the lastest sensor readings; null indicates no data has been received yet.
   const [sensorData, setSensorData] = useState(null);
+  const [status, setStatus] = useState(null);
 
-
-  //Poll the datastore every 5 second for new sensor data.
   useEffect(() => {
     if (!plantData?.userPlantId) return;
 
     const interval = setInterval(() => {
       const plantId = plantData.userPlantId;
-      const currentData = dataStore[plantId]?.sensorData;  // Get current data for the plant
+      const currentSensorData = dataStore[plantId]?.sensorData;
+      const currentStatus = dataStore[plantId]?.status;
 
-      // Update the local state
-      if (currentData) {
-        // Set sensorData to the latest readings (could be null if missing)
-        setSensorData({
-          temperature: currentData.temperature,
-          light: currentData.light,
-          humidity: currentData.humidity,
-          moisture: currentData.moisture,
-        });
+      if (currentSensorData) {
+        setSensorData(currentSensorData);
       }
-    }, 5000); // every 5 seconds
 
-    return () => clearInterval(interval); //Cleanup on unmount.
+      if (currentStatus) {
+        setStatus(currentStatus);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [plantData.userPlantId]);
 
-  const renderCard = (label, value, unit, preferred, theme) => {
-    // Determine if we have no reading
-    const noData = value == null;
-    
-    // Check if reading is outside preferred range
-    const isOutOfRange =
-      !noData &&
-      preferred &&
-      ((preferred.min != null && value < preferred.min) ||
-       (preferred.max != null && value > preferred.max));
-       //Flags for high/low to adjust styling/text
-    const aboveRange = !noData && preferred?.max != null && value > preferred.max;
-    const belowRange = !noData && preferred?.min != null && value < preferred.min;
+  const renderCard = (label, value, unit, preferred, theme, statusKey) => {
+  const noData = value == null;
+  const condition = status?.[statusKey]; // "low", "high", or "ok"
 
-    // Calculate normalized progress for dot indicator
-    const getProgress = () => {
-      if (!preferred || noData) return 0;
-      if (belowRange) return 0;
-      if (aboveRange) return 1;
-      return (value - preferred.min) / (preferred.max - preferred.min);
-    };
+  const getProgress = () => {
+    if (!preferred || noData) return 0;
+    const raw = (value - preferred.min) / (preferred.max - preferred.min);
+    return Math.max(0.05, Math.min(1, raw)); // Ensure visible progress, clamped to [0.05, 1]
+  };
 
-    return (
-      <View style={[
+  const isLow = condition === 'low';
+  const isHigh = condition === 'high';
+
+  return (
+    <View
+      style={[
         styles.card,
-        isOutOfRange && {
+        (isLow || isHigh) && {
           borderColor: '#dc2626',
           borderWidth: 2,
           shadowColor: '#dc2626',
@@ -101,66 +85,65 @@ export default function PlantMonitoringScreen({ route }) {
           shadowRadius: 30,
           shadowOffset: { width: 0, height: 4 },
           elevation: 12,
-        }
-      ]}>
-        <Text style={styles.label}>{label}</Text>
+        },
+      ]}
+    >
+      <Text style={styles.label}>{label}</Text>
 
-        {noData ? (
-          // Show 'No data' when null value.
-          <Text style={[styles.value, { color: '#9ca3af' }]}>No data</Text>
-        ) : //If we have preferred range, show progress indicator.
-        preferred?.min != null && preferred?.max != null ? (
-          <Progress.Circle
-            size={100}
-            endAngle={0.75}
-            progress={getProgress()}
-            thickness={10}
-            color={aboveRange ? '#dc2626' : belowRange ? '#f3f4f6' : theme}
-            unfilledColor={value > (preferred?.max ?? 100) ? '#fee2e2' : '#f3f4f6'}
-            borderWidth={0}
-            showsText={true}
-            formatText={() => (
-              <Text style={[styles.value, isOutOfRange && styles.alert]}>
-                {aboveRange
-                  ? `  High\n${value} ${unit}`
-                  : belowRange
-                  ? `   Low\n${value} ${unit}`
-                  : `${value} ${unit}`}
-              </Text>
-            )}
-            strokeCap="round"
-          />
-        ) : (
-          // Else just show the raw values.
-          <Text style={[styles.value, isOutOfRange && styles.alert]}>
-            {value} {unit}
-          </Text>
-        )}
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-          {preferred?.min == null && preferred?.max == null ? (
-            <Text style={styles.recommendation}>Preferred range not available</Text>
-          ) : (
-            <Text style={styles.recommendation}>
-              Preferred: {preferred.min ?? 'N/A'} - {preferred.max ?? 'N/A'} {unit}
+      {noData ? (
+        <Text style={[styles.value, { color: '#9ca3af' }]}>No data</Text>
+      ) : preferred?.min != null && preferred?.max != null ? (
+        <Progress.Circle
+          size={100}
+          endAngle={0.75}
+          progress={getProgress()}
+          thickness={10}
+          color={isHigh ? '#dc2626' : isLow ? '#f3f4f6' : theme}
+          unfilledColor={isHigh ? '#fee2e2' : '#f3f4f6'}
+          borderWidth={0}
+          showsText={true}
+          formatText={() => (
+            <Text style={[styles.value, (isLow || isHigh) && styles.alert]}>
+              {isHigh
+                ? `  High\n${value} ${unit}`
+                : isLow
+                ? `   Low\n${value} ${unit}`
+                : `${value} ${unit}`}
             </Text>
           )}
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('ChangeConditions', {
-                label,
-                preferred,
-                plant: plantData,
-                unit,
-              })
-            }
-            style={{ marginLeft: 8 }}
-          >
-            <Text style={styles.editButtonText}>✏️</Text>
-          </TouchableOpacity>
-        </View>
+          strokeCap="round"
+        />
+      ) : (
+        <Text style={[styles.value, (isLow || isHigh) && styles.alert]}>
+          {value} {unit}
+        </Text>
+      )}
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+        {preferred?.min == null && preferred?.max == null ? (
+          <Text style={styles.recommendation}>Preferred range not available</Text>
+        ) : (
+          <Text style={styles.recommendation}>
+            Preferred: {preferred.min ?? 'N/A'} - {preferred.max ?? 'N/A'} {unit}
+          </Text>
+        )}
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('ChangeConditions', {
+              label,
+              preferred,
+              plant: plantData,
+              unit,
+            })
+          }
+          style={{ marginLeft: 8 }}
+        >
+          <Text style={styles.editButtonText}>✏️</Text>
+        </TouchableOpacity>
       </View>
-    );
-  };
+    </View>
+  );
+};
+
 
   return (
     <>
@@ -193,11 +176,11 @@ export default function PlantMonitoringScreen({ route }) {
           <View style={{ paddingTop: 40 }} />
         )}
 
-        {/*Sensor data cards*/}
-        {renderCard('🌱 Soil Moisture', sensorData?.moisture, 'kPa', plantData.preferredSoilMoisture, '#DAA06D')}
-        {renderCard('☀️ Light Level', sensorData?.light, 'lux', plantData.preferredLight, '#facc15')}
-        {renderCard('🌡️ Temperature', sensorData?.temperature, '°C', plantData.preferredTemperature, '#fb923c')}
-        {renderCard('💧 Humidity', sensorData?.humidity, 'g/m3', plantData.preferredHumidity, '#60a5fa')}
+        {/* Sensor data cards */}
+        {renderCard('🌱 Soil Moisture', sensorData?.moisture, 'kPa', plantData.preferredSoilMoisture, '#DAA06D', 'soilMoisture')}
+        {renderCard('☀️ Light Level', sensorData?.light, 'lux', plantData.preferredLight, '#facc15', 'light')}
+        {renderCard('🌡️ Temperature', sensorData?.temperature, '°C', plantData.preferredTemperature, '#fb923c', 'temperature')}
+        {renderCard('💧 Humidity', sensorData?.humidity, 'g/m3', plantData.preferredHumidity, '#60a5fa', 'humidity')}
       </ScrollView>
     </>
   );
@@ -260,6 +243,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '600',
     color: '#111827',
+    textAlign: 'center',
   },
   recommendation: {
     fontSize: 14,

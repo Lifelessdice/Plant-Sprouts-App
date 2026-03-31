@@ -5,7 +5,6 @@ import{ View, Text, StyleSheet,TextInput,Alert }from 'react-native';
 import { Video } from 'expo-av';
 import CustomButton from '../components/CustomButton';
 import { doc, updateDoc, getDoc,setDoc } from 'firebase/firestore';
-import { TouchableOpacity } from 'react-native';
 import TopBar from '../components/TopBar';
 
 
@@ -20,7 +19,7 @@ const [newPassword, setnewPassword] = useState('');
 const [oldEmail, setoldEmail] = useState('');
 
 
-{/* sign out Function */}
+// Sign out Function
 const UserSignOut = () => {
 signOut(auth)
 .catch((error) => {
@@ -31,7 +30,7 @@ signOut(auth)
 
 
 
-{/* Gets current user information  */}
+// Get current user information  
 useEffect(() => {
 const getUserinformation = async () => {
 const user = auth.currentUser;
@@ -61,7 +60,7 @@ getUserinformation();
 
 
 
-{/* Function for user information update */}
+// Function for user information update
 const  changeUserInfo = async () => {
 const user = auth.currentUser;
 
@@ -107,8 +106,7 @@ setnewPassword('');
  }
 
 
-{/* Update or create user information document in Firestore*/}
-
+// Update or create user information document in Firestore
 
 const userInformation = doc(db, 'accounts', user.uid);
 const currentData = await getDoc(userInformation);
@@ -129,7 +127,7 @@ if (username.trim() !== '' && username !== currentName) {
 
 
 }
-{/*Reset UI state after updates*/}
+// Reset UI state after updates
 
 
 setAccount(false);
@@ -155,12 +153,12 @@ Alert.alert('Error', error.message);
 };
 
 
-{/* component UI*/}
+// Component UI
 return (
    <View style={styles.wrapper}>
      {/* arrow return button */}
      <TopBar
-     title=""
+     title="Account"
      onBackPress={() => navigation.goBack()} />
    {/* Background video */}
    <View style={styles.videoWrapper}>
@@ -180,9 +178,8 @@ return (
 {/* Profile */}
 <View style={styles.page}>
 <Text style={styles.header}>SmartSprout 🌱</Text>
+
 {/* Settings button */}
-
-
 {!editProfile &&!showAccount&&(
 <View style={styles.spaceBetween}>
 <CustomButton
@@ -193,7 +190,7 @@ seteditProfile(false);
 }}
 />
 <CustomButton
-title="Logout 🔒"
+title=" Logout 🔒 "
 onPress={UserSignOut}
 />
 </View>
@@ -296,10 +293,11 @@ header: {
  fontSize: 40,
  marginBottom: 10,
  fontWeight: 'bold',
+ color: '#202b4a',
 },
 setting: {
  fontSize: 20,
- color: 'black',
+ color: '#202b4a',
  marginRight: 40,
  fontWeight: 'bold',
 },
@@ -321,7 +319,8 @@ spaceBetween : {
  height: 130,
  alignItems: 'center',
  flexDirection: 'row',
- width: '70%',
+ width: '85%',
+ gap: 10,
  marginTop: 20,
 },
 
@@ -332,17 +331,17 @@ spaceBetween : {
 
 textStyle: {
  backgroundColor: '#fff',
- width: '80%',
+ width: '100%',
  borderRadius: 10,
  padding: 15,
  borderWidth: 1,
  marginBottom: 20,
- marginTop: 20,
  borderColor: '#ccc',
+ 
 },
 text : {
  fontSize: 20,
- color: 'black',
+ color: '#202b4a',
  marginRight: 40,
  fontWeight: 'bold',
 },
@@ -353,7 +352,7 @@ text : {
 accountInformationStyle: {
    fontSize: 20,
    fontWeight: 'bold',
-   color: 'black',
+   color: '#202b4a',
    textAlign: 'center', 
    padding: 20,
    width: '100%',         
@@ -377,256 +376,3 @@ zIndex: 25,
 
 
 export default ProfileScreen;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
