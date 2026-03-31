@@ -1,5 +1,6 @@
 import { Alert } from 'react-native';
 import { auth, db } from '../firebase';
+
 import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
@@ -16,7 +17,7 @@ const [showPassword, setShowPassword] = useState(false);
 const [showname, setname] = useState(false);
 
 
-{/* Function for password reset emails */}
+// Function for password reset emails 
 const forgotPassword  = async () => {
 if (!email.trim()){
 Alert.alert('Enter your email');
@@ -29,10 +30,6 @@ Alert.alert('error', error.message);
 }
 };
 
-
-
-
-{/* Login Function*/}
 
 const  userLogin = async () => {
 if (email.trim() === '') {
